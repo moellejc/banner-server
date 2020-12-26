@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import express from "express";
 import { createConnection } from "typeorm";
 import { ApolloServer } from "apollo-server-express";
@@ -8,7 +9,7 @@ import { resolvers } from "./api/resolvers";
 (async () => {
   const app = express();
 
-  // load database
+  // load database (config options in ormconfig.json)
   await createConnection();
 
   // load graphql apollo server

@@ -7,7 +7,7 @@ import {
   Field,
   Int,
 } from "type-graphql";
-import { User } from "../models/user";
+import { User } from "../entities/user";
 
 @InputType()
 class UserInput {
