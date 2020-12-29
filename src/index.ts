@@ -1,10 +1,12 @@
-import "reflect-metadata";
-import express from "express";
-import { createConnection } from "typeorm";
 import { ApolloServer } from "apollo-server-express";
-import { buildSchema } from "type-graphql";
 import cors from "cors";
+import "dotenv/config";
+import express from "express";
+import "reflect-metadata";
+import { buildSchema } from "type-graphql";
+import { createConnection } from "typeorm";
 import { resolvers } from "./api/resolvers";
+import { evalBoolean } from "./utils/EvalBoolean";
 
 (async () => {
   const app = express();
@@ -16,16 +18,17 @@ import { resolvers } from "./api/resolvers";
   const server = new ApolloServer({
     schema: await buildSchema({
       resolvers: resolvers,
+      validate: false,
     }),
     context: ({ res, req }) => ({ res, req }),
-    playground: true,
+    playground: evalBoolean(process.env.GRAPHQL_EDITOR!),
   });
 
   app.use("*", cors());
 
-  server.applyMiddleware({ app, path: "/graphql" });
+  server.applyMiddleware({ app, path: process.env.GRAPHQL_ROUTE });
 
-  app.listen({ port: 8000 }, () => {
+  app.listen({ port: process.env.APP_PORT || 3000 }, () => {
     console.log("Apollo Server on http://localhost:8000/graphql");
   });
 })();

@@ -1,8 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { Min } from "class-validator";
+import { ObjectType } from "type-graphql";
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 
+@ObjectType()
 @Entity()
-export class Post {
+export class Post extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -16,6 +24,6 @@ export class Post {
   @Min(0)
   reply_count: number;
 
-  @Column({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
+  @CreateDateColumn()
   created_at: Date;
 }
