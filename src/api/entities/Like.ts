@@ -17,12 +17,12 @@ export class Like extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Field()
+  @Field(() => User)
   @ManyToOne(() => User, (user: User) => user.likes)
   @Index("user-idx")
   user: User;
 
-  @Field()
+  @Field(() => Post)
   @ManyToOne(() => Post, (post: Post) => post.likes)
   @Index("post-idx")
   post: Post;

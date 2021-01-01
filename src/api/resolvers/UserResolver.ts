@@ -2,7 +2,11 @@ import argon2 from "argon2";
 import { validate } from "class-validator";
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
 import { getConnection } from "typeorm";
-import { createAccessToken, createRefreshToken } from "../../auth/auth";
+import {
+  createAccessToken,
+  createRefreshToken,
+  sendRefreshToken,
+} from "../../auth/auth";
 import { DUPLICATE_ENTRY } from "../../constants/ErrorCodes";
 import { AppContext } from "../../context/AppContext";
 import { User } from "../entities/User";
@@ -13,6 +17,7 @@ import {
   InvalidCredentialsError,
   ScreenNameExistsError,
   UserDoesNotExistError,
+  UserNotFound,
 } from "../errors/FieldError";
 import {
   UserLoginInput,
@@ -100,30 +105,30 @@ export class UserResolver {
       };
     }
 
-    res.cookie("jid", createRefreshToken(user), {
-      httpOnly: true,
-    });
+    sendRefreshToken(res, createRefreshToken(user));
 
     return {
       accessToken: createAccessToken(user),
     };
   }
 
-  // @Mutation(() => Boolean)
-  // logout(@Ctx() { req, res }: MyContext) {
-  //   return new Promise((resolve) =>
-  //     req.session.destroy((err) => {
-  //       res.clearCookie(COOKIE_NAME);
-  //       if (err) {
-  //         console.log(err);
-  //         resolve(false);
-  //         return;
-  //       }
+  @Mutation(() => Boolean)
+  async logout(@Ctx() { res }: AppContext) {
+    sendRefreshToken(res, "");
 
-  //       resolve(true);
-  //     })
-  //   );
-  // }
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  async revokeRefreshTokensForUser(
+    @Arg("userId", () => String) userId: string
+  ) {
+    await getConnection()
+      .getRepository(User)
+      .increment({ id: userId }, "tokenVersion", 1);
+
+    return true;
+  }
 
   @Mutation(() => Boolean)
   async updateUser(
@@ -151,7 +156,11 @@ export class UserResolver {
   }
 
   @Query(() => User)
-  async user(@Arg("id", () => Int) id: string) {
-    return await User.findOneOrFail({ id });
+  async user(@Arg("id", () => Int) id: string): Promise<UserResponse> {
+    try {
+      return { user: await User.findOneOrFail({ id }) };
+    } catch (err) {
+      return { errors: [UserNotFound] };
+    }
   }
 }

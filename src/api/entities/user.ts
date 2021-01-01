@@ -48,6 +48,9 @@ export class User extends BaseEntity {
   @Column({ name: "has_temp_password", default: false })
   hasTempPassword: boolean;
 
+  @Column({ type: "int", name: "token_version", default: 1 })
+  tokenVersion: number;
+
   @Field({ nullable: false })
   @Column({ name: "screen_name", unique: true })
   screenName: string;
@@ -85,32 +88,34 @@ export class User extends BaseEntity {
   @Column({ default: false })
   verified: boolean;
 
+  @Field(() => [Post])
   @OneToMany(() => Post, (post: Post) => post.author)
   @JoinColumn()
   posts: Post[];
 
   @Field(() => Int, { defaultValue: 0 })
-  @Column({ name: "total_posts", default: 0 })
+  @Column({ type: "int", name: "total_posts", default: 0 })
   totalPosts: number;
 
+  @Field(() => [Like])
   @OneToMany(() => Like, (like: Like) => like.user)
   @JoinColumn()
   likes: Like[];
 
   @Field(() => Int, { defaultValue: 0 })
-  @Column({ name: "totalLikes", default: 0 })
+  @Column({ type: "int", name: "totalLikes", default: 0 })
   totalLikes: number;
 
   @Field(() => Int, { defaultValue: 0 })
-  @Column({ name: "total_followers", default: 0 })
+  @Column({ type: "int", name: "total_followers", default: 0 })
   totalFollowers: number;
 
   @Field(() => Int, { defaultValue: 0 })
-  @Column({ name: "total_following", default: 0 })
+  @Column({ type: "int", name: "total_following", default: 0 })
   totalFollowing: number;
 
   @Field(() => Int, { defaultValue: 0 })
-  @Column({ name: "total_following_places", default: 0 })
+  @Column({ type: "int", name: "total_following_places", default: 0 })
   totalFollowingPlaces: number;
 
   @Field()

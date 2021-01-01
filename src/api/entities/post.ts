@@ -19,7 +19,7 @@ export class Post extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Field()
+  @Field(() => User)
   @ManyToOne(() => User, (author: User) => author.posts)
   author: User;
 
@@ -41,7 +41,7 @@ export class Post extends BaseEntity {
   @Column("int", { default: 0 })
   replyCount: number;
 
-  @OneToMany(() => Like, (like: Like) => like.postID)
+  @OneToMany(() => Like, (like: Like) => like.post)
   @JoinColumn()
   likes: Like;
 

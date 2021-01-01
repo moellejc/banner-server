@@ -4,7 +4,7 @@ import { Field, ObjectType } from "type-graphql";
 @ObjectType()
 export class FieldError {
   @Field()
-  field: string;
+  field?: string;
 
   @Field({ nullable: true })
   message?: string;
@@ -14,7 +14,7 @@ export class FieldError {
 }
 
 // error functions
-let convertValidationErrors = (
+export const convertValidationErrors = (
   validationErrors: ValidationError[]
 ): FieldError[] => {
   let convertedErrors: FieldError[] = [];
@@ -34,36 +34,31 @@ let convertValidationErrors = (
 };
 
 // predefied errors
-const GenericUserInsertError = {
+export const GenericUserInsertError = {
   field: "",
   message: "There was an issue inserting a new user",
 };
 
-const ScreenNameExistsError = {
+export const ScreenNameExistsError = {
   field: "screen_name",
   message: "Screen name already exists",
 };
 
-const EmailExistsError = {
+export const EmailExistsError = {
   field: "email",
   message: "Email already exists",
 };
 
-const UserDoesNotExistError = {
+export const UserDoesNotExistError = {
   field: "email",
   message: "User email does not exist",
 };
 
-const InvalidCredentialsError = {
+export const InvalidCredentialsError = {
   field: "password",
   message: "Invalid email or password",
 };
 
-export {
-  convertValidationErrors,
-  GenericUserInsertError,
-  ScreenNameExistsError,
-  EmailExistsError,
-  UserDoesNotExistError,
-  InvalidCredentialsError,
+export const UserNotFound = {
+  message: "User not found",
 };
