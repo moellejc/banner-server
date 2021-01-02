@@ -20,6 +20,7 @@ import {
   UserNotFound,
 } from "../errors/FieldError";
 import {
+  UserCheckEmailScreenNameInputs,
   UserLoginInput,
   UserRegisterInput,
   UserUpdateInput,
@@ -28,6 +29,20 @@ import { LoginResponse, UserResponse } from "./responses/UserResponses";
 
 @Resolver()
 export class UserResolver {
+  @Mutation(() => UserResponse)
+  async checkEmail(
+    @Arg("options", () => UserCheckEmailScreenNameInputs)
+    options: UserCheckEmailScreenNameInputs
+  ): Promise<UserResponse> {
+    const errors = convertValidationErrors(await validate(options));
+    if (errors.length > 0) {
+      return { errors };
+    }
+
+    // no existing users with email or screen name
+    return { errors: [] };
+  }
+
   @Mutation(() => UserResponse)
   async register(
     @Arg("options", () => UserRegisterInput) options: UserRegisterInput,
@@ -152,7 +167,7 @@ export class UserResolver {
 
   @Query(() => [User])
   async users() {
-    return await User.find();
+    return await User.find({ relations: ["posts"] });
   }
 
   @Query(() => User)

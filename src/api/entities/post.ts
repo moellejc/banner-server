@@ -1,3 +1,4 @@
+import { Point } from "geojson";
 import { Field, Int, ObjectType } from "type-graphql";
 import {
   BaseEntity,
@@ -9,6 +10,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { PointScalar } from "../../types/Point";
 import { Like } from "./Like";
 import { User } from "./User";
 
@@ -22,6 +24,17 @@ export class Post extends BaseEntity {
   @Field(() => User)
   @ManyToOne(() => User, (author: User) => author.posts)
   author: User;
+
+  // @Field()
+  // @ManyToMany(() => Place, (place: Place) => place.posts)
+  // placeID: Place;
+
+  @Field(() => PointScalar)
+  @Column("geometry", {
+    spatialFeatureType: "Point",
+    srid: 4326,
+  })
+  coordinates: Point;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
@@ -51,5 +64,5 @@ export class Post extends BaseEntity {
 
   @Field()
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 }

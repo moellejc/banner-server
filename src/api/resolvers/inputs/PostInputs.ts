@@ -1,4 +1,7 @@
-import { Field, Float, InputType } from "type-graphql";
+import { Point } from "geojson";
+import { Field, InputType } from "type-graphql";
+import { PointScalar } from "../../../types/Point";
+
 @InputType()
 export class PostCreateInput {
   @Field()
@@ -7,15 +10,12 @@ export class PostCreateInput {
   @Field()
   message?: string;
 
-  @Field()
-  media?: string;
+  //   @Field()
+  //   media?: string;
 
   @Field()
   placeID?: String;
 
-  @Field(() => Float)
-  longitude: number;
-
-  @Field(() => Float)
-  latitude: number;
+  @Field(() => PointScalar)
+  coordinates: Point;
 }

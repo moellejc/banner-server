@@ -1,7 +1,9 @@
 import { IsEmail, IsNotEmpty, IsOptional, MinLength } from "class-validator";
 import { Field, InputType } from "type-graphql";
+import { IsEmailAlreadyExist } from "../../validators/IsEmailAlreadyExist";
 import { IsPassword } from "../../validators/IsPassword";
 import { IsScreenName } from "../../validators/IsScreenName";
+import { IsScreenNameAlreadyExist } from "../../validators/IsScreenNameAlreadyExist";
 import { Match } from "../../validators/Match";
 
 @InputType()
@@ -16,6 +18,7 @@ export class UserRegisterInput {
 
   @Field()
   @IsEmail({}, { message: "Email is not valid" })
+  @IsEmailAlreadyExist({ message: "Email already exists" })
   email!: string;
 
   @Field()
@@ -29,6 +32,19 @@ export class UserRegisterInput {
   @Field()
   @Match("password", { message: "Passwords do not match" })
   repassword!: string;
+}
+
+@InputType()
+export class UserCheckEmailScreenNameInputs {
+  @Field()
+  @IsEmail({}, { message: "Email is not valid" })
+  @IsEmailAlreadyExist({ message: "Email already exists" })
+  email!: string;
+
+  @Field()
+  @IsScreenName({ message: "Screen name is not valid" })
+  @IsScreenNameAlreadyExist({ message: "Screen name already exists" })
+  screenName!: string;
 }
 
 @InputType()
