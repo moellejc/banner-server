@@ -13,6 +13,7 @@ import { UserRoles } from "../enums/UserRoles";
 import { UserStatuses } from "../enums/UserStatuses";
 import { UserTypes } from "../enums/UserTypes";
 import { Like } from "./Like";
+import { Media } from "./Media";
 import { Post } from "./Post";
 
 @ObjectType()
@@ -89,9 +90,13 @@ export class User extends BaseEntity {
   verified: boolean;
 
   @Field(() => [Post])
-  @OneToMany(() => Post, (post: Post) => post.author)
+  @OneToMany(() => Post, (post: Post) => post.creator)
   @JoinColumn()
   posts: Post[];
+
+  @Field(() => [Media])
+  @OneToMany(() => Media, (media: Media) => media.creator)
+  media: Media[];
 
   @Field(() => Int, { defaultValue: 0 })
   @Column({ type: "int", name: "total_posts", default: 0 })

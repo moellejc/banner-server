@@ -12,20 +12,20 @@ import { Post } from "./Post";
 import { User } from "./User";
 
 @ObjectType()
-@Entity({ name: "likes" })
-export class Like extends BaseEntity {
+@Entity({ name: "media" })
+export class Media extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @Field()
-  @Column({ name: "user_id" })
-  @Index("user-idx")
-  userID: string;
+  @Column({ name: "creator_id" })
+  @Index("creator-idx")
+  creatorID: string;
 
   @Field(() => User)
-  @ManyToOne(() => User, (user: User) => user.likes)
-  user: User;
+  @ManyToOne(() => User, (user: User) => user.media)
+  creator: User;
 
   @Field()
   @Column({ name: "post_id" })
@@ -33,7 +33,7 @@ export class Like extends BaseEntity {
   postID: string;
 
   @Field(() => Post)
-  @ManyToOne(() => Post, (post: Post) => post.likes)
+  @ManyToOne(() => Post, (post: Post) => post.media)
   post: Post;
 
   @Field()

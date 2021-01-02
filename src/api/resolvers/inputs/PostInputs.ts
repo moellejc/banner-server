@@ -5,10 +5,10 @@ import { PointScalar } from "../../../types/Point";
 @InputType()
 export class PostCreateInput {
   @Field()
-  authorID!: string;
+  creatorID!: string;
 
   @Field()
-  message?: string;
+  text?: string;
 
   //   @Field()
   //   media?: string;

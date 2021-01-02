@@ -10,15 +10,15 @@ import {
 import { DUPLICATE_ENTRY } from "../../constants/ErrorCodes";
 import { AppContext } from "../../context/AppContext";
 import { User } from "../entities/User";
+import { convertValidationErrors } from "../errors/FieldError";
 import {
-  convertValidationErrors,
   EmailExistsError,
   GenericUserInsertError,
   InvalidCredentialsError,
   ScreenNameExistsError,
   UserDoesNotExistError,
   UserNotFound,
-} from "../errors/FieldError";
+} from "../errors/UserErrors";
 import {
   UserCheckEmailScreenNameInputs,
   UserLoginInput,

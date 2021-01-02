@@ -29,9 +29,12 @@ export const PointScalar = new GraphQLScalarType({
 
     let p: Point = { type: "Point", coordinates: [] };
     try {
-      p.type = ast.fields[0].value.value;
+      //@ts-ignore
+      p.type = ast.fields[0].value.value!;
       p.coordinates = [
+        //@ts-ignore
         ast.fields[1].value.values[0].value as number,
+        //@ts-ignore
         ast.fields[1].value.values[1].value as number,
       ];
     } catch {

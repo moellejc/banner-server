@@ -27,13 +27,13 @@ export class PostResolver {
       return { errors };
     }
 
-    let author: User = new User();
+    let creator: User = new User();
 
     // find author
     try {
-      author = (await User.findOne({ id: options.authorID })) || new User();
+      creator = (await User.findOne({ id: options.creatorID })) || new User();
 
-      if (!author.id) {
+      if (!creator.id) {
         return { errors: [PostAuthorNotFound] };
       }
     } catch (err) {
@@ -50,8 +50,8 @@ export class PostResolver {
         .insert()
         .into(Post)
         .values({
-          author: author,
-          message: options.message,
+          creator: creator,
+          text: options.text,
           coordinates: options.coordinates,
         })
         .returning("*")
@@ -68,7 +68,7 @@ export class PostResolver {
     try {
       await getConnection()
         .getRepository(User)
-        .increment({ id: author!.id }, "totalPosts", 1);
+        .increment({ id: creator!.id }, "totalPosts", 1);
     } catch (err) {
       logger.error(err);
       return { errors: [TotalPostsNotIncremented] };
@@ -79,7 +79,7 @@ export class PostResolver {
 
   @Query(() => [Post])
   async posts() {
-    return await Post.find({ relations: ["author"] });
+    return await Post.find({ relations: ["creator"] });
   }
 
   @Mutation(() => Boolean)
@@ -88,14 +88,14 @@ export class PostResolver {
       // ensure the post exists
       let postToDelete = await Post.findOneOrFail(
         { id },
-        { relations: ["author"] }
+        { relations: ["creator"] }
       );
 
       // decrement total posts from the user
       await getConnection()
         .getRepository(User)
         .decrement(
-          { id: postToDelete.author.id, totalPosts: MoreThan(0) },
+          { id: postToDelete.creator.id, totalPosts: MoreThan(0) },
           "totalPosts",
           1
         );

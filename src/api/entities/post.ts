@@ -12,6 +12,8 @@ import {
 } from "typeorm";
 import { PointScalar } from "../../types/Point";
 import { Like } from "./Like";
+import { Media } from "./Media";
+import { PostReply } from "./PostReply";
 import { User } from "./User";
 
 @ObjectType()
@@ -21,9 +23,13 @@ export class Post extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
+  @Field()
+  @Column({ name: "creator_id" })
+  creatorID!: string;
+
   @Field(() => User)
   @ManyToOne(() => User, (author: User) => author.posts)
-  author: User;
+  creator!: User;
 
   // @Field()
   // @ManyToMany(() => Place, (place: Place) => place.posts)
@@ -38,17 +44,14 @@ export class Post extends BaseEntity {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  message: string;
+  text: string;
 
-  @Field({ nullable: true })
-  @Column({ nullable: true })
-  photo_url: string;
+  @Field(() => [Media])
+  @OneToMany(() => Media, (media: Media) => media.post)
+  media: [Media];
 
-  @Field({ nullable: true })
-  @Column({ nullable: true })
-  video_url: string;
-
-  // TODO: replies
+  @OneToMany(() => PostReply, (reply: PostReply) => reply.post)
+  replies: [PostReply];
 
   @Field(() => Int, { defaultValue: 0 })
   @Column("int", { default: 0 })
@@ -56,7 +59,7 @@ export class Post extends BaseEntity {
 
   @OneToMany(() => Like, (like: Like) => like.post)
   @JoinColumn()
-  likes: Like;
+  likes: [Like];
 
   @Field(() => Int, { defaultValue: 0 })
   @Column("int", { default: 0 })
