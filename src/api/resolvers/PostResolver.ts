@@ -1,13 +1,23 @@
 import { validate } from "class-validator";
-import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
+import {
+  Arg,
+  Ctx,
+  Mutation,
+  Query,
+  Resolver,
+  UseMiddleware,
+} from "type-graphql";
 import { getConnection, InsertResult, MoreThan } from "typeorm";
 import { AppContext } from "../../context/AppContext";
-import { logger } from "../../Logging/Logger";
+import { logger } from "../../lib/logger/Logger";
+import { isAuth } from "../../middlewares/isAuth";
+import { Media } from "../entities/Media";
 import { Post } from "../entities/Post";
 import { User } from "../entities/User";
 import { convertValidationErrors } from "../errors/FieldError";
 import {
   PostAuthorNotFound,
+  PostMediaNotInserted,
   PostNotCreated,
   TotalPostsNotIncremented,
 } from "../errors/PostErrors";
@@ -17,9 +27,10 @@ import { PostResponse } from "./responses/PostResponses";
 @Resolver()
 export class PostResolver {
   @Mutation(() => PostResponse)
+  @UseMiddleware(isAuth)
   async createPost(
     @Arg("options", () => PostCreateInput) options: PostCreateInput,
-    @Ctx() { req, res }: AppContext
+    @Ctx() context: AppContext
   ): Promise<PostResponse> {
     const errors = convertValidationErrors(await validate(options));
     if (errors.length > 0) {
@@ -31,7 +42,8 @@ export class PostResolver {
 
     // find author
     try {
-      creator = (await User.findOne({ id: options.creatorID })) || new User();
+      creator =
+        (await User.findOne({ id: context.jwtPayload?.userID })) || new User();
 
       if (!creator.id) {
         return { errors: [PostAuthorNotFound] };
@@ -41,7 +53,7 @@ export class PostResolver {
       return { errors: [PostAuthorNotFound] };
     }
 
-    let post;
+    let post: Post;
 
     // insert post
     try {
@@ -50,6 +62,7 @@ export class PostResolver {
         .insert()
         .into(Post)
         .values({
+          creatorID: context.jwtPayload?.userID,
           creator: creator,
           text: options.text,
           coordinates: options.coordinates,
@@ -62,6 +75,18 @@ export class PostResolver {
     } catch (err) {
       logger.error(err);
       return { errors: [PostNotCreated] };
+    }
+
+    // insert media
+    try {
+      if (options.media) {
+        options.media?.forEach(async (value: Media) => {
+          let m = await value.save();
+          post.media.push(m);
+        });
+      }
+    } catch (err) {
+      return { errors: [PostMediaNotInserted] };
     }
 
     // increment post total on users
@@ -83,11 +108,15 @@ export class PostResolver {
   }
 
   @Mutation(() => Boolean)
-  async deletePost(@Arg("id", () => String) id: string) {
+  @UseMiddleware(isAuth)
+  async deletePost(
+    @Arg("id", () => String) id: string,
+    @Ctx() context: AppContext
+  ) {
     try {
       // ensure the post exists
       let postToDelete = await Post.findOneOrFail(
-        { id },
+        { id, creatorID: context.jwtPayload?.userID },
         { relations: ["creator"] }
       );
 
@@ -95,7 +124,7 @@ export class PostResolver {
       await getConnection()
         .getRepository(User)
         .decrement(
-          { id: postToDelete.creator.id, totalPosts: MoreThan(0) },
+          { id: context.jwtPayload?.userID, totalPosts: MoreThan(0) },
           "totalPosts",
           1
         );

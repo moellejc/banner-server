@@ -1,17 +1,16 @@
 import { Point } from "geojson";
 import { Field, InputType } from "type-graphql";
+import { MediaScalar } from "../../../types/MediaScalar";
 import { PointScalar } from "../../../types/Point";
+import { Media } from "../../entities/Media";
 
 @InputType()
 export class PostCreateInput {
   @Field()
-  creatorID!: string;
-
-  @Field()
   text?: string;
 
-  //   @Field()
-  //   media?: string;
+  @Field(() => [MediaScalar], { nullable: true })
+  media?: [Media];
 
   @Field()
   placeID?: String;

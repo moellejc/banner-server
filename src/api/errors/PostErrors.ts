@@ -13,3 +13,7 @@ export const PostAuthorNotFound = {
 export const PostNotDeleted = {
   message: "Post was not deleted",
 };
+
+export const PostMediaNotInserted = {
+  message: "Media was not added to the post",
+};

@@ -20,7 +20,7 @@ export class Like extends BaseEntity {
 
   @Field()
   @Column({ name: "user_id" })
-  @Index("user-idx")
+  @Index("likes-userid-idx")
   userID: string;
 
   @Field(() => User)
@@ -29,7 +29,7 @@ export class Like extends BaseEntity {
 
   @Field()
   @Column({ name: "post_id" })
-  @Index("post-idx")
+  @Index("likes-post-idx")
   postID: string;
 
   @Field(() => Post)

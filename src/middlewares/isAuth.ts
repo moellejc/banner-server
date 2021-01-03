@@ -4,6 +4,7 @@ import { AppContext } from "../context/AppContext";
 
 export const isAuth: MiddlewareFn<AppContext> = ({ context }, next) => {
   const authorization = context.req.headers["authorization"];
+  console.log(authorization);
 
   if (!authorization) {
     throw new Error("not authenticated");

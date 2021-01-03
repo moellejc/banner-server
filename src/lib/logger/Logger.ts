@@ -1,6 +1,6 @@
 import * as winston from "winston";
-import { EnvLevels } from "../constants/EnvLevels";
-import { LoggingLevels } from "../constants/LoggingLevels";
+import { EnvLevels } from "../../constants/EnvLevels";
+import { LoggingLevels } from "../../constants/LoggingLevels";
 
 const logger = winston.createLogger({
   level: "info",

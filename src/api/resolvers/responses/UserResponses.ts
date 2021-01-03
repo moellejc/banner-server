@@ -12,6 +12,18 @@ export class UserResponse {
 }
 
 @ObjectType()
+export class RegisterResponse {
+  @Field()
+  accessToken?: string;
+
+  @Field(() => User)
+  user?: User;
+
+  @Field(() => [FieldError], { nullable: true })
+  errors?: FieldError[];
+}
+
+@ObjectType()
 export class LoginResponse {
   @Field()
   accessToken?: string;

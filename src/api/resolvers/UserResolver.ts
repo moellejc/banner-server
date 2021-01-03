@@ -1,6 +1,14 @@
 import argon2 from "argon2";
 import { validate } from "class-validator";
-import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
+import {
+  Arg,
+  Ctx,
+  Int,
+  Mutation,
+  Query,
+  Resolver,
+  UseMiddleware,
+} from "type-graphql";
 import { getConnection } from "typeorm";
 import {
   createAccessToken,
@@ -9,6 +17,7 @@ import {
 } from "../../auth/auth";
 import { DUPLICATE_ENTRY } from "../../constants/ErrorCodes";
 import { AppContext } from "../../context/AppContext";
+import { isAuth } from "../../middlewares/isAuth";
 import { User } from "../entities/User";
 import { convertValidationErrors } from "../errors/FieldError";
 import {
@@ -25,7 +34,11 @@ import {
   UserRegisterInput,
   UserUpdateInput,
 } from "./inputs/UserInputs";
-import { LoginResponse, UserResponse } from "./responses/UserResponses";
+import {
+  LoginResponse,
+  RegisterResponse,
+  UserResponse,
+} from "./responses/UserResponses";
 
 @Resolver()
 export class UserResolver {
@@ -43,11 +56,11 @@ export class UserResolver {
     return { errors: [] };
   }
 
-  @Mutation(() => UserResponse)
+  @Mutation(() => RegisterResponse)
   async register(
     @Arg("options", () => UserRegisterInput) options: UserRegisterInput,
     @Ctx() { req, res }: AppContext
-  ): Promise<UserResponse> {
+  ): Promise<RegisterResponse> {
     const errors = convertValidationErrors(await validate(options));
     if (errors.length > 0) {
       return { errors };
@@ -55,7 +68,7 @@ export class UserResolver {
 
     // hash password
     const hashedPassword = await argon2.hash(options.password);
-    let user;
+    let user: User = new User();
 
     try {
       const insertUserQuery = getConnection()
@@ -70,10 +83,9 @@ export class UserResolver {
           password: hashedPassword,
         })
         .returning("*");
-      await insertUserQuery.execute();
-      user = await User.findOne({ email: options.email });
+      let userRes = await insertUserQuery.execute();
+      user = userRes.generatedMaps[0] as User;
     } catch (err) {
-      console.log(err);
       // duplicate username error
       if (err.code === DUPLICATE_ENTRY) {
         const errDetail: string = err.detail.toLowerCase();
@@ -90,11 +102,15 @@ export class UserResolver {
       }
     }
 
-    // store user id session
-    // this will set a cookie on the user
-    // keep them logged in
-    // req.session.userId = user.id;
-    return { user };
+    // create JWT
+    sendRefreshToken(res, createRefreshToken(user));
+
+    return {
+      accessToken: createAccessToken(user),
+      user: user,
+    };
+
+    // return { user };
   }
 
   @Mutation(() => LoginResponse)
@@ -125,6 +141,17 @@ export class UserResolver {
     return {
       accessToken: createAccessToken(user),
     };
+  }
+
+  @Query(() => User, { nullable: true })
+  @UseMiddleware(isAuth)
+  me(@Ctx() context: AppContext) {
+    try {
+      return User.findOne(context.jwtPayload?.userID);
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
   }
 
   @Mutation(() => Boolean)

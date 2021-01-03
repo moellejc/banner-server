@@ -50,6 +50,7 @@ export class Post extends BaseEntity {
   @OneToMany(() => Media, (media: Media) => media.post)
   media: [Media];
 
+  @Field(() => [PostReply])
   @OneToMany(() => PostReply, (reply: PostReply) => reply.post)
   replies: [PostReply];
 
@@ -57,6 +58,7 @@ export class Post extends BaseEntity {
   @Column("int", { default: 0 })
   replyCount: number;
 
+  @Field(() => [Like])
   @OneToMany(() => Like, (like: Like) => like.post)
   @JoinColumn()
   likes: [Like];
