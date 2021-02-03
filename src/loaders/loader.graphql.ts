@@ -1,5 +1,6 @@
 import { ApolloServer } from "apollo-server-express";
 import { Application } from "express";
+import path from "path";
 import { buildSchema } from "type-graphql";
 import { registerAllEnums } from "../api/enums/index";
 import { resolvers } from "../api/resolvers";
@@ -11,6 +12,8 @@ export const graphqlLoader = async (app: Application) => {
 
   const server = new ApolloServer({
     schema: await buildSchema({
+      // emitSchemaFile: isPROD() ? false : true, // autogenerate schema.graphql in root dir if not prod env
+      emitSchemaFile: path.resolve("./generator", "schema.gql"),
       resolvers: resolvers,
       validate: false,
     }),

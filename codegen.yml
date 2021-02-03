@@ -1,0 +1,10 @@
+overwrite: true
+schema: "./schema.gql"
+documents: null
+generates:
+  ./generator/NeuronGQLTypes.ts:
+    plugins:
+      - "typescript"
+  ./generator/graphql.schema.json:
+    plugins:
+      - "introspection"
