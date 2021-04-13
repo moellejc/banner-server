@@ -4,7 +4,7 @@ import { createConnection } from "typeorm";
 export const typeormLoader = async (app: Application) => {
   await createConnection({
     type: "postgres",
-    database: "neurondb",
+    database: "fabricdb",
     synchronize: true,
     logging: true,
     entities: ["dist/api/entities/**/*.js"],

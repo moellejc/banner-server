@@ -22,6 +22,6 @@ import { typeormLoader } from "./loaders/loader.typeorm";
   app.use("/api", routes);
 
   app.listen({ port: process.env.APP_PORT || 3000 }, () => {
-    console.log("Neuron Server Online!");
+    console.log("Fabric Server Online!");
   });
 })();
