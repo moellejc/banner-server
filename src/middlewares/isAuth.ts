@@ -4,7 +4,7 @@ import { AppContext } from "../context/AppContext";
 
 export const isAuth: MiddlewareFn<AppContext> = ({ context }, next) => {
   const authorization = context.req.headers["authorization"];
-  console.log(authorization);
+  console.log(context.req.headers);
 
   if (!authorization) {
     throw new Error("not authenticated");
@@ -16,7 +16,7 @@ export const isAuth: MiddlewareFn<AppContext> = ({ context }, next) => {
     const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!);
     context.jwtPayload = payload as any;
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     throw new Error("not authenticated");
   }
 

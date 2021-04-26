@@ -122,20 +122,23 @@ export class UserResolver {
     if (errors.length > 0) {
       return { errors };
     }
-
+    console.log("find logged in user");
     const user = await User.findOne({ where: { email: options.email } });
     if (!user) {
+      console.log("user doesn't exist");
       return {
         errors: [UserDoesNotExistError],
       };
     }
     const valid = await argon2.verify(user.password, options.password);
     if (!valid) {
+      console.log("creds are wrong");
       return {
         errors: [InvalidCredentialsError],
       };
     }
 
+    console.log("success returning token");
     sendRefreshToken(res, createRefreshToken(user));
 
     return {
@@ -147,6 +150,7 @@ export class UserResolver {
   @UseMiddleware(isAuth)
   me(@Ctx() context: AppContext) {
     try {
+      console.log("getting me");
       return User.findOne(context.jwtPayload?.userID);
     } catch (err) {
       console.log(err);
