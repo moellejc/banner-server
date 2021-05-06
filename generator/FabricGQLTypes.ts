@@ -39,6 +39,7 @@ export type LoginResponse = {
   __typename?: 'LoginResponse';
   accessToken: Scalars['String'];
   errors?: Maybe<Array<FieldError>>;
+  refreshToken: Scalars['String'];
 };
 
 export type Media = {
@@ -175,6 +176,7 @@ export type RegisterResponse = {
   __typename?: 'RegisterResponse';
   accessToken: Scalars['String'];
   errors?: Maybe<Array<FieldError>>;
+  refreshToken: Scalars['String'];
   user: User;
 };
 

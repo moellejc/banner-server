@@ -17,7 +17,7 @@ import {
 } from "../../auth/auth";
 import { DUPLICATE_ENTRY } from "../../constants/ErrorCodes";
 import { AppContext } from "../../context/AppContext";
-import { isAuth } from "../../middlewares/isAuth";
+import { isAuth, isRefresh } from "../../middlewares";
 import { User } from "../entities/User";
 import { convertValidationErrors } from "../errors/FieldError";
 import {
@@ -36,6 +36,7 @@ import {
 } from "./inputs/UserInputs";
 import {
   LoginResponse,
+  RefreshResponse,
   RegisterResponse,
   UserResponse,
 } from "./responses/UserResponses";
@@ -103,14 +104,13 @@ export class UserResolver {
     }
 
     // create JWT
-    sendRefreshToken(res, createRefreshToken(user));
+    let refreshToken = createRefreshToken(user);
+    sendRefreshToken(res, refreshToken);
 
     return {
       accessToken: createAccessToken(user),
-      user: user,
+      refreshToken: refreshToken,
     };
-
-    // return { user };
   }
 
   @Mutation(() => LoginResponse)
@@ -139,10 +139,12 @@ export class UserResolver {
     }
 
     console.log("success returning token");
-    sendRefreshToken(res, createRefreshToken(user));
+    let refreshToken = createRefreshToken(user);
+    sendRefreshToken(res, refreshToken);
 
     return {
       accessToken: createAccessToken(user),
+      refreshToken: refreshToken,
     };
   }
 
@@ -159,24 +161,45 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
   async logout(@Ctx() { res }: AppContext) {
     sendRefreshToken(res, "");
 
+    //TODO: increment token version in DB by 1
+
     return true;
   }
 
+  @Mutation(() => RefreshResponse)
+  @UseMiddleware(isRefresh)
+  async refreshToken(@Ctx() context: AppContext) {
+    let user;
+    try {
+      user = await User.findOne(context.jwtPayload?.userID);
+    } catch (err) {
+      console.log(err);
+      return {
+        accessToken: "",
+        errors: [{ message: "failed to create access token" }],
+      };
+    }
+
+    return {
+      accessToken: createAccessToken(user!),
+    };
+  }
+
   @Mutation(() => Boolean)
-  async revokeRefreshTokensForUser(
-    @Arg("userId", () => String) userId: string
-  ) {
+  async revokeRefreshTokensForUser(@Ctx() context: AppContext) {
     await getConnection()
       .getRepository(User)
-      .increment({ id: userId }, "tokenVersion", 1);
+      .increment({ id: context.jwtPayload?.userID }, "tokenVersion", 1);
 
     return true;
   }
 
   @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
   async updateUser(
     @Arg("id", () => String) id: string,
     @Arg("options", () => UserUpdateInput) options: UserUpdateInput
@@ -191,17 +214,20 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
   async deleteUser(@Arg("id", () => String) id: string) {
     await User.delete({ id });
     return true;
   }
 
   @Query(() => [User])
+  @UseMiddleware(isAuth)
   async users() {
     return await User.find({ relations: ["posts"] });
   }
 
   @Query(() => User)
+  @UseMiddleware(isAuth)
   async user(@Arg("id", () => Int) id: string): Promise<UserResponse> {
     try {
       return { user: await User.findOneOrFail({ id }) };

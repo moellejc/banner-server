@@ -16,8 +16,8 @@ export class RegisterResponse {
   @Field()
   accessToken?: string;
 
-  @Field(() => User)
-  user?: User;
+  @Field()
+  refreshToken?: string;
 
   @Field(() => [FieldError], { nullable: true })
   errors?: FieldError[];
@@ -25,6 +25,18 @@ export class RegisterResponse {
 
 @ObjectType()
 export class LoginResponse {
+  @Field()
+  accessToken?: string;
+
+  @Field()
+  refreshToken?: string;
+
+  @Field(() => [FieldError], { nullable: true })
+  errors?: FieldError[];
+}
+
+@ObjectType()
+export class RefreshResponse {
   @Field()
   accessToken?: string;
 

@@ -26,6 +26,7 @@ type Like {
 type LoginResponse {
   accessToken: String!
   errors: [FieldError!]
+  refreshToken: String!
 }
 
 type Media {
@@ -56,8 +57,9 @@ type Mutation {
   deleteUser(id: String!): Boolean!
   login(options: UserLoginInput!): LoginResponse!
   logout: Boolean!
+  refreshToken: RefreshResponse!
   register(options: UserRegisterInput!): RegisterResponse!
-  revokeRefreshTokensForUser(userId: String!): Boolean!
+  revokeRefreshTokensForUser: Boolean!
   updateUser(id: String!, options: UserUpdateInput!): Boolean!
 }
 
@@ -110,10 +112,15 @@ type Query {
   users: [User!]!
 }
 
+type RefreshResponse {
+  accessToken: String!
+  errors: [FieldError!]
+}
+
 type RegisterResponse {
   accessToken: String!
   errors: [FieldError!]
-  user: User!
+  refreshToken: String!
 }
 
 type User {

@@ -1,5 +1,5 @@
 overwrite: true
-schema: "./schema.gql"
+schema: "./generator/schema.gql"
 documents: null
 generates:
   ./generator/FabricGQLTypes.ts:
