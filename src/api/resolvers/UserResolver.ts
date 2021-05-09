@@ -144,7 +144,7 @@ export class UserResolver {
 
     return {
       accessToken: createAccessToken(user),
-      refreshToken: refreshToken,
+      refreshToken,
     };
   }
 
