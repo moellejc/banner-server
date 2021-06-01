@@ -70,6 +70,7 @@ export type Mutation = {
   deleteUser: Scalars['Boolean'];
   login: LoginResponse;
   logout: Scalars['Boolean'];
+  refreshToken: RefreshResponse;
   register: RegisterResponse;
   revokeRefreshTokensForUser: Scalars['Boolean'];
   updateUser: Scalars['Boolean'];
@@ -103,11 +104,6 @@ export type MutationLoginArgs = {
 
 export type MutationRegisterArgs = {
   options: UserRegisterInput;
-};
-
-
-export type MutationRevokeRefreshTokensForUserArgs = {
-  userId: Scalars['String'];
 };
 
 
@@ -172,12 +168,17 @@ export type QueryUserArgs = {
   id: Scalars['Int'];
 };
 
+export type RefreshResponse = {
+  __typename?: 'RefreshResponse';
+  accessToken: Scalars['String'];
+  errors?: Maybe<Array<FieldError>>;
+};
+
 export type RegisterResponse = {
   __typename?: 'RegisterResponse';
   accessToken: Scalars['String'];
   errors?: Maybe<Array<FieldError>>;
   refreshToken: Scalars['String'];
-  user: User;
 };
 
 export type User = {
