@@ -1,22 +1,19 @@
 import { Request, Response } from "express";
 import { verify } from "jsonwebtoken";
-import {
-  createAccessToken,
-  createRefreshToken,
-  sendRefreshToken,
-} from "../../../auth/auth";
+import { createAccessToken } from "../../../auth/auth";
 import { User } from "../../entities/User";
 
 export default class AuthController {
   public refreshToken = async (req: Request, res: Response): Promise<any> => {
-    const token = req.cookies.jid;
-    if (!token) {
+    const refreshToken = req.headers["refresh-token"] as string;
+
+    if (!refreshToken) {
       return res.send({ ok: false, accessToken: "" });
     }
 
     let payload: any = null;
     try {
-      payload = verify(token, process.env.REFRESH_TOKEN_SECRET!);
+      payload = verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!);
     } catch (err) {
       console.log(err);
       return res.send({ ok: false, accessToken: "" });
@@ -33,8 +30,6 @@ export default class AuthController {
     if (user.tokenVersion !== payload.tokenVersion) {
       return res.send({ ok: false, accessToken: "" });
     }
-
-    sendRefreshToken(res, createRefreshToken(user));
 
     return res.send({ ok: true, accessToken: createAccessToken(user) });
   };

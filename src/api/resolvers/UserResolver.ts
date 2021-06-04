@@ -17,7 +17,7 @@ import {
 } from "../../auth/auth";
 import { DUPLICATE_ENTRY } from "../../constants/ErrorCodes";
 import { AppContext } from "../../context/AppContext";
-import { isAuth, isRefresh } from "../../middlewares";
+import { isAuth } from "../../middlewares";
 import { User } from "../entities/User";
 import { convertValidationErrors } from "../errors/FieldError";
 import {
@@ -36,7 +36,6 @@ import {
 } from "./inputs/UserInputs";
 import {
   LoginResponse,
-  RefreshResponse,
   RegisterResponse,
   UserResponse,
 } from "./responses/UserResponses";
@@ -162,41 +161,33 @@ export class UserResolver {
 
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
-  async logout(@Ctx() { res }: AppContext) {
-    sendRefreshToken(res, "");
-
-    //TODO: increment token version in DB by 1
-
-    return true;
-  }
-
-  @Mutation(() => RefreshResponse)
-  @UseMiddleware(isRefresh)
-  async refreshToken(@Ctx() context: AppContext) {
-    let user;
-    try {
-      user = await User.findOne(context.jwtPayload?.userID);
-    } catch (err) {
-      console.log(err);
-      return {
-        accessToken: "",
-        errors: [{ message: "failed to create access token" }],
-      };
-    }
-
-    return {
-      accessToken: createAccessToken(user!),
-    };
-  }
-
-  @Mutation(() => Boolean)
-  async revokeRefreshTokensForUser(@Ctx() context: AppContext) {
+  async logout(@Ctx() context: AppContext) {
+    // increment token version in DB by 1
     await getConnection()
       .getRepository(User)
       .increment({ id: context.jwtPayload?.userID }, "tokenVersion", 1);
 
     return true;
   }
+
+  // @Mutation(() => RefreshResponse)
+  // @UseMiddleware(isRefresh)
+  // async refreshToken(@Ctx() context: AppContext) {
+  //   let user;
+  //   try {
+  //     user = await User.findOne(context.jwtPayload?.userID);
+  //   } catch (err) {
+  //     console.log(err);
+  //     return {
+  //       accessToken: "",
+  //       errors: [{ message: "failed to create access token" }],
+  //     };
+  //   }
+
+  //   return {
+  //     accessToken: createAccessToken(user!),
+  //   };
+  // }
 
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
