@@ -7,4 +7,6 @@ const controller = new AuthController();
 // Sign In
 router.post("/refresh_token", controller.refreshToken);
 
+router.post("/logout", controller.logout);
+
 export default router;
