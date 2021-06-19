@@ -13,10 +13,10 @@ export class UserResponse {
 
 @ObjectType()
 export class RegisterResponse {
-  @Field()
+  @Field({ nullable: true })
   accessToken?: string;
 
-  @Field()
+  @Field({ nullable: true })
   refreshToken?: string;
 
   @Field(() => [FieldError], { nullable: true })
@@ -25,10 +25,10 @@ export class RegisterResponse {
 
 @ObjectType()
 export class LoginResponse {
-  @Field()
+  @Field({ nullable: true })
   accessToken?: string;
 
-  @Field()
+  @Field({ nullable: true })
   refreshToken?: string;
 
   @Field(() => [FieldError], { nullable: true })

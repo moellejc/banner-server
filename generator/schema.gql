@@ -24,9 +24,9 @@ type Like {
 }
 
 type LoginResponse {
-  accessToken: String!
+  accessToken: String
   errors: [FieldError!]
-  refreshToken: String!
+  refreshToken: String
 }
 
 type Media {
@@ -111,9 +111,9 @@ type Query {
 }
 
 type RegisterResponse {
-  accessToken: String!
+  accessToken: String
   errors: [FieldError!]
-  refreshToken: String!
+  refreshToken: String
 }
 
 type User {
