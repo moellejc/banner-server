@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "watch": "tsc -w",
-    "dev": "concurrently \"nodemon dist/index.js\" \"yarn generate --watch\"",
+    "start": "node ./dist/index.js",
+    "dev": "nodemon ./dist/index.js",
+    "dev-gen": "concurrently \"nodemon dist/index.js\" \"yarn generate --watch\"",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prestart": "yarn generate",
     "clean:database": "npx ts-node scripts/CleanDatabase.ts",
