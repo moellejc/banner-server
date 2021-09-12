@@ -4,7 +4,7 @@ import { createConnection } from "typeorm";
 export const typeormLoader = async (app: Application) => {
   await createConnection({
     type: "postgres",
-    // database: "fabricdb",
+    // database: "ultradb",
     url: process.env.DATABASE_URL,
     synchronize: true,
     logging: true,

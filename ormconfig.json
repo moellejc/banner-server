@@ -1,6 +1,6 @@
 {
   "type": "postgres",
-  "database": "fabricdb",
+  "database": "ultradb",
   "synchronize": true,
   "logging": true,
   "entities": ["dist/api/entities/**/*.js"],

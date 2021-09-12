@@ -3,7 +3,7 @@ import { createConnection } from "typeorm";
 import { Follow } from "../src/api/entities/Follow";
 import { Like } from "../src/api/entities/Like";
 import { Post } from "../src/api/entities/Post";
-import { Reply } from "../src/api/entities/Reply";
+import { PostReply } from "../src/api/entities/PostReply";
 import { User } from "../src/api/entities/User";
 import { EnvLevels } from "../src/constants/EnvLevels";
 
@@ -21,11 +21,11 @@ import { EnvLevels } from "../src/constants/EnvLevels";
 
   const con = await createConnection({
     type: "postgres",
-    database: "farbicdb",
+    database: "ultradb",
     synchronize: false,
     logging: true,
     // entities: [__dirname + "../src/api/entities/**/*{.js,.ts}"],
-    entities: [User, Post, Follow, Like, Reply],
+    entities: [User, Post, Follow, Like, PostReply],
     migrations: [__dirname + "../src/database/migrations/**/*.js"],
     subscribers: [__dirname + "../src/api/subscribers/**/*.js"],
     cli: {
@@ -40,7 +40,7 @@ import { EnvLevels } from "../src/constants/EnvLevels";
   console.log("Clean Likes...");
   await con.getRepository(Like).delete({});
   console.log("Clean Replies...");
-  await con.getRepository(Reply).delete({});
+  await con.getRepository(PostReply).delete({});
   console.log("Clean Posts...");
   await con.getRepository(Post).delete({});
   console.log("Clean Users...");

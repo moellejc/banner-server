@@ -1,5 +1,5 @@
 {
-  "name": "fabric-server",
+  "name": "ultra-server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -15,15 +15,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/moellejc/fabric-server.git"
+    "url": "git+https://github.com/moellejc/ultra-server.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/moellejc/fabric-server/issues"
+    "url": "https://github.com/moellejc/ultra-server/issues"
   },
-  "homepage": "https://github.com/moellejc/fabric-server#readme",
+  "homepage": "https://github.com/moellejc/ultra-server#readme",
   "devDependencies": {
     "@graphql-codegen/cli": "1.20.1",
     "@graphql-codegen/introspection": "1.18.1",

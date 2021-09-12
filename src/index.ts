@@ -22,6 +22,6 @@ import { typeormLoader } from "./loaders/loader.typeorm";
   app.use("/api", routes);
 
   app.listen({ port: process.env.APP_PORT || 3000 }, () => {
-    console.log("Fabric Server Online!");
+    console.log("ultra Server Online!!");
   });
 })();
