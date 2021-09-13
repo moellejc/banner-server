@@ -1,6 +1,7 @@
 import cors from "cors";
 import "dotenv/config";
 import express from "express";
+import helmet from "helmet";
 import "reflect-metadata";
 import routes from "./api/routes";
 import { graphqlLoader } from "./loaders/loader.graphql";
@@ -9,8 +10,9 @@ import { typeormLoader } from "./loaders/loader.typeorm";
 (async () => {
   const app = express();
 
-  // load middleware
+  // load security middleware
   app.use("*", cors());
+  app.use(helmet({ contentSecurityPolicy: (process.env.NODE_ENV === 'production') ? undefined : false }));
 
   // load database (config options in ormconfig.json)
   await typeormLoader(app);
