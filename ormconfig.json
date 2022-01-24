@@ -1,6 +1,6 @@
 {
   "type": "postgres",
-  "database": "ultradb",
+  "database": "bannerdb",
   "synchronize": true,
   "logging": true,
   "entities": ["dist/api/entities/**/*.js"],

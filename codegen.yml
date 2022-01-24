@@ -2,7 +2,7 @@ overwrite: true
 schema: "./generator/schema.gql"
 documents: null
 generates:
-  ./generator/ultraGQLTypes.ts:
+  ./generator/BannerGQLTypes.ts:
     plugins:
       - "typescript"
   ./generator/graphql.schema.json:

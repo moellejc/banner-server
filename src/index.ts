@@ -12,7 +12,12 @@ import { typeormLoader } from "./loaders/loader.typeorm";
 
   // load security middleware
   app.use("*", cors());
-  app.use(helmet({ contentSecurityPolicy: (process.env.NODE_ENV === 'production') ? undefined : false }));
+  app.use(
+    helmet({
+      contentSecurityPolicy:
+        process.env.NODE_ENV === "production" ? undefined : false,
+    })
+  );
 
   // load database (config options in ormconfig.json)
   await typeormLoader(app);
@@ -24,6 +29,6 @@ import { typeormLoader } from "./loaders/loader.typeorm";
   app.use("/api", routes);
 
   app.listen({ port: process.env.APP_PORT || 3000 }, () => {
-    console.log("ultra Server Online!!");
+    console.log("banner Server Online!!");
   });
 })();

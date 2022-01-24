@@ -21,7 +21,7 @@ import { EnvLevels } from "../src/constants/EnvLevels";
 
   const con = await createConnection({
     type: "postgres",
-    database: "ultradb",
+    database: "bannerdb",
     synchronize: false,
     logging: true,
     // entities: [__dirname + "../src/api/entities/**/*{.js,.ts}"],

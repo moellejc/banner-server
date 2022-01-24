@@ -1,5 +1,5 @@
 {
-  "name": "ultra-server",
+  "name": "banner-server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -15,15 +15,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/moellejc/ultra-server.git"
+    "url": "git+https://github.com/moellejc/banner-server.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/moellejc/ultra-server/issues"
+    "url": "https://github.com/moellejc/banner-server/issues"
   },
-  "homepage": "https://github.com/moellejc/ultra-server#readme",
+  "homepage": "https://github.com/moellejc/banner-server#readme",
   "devDependencies": {
     "@graphql-codegen/cli": "1.20.1",
     "@graphql-codegen/introspection": "1.18.1",
