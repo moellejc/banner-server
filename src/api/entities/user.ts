@@ -6,6 +6,7 @@ import {
   Entity,
   JoinColumn,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
@@ -15,6 +16,7 @@ import { UserTypes } from "../enums/UserTypes";
 import { Like } from "./Like";
 import { Media } from "./Media";
 import { Post } from "./Post";
+import { LocationCell } from "./LocationCell";
 
 @ObjectType()
 @Entity({ name: "users" })
@@ -88,6 +90,11 @@ export class User extends BaseEntity {
   @Field({ defaultValue: false })
   @Column({ default: false })
   verified: boolean;
+
+  @Field(() => LocationCell)
+  @OneToOne(() => LocationCell, (location: LocationCell) => location.id)
+  @JoinColumn({ name: "location_cell" })
+  locationCell: LocationCell;
 
   @Field(() => [Post])
   @OneToMany(() => Post, (post: Post) => post.creator)
