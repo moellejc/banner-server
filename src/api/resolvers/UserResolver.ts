@@ -70,6 +70,8 @@ export class UserResolver {
     const hashedPassword = await argon2.hash(options.password);
     let user: User = new User();
 
+    // calculate h3 cell
+
     try {
       const insertUserQuery = getConnection()
         .createQueryBuilder()
