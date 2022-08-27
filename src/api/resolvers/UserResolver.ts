@@ -1,3 +1,4 @@
+import { PrismaClient, User as UserPrisma } from "@prisma/client";
 import argon2 from "argon2";
 import { validate } from "class-validator";
 import {
@@ -9,16 +10,15 @@ import {
   Resolver,
   UseMiddleware,
 } from "type-graphql";
-import { getConnection } from "typeorm";
 import {
   createAccessToken,
   createRefreshToken,
   sendRefreshToken,
 } from "../../auth/auth";
+import { User as UserGQL } from "../entities/User";
 import { DUPLICATE_ENTRY } from "../../constants/ErrorCodes";
 import { AppContext } from "../../context/AppContext";
 import { isAuth } from "../../middlewares";
-import { User } from "../entities/User";
 import { convertValidationErrors } from "../errors/FieldError";
 import {
   EmailExistsError,
@@ -39,6 +39,8 @@ import {
   RegisterResponse,
   UserResponse,
 } from "./responses/UserResponses";
+
+const prisma = new PrismaClient();
 
 @Resolver()
 export class UserResolver {
@@ -68,25 +70,20 @@ export class UserResolver {
 
     // hash password
     const hashedPassword = await argon2.hash(options.password);
-    let user: User = new User();
+    let user!: UserPrisma;
 
     // calculate h3 cell
 
     try {
-      const insertUserQuery = getConnection()
-        .createQueryBuilder()
-        .insert()
-        .into(User)
-        .values({
+      user = await prisma.user.create({
+        data: {
           firstName: options.firstName,
           lastName: options.lastName,
           screenName: options.screenName,
           email: options.email,
           password: hashedPassword,
-        })
-        .returning("*");
-      let userRes = await insertUserQuery.execute();
-      user = userRes.generatedMaps[0] as User;
+        },
+      });
     } catch (err) {
       // duplicate username error
       if (err.code === DUPLICATE_ENTRY) {
@@ -123,8 +120,11 @@ export class UserResolver {
     if (errors.length > 0) {
       return { errors };
     }
-    console.log("find logged in user");
-    const user = await User.findOne({ where: { email: options.email } });
+
+    const user = await prisma.user.findUnique({
+      where: { email: options.email },
+    });
+
     if (!user) {
       console.log("user doesn't exist");
       return {
@@ -149,12 +149,15 @@ export class UserResolver {
     };
   }
 
-  @Query(() => User, { nullable: true })
+  @Query(() => UserGQL, { nullable: true })
   @UseMiddleware(isAuth)
-  me(@Ctx() context: AppContext) {
+  async me(@Ctx() context: AppContext) {
     try {
       console.log("getting me");
-      return User.findOne(context.jwtPayload?.userID);
+      // return User.findOne(context.jwtPayload?.userID);
+      return await prisma.user.findUnique({
+        where: { id: context.jwtPayload?.userID },
+      });
     } catch (err) {
       console.log(err);
       return null;
@@ -165,9 +168,10 @@ export class UserResolver {
   @UseMiddleware(isAuth)
   async logout(@Ctx() context: AppContext) {
     // increment token version in DB by 1
-    await getConnection()
-      .getRepository(User)
-      .increment({ id: context.jwtPayload?.userID }, "tokenVersion", 1);
+    await prisma.user.update({
+      where: { id: context.jwtPayload?.userID },
+      data: { tokenVersion: { increment: 1 } },
+    });
 
     return true;
   }
@@ -194,7 +198,7 @@ export class UserResolver {
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
   async updateUser(
-    @Arg("id", () => String) id: string,
+    @Arg("id", () => Int) id: number,
     @Arg("options", () => UserUpdateInput) options: UserUpdateInput
   ) {
     const errors = validate(options);
@@ -202,28 +206,29 @@ export class UserResolver {
       return { errors };
     }
 
-    await User.update({ id }, options);
+    await prisma.user.update({ where: { id }, data: { ...options } });
+
     return true;
   }
 
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
-  async deleteUser(@Arg("id", () => String) id: string) {
-    await User.delete({ id });
+  async deleteUser(@Arg("id", () => Int) id: number) {
+    await prisma.user.delete({ where: { id } });
     return true;
   }
 
-  @Query(() => [User])
+  @Query(() => [UserGQL])
   @UseMiddleware(isAuth)
   async users() {
-    return await User.find({ relations: ["posts"] });
+    // return await User.find({ relations: ["posts"] });
   }
 
-  @Query(() => User)
+  @Query(() => UserGQL)
   @UseMiddleware(isAuth)
-  async user(@Arg("id", () => Int) id: string): Promise<UserResponse> {
+  async user(@Arg("id", () => Int) id: number): Promise<UserResponse> {
     try {
-      return { user: await User.findOneOrFail({ id }) };
+      return { user: await prisma.user.findUniqueOrThrow({ where: { id } }) };
     } catch (err) {
       return { errors: [UserNotFound] };
     }

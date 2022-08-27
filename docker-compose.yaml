@@ -19,12 +19,13 @@ services:
 
   postgres:
     image: postgis/postgis:13-master
+    hostname: postgres
     restart: always
     ports:
-      - "35432:5432"
+      - "5432:5432"
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: bannerdb
     volumes:
       - postgres-data:/var/lib/postgresql/data
