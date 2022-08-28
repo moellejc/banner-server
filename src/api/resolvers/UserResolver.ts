@@ -199,7 +199,7 @@ export class UserResolver {
     @Arg("options", () => UserUpdateInput) options: UserUpdateInput,
     @Ctx() { prisma }: AppContext
   ) {
-    const errors = validate(options);
+    const errors = await validate(options);
     if (errors) {
       return { errors };
     }
