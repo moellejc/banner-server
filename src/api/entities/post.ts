@@ -5,6 +5,7 @@ import { Like } from "./Like";
 import { Media } from "./Media";
 import { PostReply } from "./PostReply";
 import { User } from "./User";
+import { LocationCell } from "./LocationCell";
 
 @ObjectType()
 export class Post {
@@ -17,8 +18,11 @@ export class Post {
   @Field(() => User)
   creator!: User;
 
-  @Field(() => PointScalar)
-  coordinates: Point;
+  @Field(() => Int, { nullable: true })
+  cellID?: number | null;
+
+  @Field(() => LocationCell, { nullable: true })
+  cell?: LocationCell | null;
 
   @Field({ nullable: true })
   text: string;

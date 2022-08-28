@@ -8,8 +8,11 @@ export class Place {
   @Field({ nullable: false })
   name: string;
 
-  @Field(() => LocationCell)
-  locationCell: LocationCell;
+  @Field(() => Int, { nullable: true })
+  cellID?: number | null;
+
+  @Field(() => LocationCell, { nullable: true })
+  cell?: LocationCell | null;
 
   @Field()
   streetNum: string;

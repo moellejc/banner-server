@@ -1,5 +1,5 @@
 import { Field, Int, ObjectType } from "type-graphql";
-import { MediaTypes } from "../enums/MediaTypes";
+import { MediaTypes } from "@prisma/client";
 import { Post } from "./Post";
 import { User } from "./User";
 

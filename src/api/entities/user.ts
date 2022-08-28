@@ -1,7 +1,5 @@
 import { Field, Int, ObjectType } from "type-graphql";
-import { UserRoles } from "../enums/UserRoles";
-import { UserStatuses } from "../enums/UserStatuses";
-import { UserTypes } from "../enums/UserTypes";
+import { UserRoles, UserStatuses, UserVerifications } from "@prisma/client";
 import { Like } from "./Like";
 import { Media } from "./Media";
 import { Post } from "./Post";
@@ -9,8 +7,8 @@ import { LocationCell } from "./LocationCell";
 
 @ObjectType()
 export class User {
-  @Field()
-  id!: string;
+  @Field(() => Int)
+  id!: number;
 
   @Field({ nullable: false })
   firstName: string;
@@ -23,10 +21,10 @@ export class User {
 
   password: string;
 
-  tempPassword: string;
+  tempPassword?: string | null;
 
   @Field({ nullable: true })
-  tempPasswordExpires: Date;
+  tempPasswordExpires?: Date | null;
 
   @Field({ defaultValue: false })
   hasTempPassword: boolean;
@@ -37,34 +35,37 @@ export class User {
   screenName: string;
 
   @Field({ nullable: true })
-  profilePic: string;
+  profilePic?: string | null;
 
-  @Field(() => UserRoles, { defaultValue: UserRoles.BASIC })
+  @Field(() => UserRoles, { defaultValue: UserRoles.USER })
   role: UserRoles;
 
   @Field(() => UserStatuses, { defaultValue: UserStatuses.ACTIVE })
   status: UserStatuses;
 
-  @Field(() => UserTypes, { defaultValue: UserTypes.STANDARD })
-  userType: UserTypes;
+  @Field(() => UserVerifications, { defaultValue: UserVerifications.STANDARD })
+  verificationType: UserVerifications;
 
   @Field({ defaultValue: false })
-  verified: boolean;
+  isVerified: boolean;
 
-  @Field(() => LocationCell)
-  locationCell: LocationCell;
+  @Field(() => Int, { nullable: true })
+  cellID?: number | null;
 
-  @Field(() => [Post])
-  posts: Post[];
+  @Field(() => LocationCell, { nullable: true })
+  cell?: LocationCell | null;
 
-  @Field(() => [Media])
-  media: Media[];
+  @Field(() => [Post], { nullable: true })
+  posts?: Post[] | null;
+
+  @Field(() => [Media], { nullable: true })
+  media?: Media[] | null;
 
   @Field(() => Int, { defaultValue: 0 })
   totalPosts: number;
 
-  @Field(() => [Like])
-  likes: Like[];
+  @Field(() => [Like], { nullable: true })
+  likes?: Like[] | null;
 
   @Field(() => Int, { defaultValue: 0 })
   totalLikes: number;

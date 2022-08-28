@@ -16,9 +16,11 @@ enum UserRoles {
 }
 
 enum UserStatuses {
+  INVITED
   ACTIVE
   INACTIVE
-  PENDING
+  ARCHIVE
+  DEACTIVATED
   REMOVED
 }
 

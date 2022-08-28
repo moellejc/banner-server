@@ -1,4 +1,3 @@
-import { PrismaClient, User as UserPrisma } from "@prisma/client";
 import argon2 from "argon2";
 import { validate } from "class-validator";
 import {
@@ -15,7 +14,7 @@ import {
   createRefreshToken,
   sendRefreshToken,
 } from "../../auth/auth";
-import { User as UserGQL } from "../entities/User";
+import { User } from "../entities/User";
 import { DUPLICATE_ENTRY } from "../../constants/ErrorCodes";
 import { AppContext } from "../../context/AppContext";
 import { isAuth } from "../../middlewares";
@@ -40,8 +39,6 @@ import {
   UserResponse,
 } from "./responses/UserResponses";
 
-const prisma = new PrismaClient();
-
 @Resolver()
 export class UserResolver {
   @Mutation(() => UserResponse)
@@ -61,7 +58,7 @@ export class UserResolver {
   @Mutation(() => RegisterResponse)
   async register(
     @Arg("options", () => UserRegisterInput) options: UserRegisterInput,
-    @Ctx() { req, res }: AppContext
+    @Ctx() { res, prisma }: AppContext
   ): Promise<RegisterResponse> {
     const errors = convertValidationErrors(await validate(options));
     if (errors.length > 0) {
@@ -70,7 +67,7 @@ export class UserResolver {
 
     // hash password
     const hashedPassword = await argon2.hash(options.password);
-    let user!: UserPrisma;
+    let user!: User;
 
     // calculate h3 cell
 
@@ -114,7 +111,7 @@ export class UserResolver {
   @Mutation(() => LoginResponse)
   async login(
     @Arg("options", () => UserLoginInput) options: UserLoginInput,
-    @Ctx() { req, res }: AppContext
+    @Ctx() { res, prisma }: AppContext
   ): Promise<LoginResponse> {
     const errors = convertValidationErrors(await validate(options));
     if (errors.length > 0) {
@@ -149,14 +146,14 @@ export class UserResolver {
     };
   }
 
-  @Query(() => UserGQL, { nullable: true })
+  @Query(() => User, { nullable: true })
   @UseMiddleware(isAuth)
-  async me(@Ctx() context: AppContext) {
+  async me(@Ctx() { prisma, jwtPayload }: AppContext) {
     try {
       console.log("getting me");
       // return User.findOne(context.jwtPayload?.userID);
       return await prisma.user.findUnique({
-        where: { id: context.jwtPayload?.userID },
+        where: { id: jwtPayload?.userID },
       });
     } catch (err) {
       console.log(err);
@@ -166,10 +163,10 @@ export class UserResolver {
 
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
-  async logout(@Ctx() context: AppContext) {
+  async logout(@Ctx() { prisma, jwtPayload }: AppContext) {
     // increment token version in DB by 1
     await prisma.user.update({
-      where: { id: context.jwtPayload?.userID },
+      where: { id: jwtPayload?.userID },
       data: { tokenVersion: { increment: 1 } },
     });
 
@@ -199,7 +196,8 @@ export class UserResolver {
   @UseMiddleware(isAuth)
   async updateUser(
     @Arg("id", () => Int) id: number,
-    @Arg("options", () => UserUpdateInput) options: UserUpdateInput
+    @Arg("options", () => UserUpdateInput) options: UserUpdateInput,
+    @Ctx() { prisma }: AppContext
   ) {
     const errors = validate(options);
     if (errors) {
@@ -213,20 +211,26 @@ export class UserResolver {
 
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
-  async deleteUser(@Arg("id", () => Int) id: number) {
+  async deleteUser(
+    @Arg("id", () => Int) id: number,
+    @Ctx() { prisma }: AppContext
+  ) {
     await prisma.user.delete({ where: { id } });
     return true;
   }
 
-  @Query(() => [UserGQL])
+  @Query(() => [User])
   @UseMiddleware(isAuth)
   async users() {
     // return await User.find({ relations: ["posts"] });
   }
 
-  @Query(() => UserGQL)
+  @Query(() => User)
   @UseMiddleware(isAuth)
-  async user(@Arg("id", () => Int) id: number): Promise<UserResponse> {
+  async user(
+    @Arg("id", () => Int) id: number,
+    @Ctx() { prisma }: AppContext
+  ): Promise<UserResponse> {
     try {
       return { user: await prisma.user.findUniqueOrThrow({ where: { id } }) };
     } catch (err) {

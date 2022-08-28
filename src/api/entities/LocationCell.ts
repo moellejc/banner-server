@@ -1,4 +1,7 @@
 import { Field, Int, Float } from "type-graphql";
+import { User } from "./User";
+import { Post } from "./Post";
+import { Place } from "./Place";
 
 export class LocationCell {
   @Field()
@@ -57,4 +60,13 @@ export class LocationCell {
 
   @Field({ nullable: false })
   createdAt: Date;
+
+  @Field(() => [User], { nullable: true })
+  users?: User[] | null;
+
+  @Field(() => [Post], { nullable: true })
+  posts?: Post[] | null;
+
+  @Field(() => [Place], { nullable: true })
+  places?: Place[] | null;
 }

@@ -5,6 +5,8 @@ import { buildSchema } from "type-graphql";
 import { registerAllEnums } from "../api/enums/index";
 import { resolvers } from "../api/resolvers";
 import { evalBoolean } from "../utils/EvalBoolean";
+import { AppContext } from "../context/AppContext";
+import prismaClient from "../lib/prisma";
 
 export const graphqlLoader = async (app: Application) => {
   // register all enums as types with graphql
@@ -17,7 +19,14 @@ export const graphqlLoader = async (app: Application) => {
       resolvers: resolvers,
       validate: false,
     }),
-    context: ({ res, req }) => ({ res, req }),
+    context: ({ res, req }) => {
+      const custCtx: AppContext = {
+        req,
+        res,
+        prisma: prismaClient,
+      };
+      return custCtx;
+    },
     playground: evalBoolean(process.env.GRAPHQL_EDITOR!),
   });
 
