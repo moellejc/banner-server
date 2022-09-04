@@ -7,7 +7,7 @@ services:
     depends_on:
       - postgres
     environment:
-      DATABASE_URL: postgres://user:pass@postgres:5432/bannerdb
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/bannerdb
       NODE_ENV: development
       PORT: 3000
     ports:
@@ -22,13 +22,26 @@ services:
     hostname: postgres
     restart: always
     ports:
-      - "5432:5432"
+      - "35432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: bannerdb
     volumes:
       - postgres-data:/var/lib/postgresql/data
+
+  prisma-studio:
+    container_name: prisma-studio
+    image: timothyjmiller/prisma-studio:latest
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    environment:
+      POSTGRES_URL: postgres://postgres:postgres@postgres:5432/bannerdb
+    ports:
+      - 5555:5555
 
   pgadmin:
     container_name: pgadmin4_container
