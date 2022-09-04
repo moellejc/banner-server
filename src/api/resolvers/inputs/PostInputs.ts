@@ -6,8 +6,8 @@ import { Media } from "../../entities/Media";
 
 @InputType()
 export class PostCreateInput {
-  @Field()
-  text?: string;
+  @Field({ nullable: true })
+  text?: string | null;
 
   @Field(() => [MediaScalar], { nullable: true })
   media?: [Media];

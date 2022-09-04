@@ -83,19 +83,20 @@ export class UserResolver {
       });
     } catch (err) {
       // duplicate username error
-      if (err.code === DUPLICATE_ENTRY) {
-        const errDetail: string = err.detail.toLowerCase();
-        console.log(errDetail);
-        return {
-          errors: [
-            errDetail.includes("key (email)")
-              ? EmailExistsError
-              : errDetail.includes("key (screen_name)")
-              ? ScreenNameExistsError
-              : GenericUserInsertError,
-          ],
-        };
-      }
+      return {};
+      // if (err.code === DUPLICATE_ENTRY) {
+      //   const errDetail: string = err.detail.toLowerCase();
+      //   console.log(errDetail);
+      //   return {
+      //     errors: [
+      //       errDetail.includes("key (email)")
+      //         ? EmailExistsError
+      //         : errDetail.includes("key (screen_name)")
+      //         ? ScreenNameExistsError
+      //         : GenericUserInsertError,
+      //     ],
+      //   };
+      // }
     }
 
     // create JWT

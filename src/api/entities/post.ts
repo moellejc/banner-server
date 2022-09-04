@@ -6,17 +6,37 @@ import { Media } from "./Media";
 import { PostReply } from "./PostReply";
 import { User } from "./User";
 import { LocationCell } from "./LocationCell";
+import { Prisma, PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+export type PostWithRelations = Prisma.PromiseReturnType<
+  typeof getPostWithRelations
+>;
+
+async function getPostWithRelations() {
+  const posts = await prisma.post.findFirst({
+    include: {
+      author: true,
+      cell: true,
+      place: true,
+      likes: true,
+      replies: true,
+    },
+  });
+  return posts;
+}
 
 @ObjectType()
 export class Post {
-  @Field()
-  id!: string;
+  @Field(() => Int)
+  id!: number;
 
-  @Field()
-  creatorID!: string;
+  @Field(() => Int)
+  authorID!: number;
 
   @Field(() => User)
-  creator!: User;
+  author: User;
 
   @Field(() => Int, { nullable: true })
   cellID?: number | null;
@@ -25,19 +45,19 @@ export class Post {
   cell?: LocationCell | null;
 
   @Field({ nullable: true })
-  text: string;
+  text?: string | null;
 
-  @Field(() => [Media])
-  media: [Media];
+  @Field(() => [Media], { nullable: true })
+  media?: [Media] | null;
 
-  @Field(() => [PostReply])
-  replies: [PostReply];
+  @Field(() => [PostReply], { nullable: true })
+  replies?: [PostReply] | null;
 
   @Field(() => Int, { defaultValue: 0 })
   replyCount: number;
 
-  @Field(() => [Like])
-  likes: [Like];
+  @Field(() => [Like], { nullable: true })
+  likes?: [Like] | null;
 
   @Field(() => Int, { defaultValue: 0 })
   likeCount: number;

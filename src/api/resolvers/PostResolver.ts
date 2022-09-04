@@ -6,6 +6,7 @@ import {
   Query,
   Resolver,
   UseMiddleware,
+  Int,
 } from "type-graphql";
 import { getConnection, InsertResult, MoreThan } from "typeorm";
 import { AppContext } from "../../context/AppContext";
@@ -23,6 +24,8 @@ import {
 } from "../errors/PostErrors";
 import { PostCreateInput } from "./inputs/PostInputs";
 import { PostResponse } from "./responses/PostResponses";
+import { Post as PostPris, prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 @Resolver()
 export class PostResolver {
@@ -30,106 +33,83 @@ export class PostResolver {
   @UseMiddleware(isAuth)
   async createPost(
     @Arg("options", () => PostCreateInput) options: PostCreateInput,
-    @Ctx() context: AppContext
+    @Ctx() { prisma, jwtPayload }: AppContext
   ): Promise<PostResponse> {
+    // validate inputs
     const errors = convertValidationErrors(await validate(options));
     if (errors.length > 0) {
       logger.error(errors);
       return { errors };
     }
 
-    let creator: User = new User();
+    const creator = await prisma.user.findUniqueOrThrow({
+      where: { id: jwtPayload?.userID },
+    });
 
-    // find author
-    try {
-      creator =
-        (await User.findOne({ id: context.jwtPayload?.userID })) || new User();
-
-      if (!creator.id) {
-        return { errors: [PostAuthorNotFound] };
-      }
-    } catch (err) {
-      logger.error(err);
-      return { errors: [PostAuthorNotFound] };
-    }
-
-    let post: Post;
+    // TODO: get location cell based on coordinates
 
     // insert post
-    try {
-      const insertPostQuery = getConnection()
-        .createQueryBuilder()
-        .insert()
-        .into(Post)
-        .values({
-          creatorID: context.jwtPayload?.userID,
-          creator: creator,
-          text: options.text,
-          coordinates: options.coordinates,
-        })
-        .returning("*")
-        .execute();
-      const postRes: InsertResult = await insertPostQuery;
-      post = postRes.generatedMaps[0] as Post;
-      console.log(post);
-    } catch (err) {
-      logger.error(err);
-      return { errors: [PostNotCreated] };
-    }
+    // TODO: link media to post
+    // TODO: link place to post
+    const post = await prisma.post.create({
+      data: {
+        authorID: creator.id,
+        cellID: 111,
+        text: options.text,
+      },
+      include: {
+        author: true,
+      },
+    });
 
     // insert media
-    try {
-      if (options.media) {
-        options.media?.forEach(async (value: Media) => {
-          let m = await value.save();
-          post.media.push(m);
-        });
-      }
-    } catch (err) {
-      return { errors: [PostMediaNotInserted] };
-    }
+    // try {
+    //   if (options.media) {
+    //     options.media?.forEach(async (value: Media) => {
+    //       let m = await value.save();
+    //       post.media.push(m);
+    //     });
+    //   }
+    // } catch (err) {
+    //   return { errors: [PostMediaNotInserted] };
+    // }
 
     // increment post total on users
-    try {
-      await getConnection()
-        .getRepository(User)
-        .increment({ id: creator!.id }, "totalPosts", 1);
-    } catch (err) {
-      logger.error(err);
-      return { errors: [TotalPostsNotIncremented] };
-    }
+    // try {
+    //   await getConnection()
+    //     .getRepository(User)
+    //     .increment({ id: creator!.id }, "totalPosts", 1);
+    // } catch (err) {
+    //   logger.error(err);
+    //   return { errors: [TotalPostsNotIncremented] };
+    // }
 
     return { post };
   }
 
   @Query(() => [Post])
-  async posts() {
-    return await Post.find({ relations: ["creator"] });
+  @UseMiddleware(isAuth)
+  async myPosts(@Ctx() { prisma, jwtPayload }: AppContext) {
+    return await prisma.post.findMany({
+      where: { authorID: jwtPayload?.userID },
+    });
   }
 
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
   async deletePost(
-    @Arg("id", () => String) id: string,
-    @Ctx() context: AppContext
+    @Arg("id", () => Int) id: number,
+    @Ctx() { prisma, jwtPayload }: AppContext
   ) {
     try {
-      // ensure the post exists
-      let postToDelete = await Post.findOneOrFail(
-        { id, creatorID: context.jwtPayload?.userID },
-        { relations: ["creator"] }
-      );
+      // delete post (assuming there is only one post deleted...)
+      const deletedPost = await prisma.post.delete({ where: { id: id } });
 
       // decrement total posts from the user
-      await getConnection()
-        .getRepository(User)
-        .decrement(
-          { id: context.jwtPayload?.userID, totalPosts: MoreThan(0) },
-          "totalPosts",
-          1
-        );
-
-      await Post.delete({ id: postToDelete.id });
+      await prisma.user.update({
+        where: { id: deletedPost.authorID },
+        data: { totalPosts: { decrement: 1 } },
+      });
     } catch (err) {
       logger.error(err);
       return false;

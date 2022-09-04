@@ -2,16 +2,12 @@ import { ApolloServer } from "apollo-server-express";
 import { Application } from "express";
 import path from "path";
 import { buildSchema } from "type-graphql";
-import { registerAllEnums } from "../api/enums/index";
 import { resolvers } from "../api/resolvers";
 import { evalBoolean } from "../utils/EvalBoolean";
 import { AppContext } from "../context/AppContext";
 import prismaClient from "../lib/prisma";
 
 export const graphqlLoader = async (app: Application) => {
-  // register all enums as types with graphql
-  registerAllEnums();
-
   const server = new ApolloServer({
     schema: await buildSchema({
       // emitSchemaFile: isPROD() ? false : true, // autogenerate schema.graphql in root dir if not prod env

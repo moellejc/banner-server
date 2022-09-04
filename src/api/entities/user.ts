@@ -4,6 +4,24 @@ import { Like } from "./Like";
 import { Media } from "./Media";
 import { Post } from "./Post";
 import { LocationCell } from "./LocationCell";
+import { Prisma, PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+export type UserWithRelations = Prisma.PromiseReturnType<
+  typeof getUserWithRelations
+>;
+
+async function getUserWithRelations() {
+  return await prisma.user.findFirst({
+    include: {
+      cell: true,
+      posts: true,
+      postReplies: true,
+      likes: true,
+    },
+  });
+}
 
 @ObjectType()
 export class User {
