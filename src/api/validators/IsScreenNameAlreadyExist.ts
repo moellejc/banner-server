@@ -5,13 +5,18 @@ import {
   ValidatorConstraintInterface,
 } from "class-validator";
 import { User } from "../entities/User";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 @ValidatorConstraint({ async: true })
 export class IsScreenNameAlreadyExistConstraint
-  implements ValidatorConstraintInterface {
+  implements ValidatorConstraintInterface
+{
   validate(screenName: string) {
-    return User.findOne({ where: { screenName } }).then((user) => {
-      if (user) return false;
+    // return false if a screen name exists so validator fails
+    return prisma.user.count({ where: { screenName } }).then((total) => {
+      if (total) return false;
       return true;
     });
   }

@@ -5,13 +5,18 @@ import {
   ValidatorConstraintInterface,
 } from "class-validator";
 import { User } from "../entities/User";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 @ValidatorConstraint({ async: true })
 export class IsEmailAlreadyExistConstraint
-  implements ValidatorConstraintInterface {
+  implements ValidatorConstraintInterface
+{
   validate(email: string) {
-    return User.findOne({ where: { email } }).then((user) => {
-      if (user) return false;
+    // return false if a email exists so validator fails
+    return prisma.user.count({ where: { email } }).then((total) => {
+      if (total > 0) return false;
       return true;
     });
   }

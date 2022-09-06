@@ -3,6 +3,9 @@ import { verify } from "jsonwebtoken";
 import { getConnection } from "typeorm";
 import { createAccessToken } from "../../../auth/auth";
 import { User } from "../../entities/User";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export default class AuthController {
   public refreshToken = async (req: Request, res: Response): Promise<any> => {
@@ -22,7 +25,7 @@ export default class AuthController {
 
     // token is valid and
     // we can send back an access token
-    const user = await User.findOne({ id: payload.userId });
+    const user = await prisma.user.findFirst({ where: { id: payload.userId } });
 
     if (!user) {
       return res.send({ ok: false, accessToken: "" });
@@ -52,7 +55,7 @@ export default class AuthController {
 
     // token is valid and
     // we can send back an access token
-    const user = await User.findOne({ id: payload.userId });
+    const user = await prisma.user.findFirst({ where: { id: payload.userId } });
 
     if (!user) {
       return res.send({ ok: false, accessToken: "" });
