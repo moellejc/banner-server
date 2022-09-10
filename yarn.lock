@@ -3052,6 +3052,11 @@ graphql@^15.3.0, graphql@^15.4.0:
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-15.4.0.tgz#e459dea1150da5a106486ba7276518b5295a4347"
   integrity sha512-EB3zgGchcabbsU9cFe1j+yxdzKQKAbGUWRb13DsrsMN1yyfmmIq+2+L5MqVWcDCE4V89R5AyUOi7sMOGxdsYtA==
 
+h3-js@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/h3-js/-/h3-js-4.0.0.tgz#f55efb89f4608014146f3839d1d01d7a2767b3ba"
+  integrity sha512-zIx1NIflzkQ6Jw0tzVOba1wkJvZ/uwVHnuOrgK6VGFzsWdM/QUC3h2ALk2RizyxSNAi0UibmftniyfVK3BVf7A==
+
 has-ansi@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/has-ansi/-/has-ansi-2.0.0.tgz#34f5049ce1ecdf2b0649af3ef24e45ed35416d91"

@@ -38,6 +38,7 @@ import {
   RegisterResponse,
   UserResponse,
 } from "./responses/UserResponses";
+import { latLngToAllCellLevels } from "../../utils/CellUtils";
 
 @Resolver()
 export class UserResolver {
@@ -70,6 +71,7 @@ export class UserResolver {
     let user!: User;
 
     // calculate h3 cell
+    let cellsLevels = latLngToAllCellLevels(options.lat!, options.lon!);
 
     try {
       user = await prisma.user.create({
@@ -79,6 +81,13 @@ export class UserResolver {
           screenName: options.screenName,
           email: options.email,
           password: hashedPassword,
+          cell: {
+            create: {
+              lat: options.lat!,
+              lon: options.lon!,
+              ...cellsLevels!,
+            },
+          },
         },
       });
     } catch (err) {

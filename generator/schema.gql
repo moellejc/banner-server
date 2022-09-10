@@ -202,6 +202,8 @@ input UserRegisterInput {
   email: String!
   firstName: String!
   lastName: String!
+  lat: Float!
+  lon: Float!
   password: String!
   repassword: String!
   screenName: String!

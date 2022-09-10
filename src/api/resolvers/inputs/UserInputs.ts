@@ -32,6 +32,12 @@ export class UserRegisterInput {
   @Field()
   @Match("password", { message: "Passwords do not match" })
   repassword!: string;
+
+  @Field()
+  lat?: number;
+
+  @Field()
+  lon?: number;
 }
 
 @InputType()
