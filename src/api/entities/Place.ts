@@ -1,11 +1,12 @@
 import { Field, Int, ObjectType } from "type-graphql";
 import { LocationCell } from "./LocationCell";
 
+@ObjectType()
 export class Place {
   @Field()
   id: number;
 
-  @Field({ nullable: false })
+  @Field(() => String, { nullable: false })
   name: string;
 
   @Field(() => Int, { nullable: true })

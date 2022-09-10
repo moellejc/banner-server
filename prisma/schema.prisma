@@ -96,7 +96,7 @@ model Post {
   cell       LocationCell @relation(fields: [cellID], references: [id])
   placeID    Int?
   place      Place?       @relation(fields: [placeID], references: [id])
-  text       String?
+  text       String?    
   media      Media[]
   createdAt  DateTime     @default(now())
   replies    PostReply[]

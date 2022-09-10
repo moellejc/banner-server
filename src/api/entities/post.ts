@@ -44,8 +44,8 @@ export class Post {
   @Field(() => LocationCell, { nullable: true })
   cell?: LocationCell | null;
 
-  @Field({ nullable: true })
-  text?: string | null;
+  @Field(() => String, { nullable: true })
+  text?: String | null;
 
   @Field(() => [Media], { nullable: true })
   media?: [Media] | null;
@@ -62,6 +62,6 @@ export class Post {
   @Field(() => Int, { defaultValue: 0 })
   likeCount: number;
 
-  @Field()
+  @Field(() => Date)
   createdAt: Date;
 }

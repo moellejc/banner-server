@@ -3,9 +3,11 @@ version: "3.9"
 services:
   banner-server:
     build: .
+    image: app
     restart: always
     depends_on:
       - postgres
+      - migration
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/bannerdb
       NODE_ENV: development
@@ -16,6 +18,17 @@ services:
     volumes:
       - .:/app/
       - /app/node_modules
+
+  migration:
+    build: .
+    image: app
+    command: npx prisma migrate dev
+    volumes:
+      - .:/app/
+    links:
+      - postgres
+    depends_on:
+      - postgres
 
   postgres:
     image: postgis/postgis:13-master

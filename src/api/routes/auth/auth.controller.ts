@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { verify } from "jsonwebtoken";
-import { getConnection } from "typeorm";
 import { createAccessToken } from "../../../auth/auth";
 import { User } from "../../entities/User";
 import { PrismaClient } from "@prisma/client";
@@ -62,9 +61,10 @@ export default class AuthController {
     }
 
     // increment token version by 1
-    await getConnection()
-      .getRepository(User)
-      .increment({ id: user.id }, "tokenVersion", 1);
+    await prisma.user.update({
+      where: { id: payload.userId },
+      data: { tokenVersion: { increment: 1 } },
+    });
 
     return res.send({ ok: true });
   };

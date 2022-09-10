@@ -26,5 +26,6 @@ export const graphqlLoader = async (app: Application) => {
     playground: evalBoolean(process.env.GRAPHQL_EDITOR!),
   });
 
+  // apply middleware for graphql
   server.applyMiddleware({ app, path: process.env.GRAPHQL_ROUTE });
 };

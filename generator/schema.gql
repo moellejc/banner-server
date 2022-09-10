@@ -16,11 +16,36 @@ type FieldError {
 
 type Like {
   createdAt: DateTime!
-  id: String!
+  id: Int!
   post: Post!
-  postID: String!
+  postID: Int!
   user: User!
-  userID: String!
+  userID: Int!
+}
+
+type LocationCell {
+  createdAt: DateTime!
+  geoCellRes1: String!
+  geoCellRes2: String!
+  geoCellRes3: String!
+  geoCellRes4: String!
+  geoCellRes5: String!
+  geoCellRes6: String!
+  geoCellRes7: String!
+  geoCellRes8: String!
+  geoCellRes9: String!
+  geoCellRes10: String!
+  geoCellRes11: String!
+  geoCellRes12: String!
+  geoCellRes13: String!
+  geoCellRes14: String!
+  geoCellRes15: String!
+  id: Int!
+  lat: Float!
+  lon: Float!
+  places: [Place!]
+  posts: [Post!]
+  users: [User!]
 }
 
 type LoginResponse {
@@ -44,8 +69,9 @@ type Media {
 """Object describing a piece of media content"""
 scalar MediaScalar
 
-"""List of media types"""
 enum MediaTypes {
+  AUDIO
+  MODEL
   PHOTO
   VIDEO
 }
@@ -53,27 +79,46 @@ enum MediaTypes {
 type Mutation {
   checkEmail(options: UserCheckEmailScreenNameInputs!): UserResponse!
   createPost(options: PostCreateInput!): PostResponse!
-  deletePost(id: String!): Boolean!
-  deleteUser(id: String!): Boolean!
+  deletePost(id: Int!): Boolean!
+  deleteUser(id: Int!): Boolean!
   login(options: UserLoginInput!): LoginResponse!
   logout: Boolean!
   register(options: UserRegisterInput!): RegisterResponse!
-  updateUser(id: String!, options: UserUpdateInput!): Boolean!
+  updateUser(id: Int!, options: UserUpdateInput!): Boolean!
+}
+
+type Place {
+  cell: LocationCell
+  cellID: Int
+  city: String!
+  countryCode: String!
+  countryName: String!
+  county: String!
+  createdAt: DateTime!
+  id: Float!
+  name: String!
+  peopleHere: Float!
+  postalCode: String!
+  state: String!
+  stateCode: String!
+  street: String!
+  streetNum: String!
 }
 
 """A set of coordinates. x, y"""
 scalar Point
 
 type Post {
-  coordinates: Point!
+  author: User!
+  authorID: Int!
+  cell: LocationCell
+  cellID: Int
   createdAt: DateTime!
-  creator: User!
-  creatorID: String!
-  id: String!
+  id: Int!
   likeCount: Int
-  likes: [Like!]!
-  media: [Media!]!
-  replies: [PostReply!]!
+  likes: [Like!]
+  media: [Media!]
+  replies: [PostReply!]
   replyCount: Int
   text: String
 }
@@ -82,7 +127,7 @@ input PostCreateInput {
   coordinates: Point!
   media: [MediaScalar!]
   placeID: String!
-  text: String!
+  text: String
 }
 
 type PostReply {
@@ -105,7 +150,7 @@ type PostResponse {
 
 type Query {
   me: User
-  posts: [Post!]!
+  myPosts: [Post!]!
   user(id: Int!): User!
   users: [User!]!
 }
@@ -117,16 +162,19 @@ type RegisterResponse {
 }
 
 type User {
+  cell: LocationCell
+  cellID: Int
   createdAt: DateTime!
   email: String!
   firstName: String!
   hasTempPassword: Boolean
-  id: String!
+  id: Int!
+  isVerified: Boolean
   lastActiveAt: DateTime!
   lastName: String!
-  likes: [Like!]!
-  media: [Media!]!
-  posts: [Post!]!
+  likes: [Like!]
+  media: [Media!]
+  posts: [Post!]
   profilePic: String
   role: UserRoles
   screenName: String!
@@ -137,8 +185,7 @@ type User {
   totalFollowingPlaces: Int
   totalLikes: Int
   totalPosts: Int
-  userType: UserTypes
-  verified: Boolean
+  verificationType: UserVerifications
 }
 
 input UserCheckEmailScreenNameInputs {
@@ -165,31 +212,29 @@ type UserResponse {
   user: User
 }
 
-"""List of user roles"""
 enum UserRoles {
   ADMIN
-  BASIC
-  GOD
+  USER
 }
 
-"""List of user statuses"""
 enum UserStatuses {
   ACTIVE
   ARCHIVE
   DEACTIVATED
   INACTIVE
   INVITED
-}
-
-"""List of user types"""
-enum UserTypes {
-  CELEBRITY
-  GOVERNMENT_OFFICIAL
-  STANDARD
+  REMOVED
 }
 
 input UserUpdateInput {
   email: String
   firstName: String
   lastName: String
+}
+
+enum UserVerifications {
+  CELEBRITY
+  DEVELOPER
+  OFFICIAL
+  STANDARD
 }

@@ -7,7 +7,6 @@ import {
   Resolver,
   UseMiddleware,
 } from "type-graphql";
-import { getConnection } from "typeorm";
 
 @Resolver()
 export class PlaceResolver {}

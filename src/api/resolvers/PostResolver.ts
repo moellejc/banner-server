@@ -8,7 +8,6 @@ import {
   UseMiddleware,
   Int,
 } from "type-graphql";
-import { getConnection, InsertResult, MoreThan } from "typeorm";
 import { AppContext } from "../../context/AppContext";
 import { logger } from "../../lib/logger/Logger";
 import { isAuth } from "../../middlewares/isAuth";
@@ -61,28 +60,6 @@ export class PostResolver {
         author: true,
       },
     });
-
-    // insert media
-    // try {
-    //   if (options.media) {
-    //     options.media?.forEach(async (value: Media) => {
-    //       let m = await value.save();
-    //       post.media.push(m);
-    //     });
-    //   }
-    // } catch (err) {
-    //   return { errors: [PostMediaNotInserted] };
-    // }
-
-    // increment post total on users
-    // try {
-    //   await getConnection()
-    //     .getRepository(User)
-    //     .increment({ id: creator!.id }, "totalPosts", 1);
-    // } catch (err) {
-    //   logger.error(err);
-    //   return { errors: [TotalPostsNotIncremented] };
-    // }
 
     return { post };
   }

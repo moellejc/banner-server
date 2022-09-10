@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType, registerEnumType } from "type-graphql";
 import { UserRoles, UserStatuses, UserVerifications } from "@prisma/client";
 import { Like } from "./Like";
 import { Media } from "./Media";
@@ -23,25 +23,40 @@ async function getUserWithRelations() {
   });
 }
 
+registerEnumType(UserRoles, {
+  name: "UserRoles",
+  description: undefined,
+});
+
+registerEnumType(UserStatuses, {
+  name: "UserStatuses",
+  description: undefined,
+});
+
+registerEnumType(UserVerifications, {
+  name: "UserVerifications",
+  description: undefined,
+});
+
 @ObjectType()
 export class User {
   @Field(() => Int)
   id!: number;
 
-  @Field({ nullable: false })
+  @Field(() => String, { nullable: false })
   firstName: string;
 
-  @Field({ nullable: false })
+  @Field(() => String, { nullable: false })
   lastName: string;
 
-  @Field({ nullable: false })
+  @Field(() => String, { nullable: false })
   email: string;
 
   password: string;
 
   tempPassword?: string | null;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   tempPasswordExpires?: Date | null;
 
   @Field({ defaultValue: false })
@@ -49,10 +64,10 @@ export class User {
 
   tokenVersion: number;
 
-  @Field({ nullable: false })
+  @Field(() => String, { nullable: false })
   screenName: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   profilePic?: string | null;
 
   @Field(() => UserRoles, { defaultValue: UserRoles.USER })
@@ -97,9 +112,9 @@ export class User {
   @Field(() => Int, { defaultValue: 0 })
   totalFollowingPlaces: number;
 
-  @Field()
+  @Field(() => Date)
   lastActiveAt: Date;
 
-  @Field()
+  @Field(() => Date)
   createdAt: Date;
 }

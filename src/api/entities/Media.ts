@@ -1,7 +1,12 @@
-import { Field, Int, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType, registerEnumType } from "type-graphql";
 import { MediaTypes } from "@prisma/client";
 import { Post } from "./Post";
 import { User } from "./User";
+
+registerEnumType(MediaTypes, {
+  name: "MediaTypes",
+  description: undefined,
+});
 
 @ObjectType()
 export class Media {
