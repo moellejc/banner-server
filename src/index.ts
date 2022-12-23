@@ -1,31 +1,30 @@
-import "reflect-metadata";
-import express from "express";
-import { createConnection } from "typeorm";
-import { ApolloServer } from "apollo-server-express";
-import { buildSchema } from "type-graphql";
 import cors from "cors";
-import { resolvers } from "./api/resolvers";
+import "dotenv/config";
+import express from "express";
+import helmet from "helmet";
+import "reflect-metadata";
+import routes from "./api/routes";
+import { graphqlLoader } from "./loaders/loader.graphql";
 
 (async () => {
   const app = express();
 
-  // load database (config options in ormconfig.json)
-  await createConnection();
+  // load security middleware
+  app.use("*", cors());
+  app.use(
+    helmet({
+      contentSecurityPolicy:
+        process.env.NODE_ENV === "production" ? undefined : false,
+    })
+  );
 
   // load graphql apollo server
-  const server = new ApolloServer({
-    schema: await buildSchema({
-      resolvers: resolvers,
-    }),
-    context: ({ res, req }) => ({ res, req }),
-    playground: true,
-  });
+  await graphqlLoader(app);
 
-  app.use("*", cors());
+  // routes
+  app.use("/api", routes);
 
-  server.applyMiddleware({ app, path: "/graphql" });
-
-  app.listen({ port: 8000 }, () => {
-    console.log("Apollo Server on http://localhost:8000/graphql");
+  app.listen({ port: process.env.APP_PORT || 3000 }, () => {
+    console.log("banner Server Online!!");
   });
 })();

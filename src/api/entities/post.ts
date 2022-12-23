@@ -1,21 +1,67 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-import { Min } from "class-validator";
+import { Point } from "geojson";
+import { Field, Int, ObjectType } from "type-graphql";
+import { PointScalar } from "../../types/Point";
+import { Like } from "./Like";
+import { Media } from "./Media";
+import { PostReply } from "./PostReply";
+import { User } from "./User";
+import { LocationCell } from "./LocationCell";
+import { Prisma, PrismaClient } from "@prisma/client";
 
-@Entity()
+const prisma = new PrismaClient();
+
+export type PostWithRelations = Prisma.PromiseReturnType<
+  typeof getPostWithRelations
+>;
+
+async function getPostWithRelations() {
+  const posts = await prisma.post.findFirst({
+    include: {
+      author: true,
+      cell: true,
+      place: true,
+      likes: true,
+      replies: true,
+    },
+  });
+  return posts;
+}
+
+@ObjectType()
 export class Post {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @Field(() => Int)
+  id!: number;
 
-  @Column("text")
-  text: string;
+  @Field(() => Int)
+  authorID!: number;
 
-  @Column()
-  author_id: number;
+  @Field(() => User)
+  author: User;
 
-  @Column("int", { default: 0 })
-  @Min(0)
-  reply_count: number;
+  @Field(() => Int, { nullable: true })
+  cellID?: number | null;
 
-  @Column({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
-  created_at: Date;
+  @Field(() => LocationCell, { nullable: true })
+  cell?: LocationCell | null;
+
+  @Field(() => String, { nullable: true })
+  text?: String | null;
+
+  @Field(() => [Media], { nullable: true })
+  media?: [Media] | null;
+
+  @Field(() => [PostReply], { nullable: true })
+  replies?: [PostReply] | null;
+
+  @Field(() => Int, { defaultValue: 0 })
+  replyCount: number;
+
+  @Field(() => [Like], { nullable: true })
+  likes?: [Like] | null;
+
+  @Field(() => Int, { defaultValue: 0 })
+  likeCount: number;
+
+  @Field(() => Date)
+  createdAt: Date;
 }

@@ -1,0 +1,10 @@
+overwrite: true
+schema: "./generator/schema.gql"
+documents: null
+generates:
+  ./generator/BannerGQLTypes.ts:
+    plugins:
+      - "typescript"
+  ./generator/graphql.schema.json:
+    plugins:
+      - "introspection"

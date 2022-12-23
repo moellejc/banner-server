@@ -1,0 +1,200 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRoles {
+  USER
+  ADMIN
+}
+
+enum UserStatuses {
+  INVITED
+  ACTIVE
+  INACTIVE
+  ARCHIVE
+  DEACTIVATED
+  REMOVED
+}
+
+enum UserVerifications {
+  STANDARD
+  CELEBRITY
+  OFFICIAL
+  DEVELOPER
+}
+
+enum MediaTypes {
+  VIDEO
+  PHOTO
+  AUDIO
+  MODEL
+}
+
+enum MediaExtensions {
+  PNG
+  JPG
+  JPEG
+  BMP
+  MP4
+  AVI
+  FBX
+  USDZ
+  GLTF
+}
+
+model User {
+  id                   Int               @id @default(autoincrement())
+  email                String            @unique
+  firstName            String            @db.VarChar(200)
+  lastName             String            @db.VarChar(200)
+  screenName           String            @db.VarChar(200)
+  password             String
+  tempPassword         String?
+  tempPasswordExpires  DateTime?
+  hasTempPassword      Boolean           @default(false)
+  tokenVersion         Int               @default(0)
+  profilePic           String?
+  role                 UserRoles         @default(USER)
+  status               UserStatuses      @default(ACTIVE)
+  isVerified           Boolean           @default(false)
+  verificationType     UserVerifications @default(STANDARD)
+  cellID               Int?
+  cell                 LocationCell?     @relation(fields: [cellID], references: [id])
+  posts                Post[]
+  postReplies          PostReply[]
+  totalPosts           Int               @default(0)
+  likes                Like[]
+  totalLikes           Int               @default(0)
+  totalFollowers       Int               @default(0)
+  totalFollowing       Int               @default(0)
+  totalFollowingPlaces Int               @default(0)
+  lastActiveAt         DateTime          @default(now())
+  createdAt            DateTime          @default(now())
+}
+
+model Friends {
+  id Int @id @default(autoincrement())
+}
+
+model Followers {
+  id Int @id @default(autoincrement())
+}
+
+model Post {
+  id         Int          @id @default(autoincrement())
+  authorID   Int
+  author     User         @relation(fields: [authorID], references: [id])
+  cellID     Int
+  cell       LocationCell @relation(fields: [cellID], references: [id])
+  placeID    Int?
+  place      Place?       @relation(fields: [placeID], references: [id])
+  text       String?    
+  media      Media[]
+  createdAt  DateTime     @default(now())
+  replies    PostReply[]
+  replyCount Int          @default(0)
+  likes      Like[]
+  likeCount  Int          @default(0)
+}
+
+model PostReply {
+  id       Int    @id @default(autoincrement())
+  postID   Int
+  post     Post   @relation(fields: [postID], references: [id])
+  authorID Int
+  author   User   @relation(fields: [authorID], references: [id])
+  text     String
+}
+
+model Media {
+  id         Int             @id @default(autoincrement())
+  extension  MediaExtensions
+  mediaType  MediaTypes
+  postID     Int
+  post       Post            @relation(fields: [postID], references: [id])
+  mediaURL   String
+  mediaIndex Int             @default(0)
+  createdAt  DateTime        @default(now())
+}
+
+model Like {
+  id      Int  @id @default(autoincrement())
+  likerID Int
+  liker   User @relation(fields: [likerID], references: [id])
+  postID  Int
+  post    Post @relation(fields: [postID], references: [id])
+}
+
+model Place {
+  id          Int          @id @default(autoincrement())
+  name        String       @db.VarChar(200)
+  cellID      Int
+  cell        LocationCell @relation(fields: [cellID], references: [id])
+  streetNum   String       @db.VarChar(200)
+  street      String       @db.VarChar(200)
+  city        String       @db.VarChar(200)
+  state       String       @db.VarChar(200)
+  stateCode   String       @db.VarChar(5)
+  postalCode  String       @db.VarChar(20)
+  county      String       @db.VarChar(200)
+  countryName String       @db.VarChar(200)
+  countryCode String       @db.VarChar(5)
+  peopleHere  Int          @default(0)
+  updatedAt   DateTime     @default(now())
+  createdAt   DateTime     @default(now())
+  posts       Post[]
+}
+
+model PlaceFavorites {
+  id Int @id @default(autoincrement())
+}
+
+model LocationCell {
+  id           Int      @id @default(autoincrement())
+  lat          Float
+  lon          Float
+  geoCellRes1  String
+  geoCellRes2  String
+  geoCellRes3  String
+  geoCellRes4  String
+  geoCellRes5  String
+  geoCellRes6  String
+  geoCellRes7  String
+  geoCellRes8  String
+  geoCellRes9  String
+  geoCellRes10 String
+  geoCellRes11 String
+  geoCellRes12 String
+  geoCellRes13 String
+  geoCellRes14 String
+  geoCellRes15 String
+  createdAt    DateTime @default(now())
+  users        User[]
+  posts        Post[]
+  places       Place[]
+
+  @@unique([geoCellRes1, geoCellRes2, geoCellRes3, geoCellRes4, geoCellRes5, geoCellRes6, geoCellRes7, geoCellRes8, geoCellRes9, geoCellRes10, geoCellRes11, geoCellRes12, geoCellRes13, geoCellRes14, geoCellRes15])
+  @@index([geoCellRes1], type: Hash)
+  @@index([geoCellRes2], type: Hash)
+  @@index([geoCellRes3], type: Hash)
+  @@index([geoCellRes4], type: Hash)
+  @@index([geoCellRes5], type: Hash)
+  @@index([geoCellRes6], type: Hash)
+  @@index([geoCellRes7], type: Hash)
+  @@index([geoCellRes8], type: Hash)
+  @@index([geoCellRes9], type: Hash)
+  @@index([geoCellRes10], type: Hash)
+  @@index([geoCellRes11], type: Hash)
+  @@index([geoCellRes12], type: Hash)
+  @@index([geoCellRes13], type: Hash)
+  @@index([geoCellRes14], type: Hash)
+  @@index([geoCellRes15], type: Hash)
+}
