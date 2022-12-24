@@ -12,6 +12,8 @@ COPY ./.env* .
 
 COPY ./tsconfig.json ./
 
+COPY ./codegen.yml .
+
 COPY ./src ./src
 
 RUN npm install
