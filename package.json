@@ -12,7 +12,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prestart": "yarn generate",
     "clean:database": "npx ts-node scripts/CleanDatabase.ts",
-    "generate": "graphql-codegen --config codegen.yml"
+    "generate": "graphql-codegen --config codegen.yml",
+    "migrate:create": "npx prisma migrate dev --create-only",
+    "migrate:deploy": "npx pisma migrate deploy"
   },
   "repository": {
     "type": "git",
