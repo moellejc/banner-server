@@ -14,6 +14,8 @@ COPY ./tsconfig.json ./
 
 COPY ./codegen.yml .
 
+COPY ./generator ./generator/
+
 COPY ./src ./src
 
 RUN npm install
