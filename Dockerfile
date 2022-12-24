@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:18
 
 WORKDIR /app
 
@@ -6,13 +6,17 @@ COPY ./package*.json .
 
 COPY ./prisma ./prisma/
 
-COPY ./.env .
+COPY ./.env.example ./.env
+
+COPY ./.env* .
 
 COPY ./tsconfig.json ./
 
+COPY src ./src
+
 RUN npm install
 
-COPY ./dist/ ./dist/
+RUN npm build
 
 RUN npx prisma generate
 
