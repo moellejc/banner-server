@@ -28,9 +28,12 @@ export class LocationResolver {
 
       // return place
 
-      return { user: await prisma.user.findUniqueOrThrow({ where: { id } }) };
+      // return { user: await prisma.user.findUniqueOrThrow({ where: { id } }) };
+      return {
+        place: await prisma.place.findUniqueOrThrow({ where: { id: 0 } }),
+      };
     } catch (err) {
-      return { errors: [UserNotFound] };
+      return { errors: [] };
     }
   }
 }

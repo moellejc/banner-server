@@ -12,11 +12,11 @@ COPY ./.env* .
 
 COPY ./tsconfig.json ./
 
-COPY src ./src
+COPY ./src ./src
 
 RUN npm install
 
-RUN npm build
+RUN npm run build
 
 RUN npx prisma generate
 
