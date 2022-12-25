@@ -6,8 +6,6 @@ COPY ./package*.json .
 
 COPY ./prisma ./prisma/
 
-COPY ./.env.example ./.env
-
 COPY ./.env* .
 
 COPY ./tsconfig.json ./

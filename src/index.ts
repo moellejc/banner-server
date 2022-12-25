@@ -25,6 +25,8 @@ import { graphqlLoader } from "./loaders/loader.graphql";
   app.use("/api", routes);
 
   app.listen({ port: process.env.APP_PORT || 3000 }, () => {
-    console.log("banner Server Online!!");
+    console.log(
+      `Banner Server Online on port ${process.env.APP_PORT || 3000}!!`
+    );
   });
 })();
