@@ -4,7 +4,7 @@ import health from "./health/health.route";
 
 const router: Router = Router();
 
-router.use("/api/", auth);
-router.use("/api/", health);
+router.use("/", auth);
+router.use("/", health);
 
 export default router;
