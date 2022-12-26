@@ -14,7 +14,7 @@
     "clean:database": "npx ts-node scripts/CleanDatabase.ts",
     "generate": "graphql-codegen --config codegen.yml",
     "migrate:create": "npx prisma migrate dev --create-only",
-    "migrate:deploy": "npx pisma migrate deploy"
+    "migrate:deploy": "npx prisma migrate deploy"
   },
   "repository": {
     "type": "git",
