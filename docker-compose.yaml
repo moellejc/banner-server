@@ -19,17 +19,6 @@ services:
       - .:/app/
       - /app/node_modules
 
-  migration:
-    build: .
-    image: app
-    command: npx prisma migrate dev
-    volumes:
-      - .:/app/
-    links:
-      - postgres
-    depends_on:
-      - postgres
-
   postgres:
     image: postgis/postgis:13-master
     hostname: postgres
