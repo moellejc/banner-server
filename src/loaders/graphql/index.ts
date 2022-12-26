@@ -2,10 +2,10 @@ import { ApolloServer } from "apollo-server-express";
 import { Application } from "express";
 import path from "path";
 import { buildSchema } from "type-graphql";
-import { resolvers } from "../api/resolvers";
-import { evalBoolean } from "../utils/EvalBoolean";
-import { AppContext } from "../context/AppContext";
-import prismaClient from "../lib/prisma";
+import { resolvers } from "../../api/resolvers";
+import { evalBoolean } from "../../utils/EvalBoolean";
+import { AppContext } from "../../context/AppContext";
+import prismaClient from "../../lib/prisma";
 
 export const graphqlLoader = async (app: Application) => {
   const server = new ApolloServer({

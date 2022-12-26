@@ -7,10 +7,8 @@ services:
     restart: always
     depends_on:
       - postgres
-      - migration
+      - cache
     environment:
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/bannerdb
-      NODE_ENV: development
       PORT: 3000
     ports:
       - "3000:3000"
@@ -31,6 +29,15 @@ services:
       POSTGRES_DB: bannerdb
     volumes:
       - postgres-data:/var/lib/postgresql/data
+
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes:
+      - cache:/data
 
   prisma-studio:
     container_name: prisma-studio

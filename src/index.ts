@@ -4,7 +4,7 @@ import express from "express";
 import helmet from "helmet";
 import "reflect-metadata";
 import routes from "./api/routes";
-import { graphqlLoader } from "./loaders/loader.graphql";
+import { graphqlLoader } from "./loaders/graphql";
 
 (async () => {
   const app = express();
