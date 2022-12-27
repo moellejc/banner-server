@@ -2,10 +2,16 @@ import axios, { AxiosResponse } from "axios";
 import OAuth from "oauth-1.0a";
 import * as Crypto from "crypto";
 
+interface HereTokenResponse {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  scope: string;
+}
+
 export const getAccessToken = async (): Promise<
-  AxiosResponse<any, any> | undefined
+  HereTokenResponse | undefined
 > => {
-  var replace_base_str = "";
   const oauth = new OAuth({
     consumer: {
       key: process.env.HERE_KEY_ID!, //Access key
@@ -28,12 +34,13 @@ export const getAccessToken = async (): Promise<
   try {
     let hereJWT = await axios.post(request_data.url, request_data.data, {
       headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
         Authorization: oauth.toHeader(oauth.authorize(request_data))
           .Authorization,
       },
     });
 
-    return hereJWT;
+    return hereJWT.data;
   } catch (error) {
     console.log("Here Maps JWT Error");
     console.log(error);

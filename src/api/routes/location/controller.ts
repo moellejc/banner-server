@@ -7,10 +7,10 @@ const redisClient = getRedisClient();
 
 export default class LocationController {
   public reverseGeocode = async (req: Request, res: Response): Promise<any> => {
-    if (!req.query.lat || !req.query.lon) return;
+    if (!req.body.lat || !req.body.lon) return;
 
-    let lat = +req.query.lat;
-    let lon = +req.query.lon;
+    let lat = +req.body.lat;
+    let lon = +req.body.lon;
 
     await redisClient.connect();
     const hereToken = await redisClient.get(HERE_ACCESS_TOKEN);
@@ -28,10 +28,10 @@ export default class LocationController {
     req: Request,
     res: Response
   ): Promise<any> => {
-    if (!req.query.lat || !req.query.lon) return;
+    if (!req.body.lat || !req.body.lon) return;
 
-    let lat = +req.query.lat;
-    let lon = +req.query.lon;
+    let lat = +req.body.lat;
+    let lon = +req.body.lon;
 
     await redisClient.connect();
     const hereToken = await redisClient.get(HERE_ACCESS_TOKEN);

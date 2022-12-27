@@ -5,6 +5,7 @@ import helmet from "helmet";
 import "reflect-metadata";
 import routes from "./api/routes";
 import { graphqlLoader } from "./loaders/graphql";
+import { heremapsLoader } from "./loaders/heremaps";
 
 (async () => {
   const app = express();
@@ -18,8 +19,14 @@ import { graphqlLoader } from "./loaders/graphql";
     })
   );
 
+  // middleware to create an object from json body
+  app.use(express.json());
+
   // load graphql apollo server
   await graphqlLoader(app);
+
+  // load Here Maps access
+  await heremapsLoader();
 
   // routes
   app.use("/api", routes);
