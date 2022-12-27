@@ -2,6 +2,12 @@ import axios, { AxiosResponse } from "axios";
 import OAuth from "oauth-1.0a";
 import * as Crypto from "crypto";
 import jwt from "jsonwebtoken";
+import { RedisClientType } from "../../types/Redis";
+import { getRedisClient } from "../../lib/redis";
+import { HERE_ACCESS_TOKEN } from "../../constants/cache";
+import { NonNullTypeNode } from "graphql";
+
+const cacheClient = getRedisClient();
 
 interface HereTokenResponse {
   access_token: string;
@@ -10,7 +16,7 @@ interface HereTokenResponse {
   scope: string;
 }
 
-export const getAccessToken = async (): Promise<
+export const generateAccessToken = async (): Promise<
   HereTokenResponse | undefined
 > => {
   const oauth = new OAuth({
@@ -51,22 +57,60 @@ export const getAccessToken = async (): Promise<
 };
 
 export const isAccessTokenValid = (token: string): boolean => {
+  if (!token) return false;
+
   try {
     let dateNow = new Date();
     let decoded = jwt.decode(token, { complete: true }) as any;
     // if token not expired then don't get a new token
-    if (dateNow.getTime() / 1000 < decoded.header.exp) {
+    if (decoded.header.exp <= dateNow.getTime() / 1000) {
       return false;
     }
   } catch (err) {
-    console.log("Here.com Token Error");
+    console.log("Here Maps Token Error");
     console.log(err);
     return false;
   }
   return true;
 };
 
-export const refreshAccessToken = async (): Promise<void> => {};
+export const refreshAccessToken = async (): Promise<string | null> => {
+  await cacheClient.connect();
+
+  var getNewToken = true;
+  var token = await cacheClient.get(HERE_ACCESS_TOKEN);
+
+  // check for valid stored token
+  if (token) getNewToken = !isAccessTokenValid(token);
+
+  if (getNewToken) {
+    const tokenData = await generateAccessToken();
+    if (tokenData) {
+      await cacheClient.set(HERE_ACCESS_TOKEN, tokenData.access_token);
+      token = tokenData.access_token;
+    }
+  }
+
+  await cacheClient.disconnect();
+
+  return token;
+};
+
+export const validOrRefreshToken = async (
+  token: string | null
+): Promise<string | null> => {
+  if (isAccessTokenValid(token!)) return token;
+  const newToken = await refreshAccessToken();
+  return newToken;
+};
+
+export const getAccessToken = async (): Promise<string | null> => {
+  await cacheClient.connect();
+  const storedToken = await cacheClient.get(HERE_ACCESS_TOKEN);
+  await cacheClient.disconnect();
+
+  return storedToken;
+};
 
 export const reverseGeocode = async (
   lat: number,

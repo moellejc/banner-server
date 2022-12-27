@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
 import { getRedisClient } from "../../../lib/redis";
-import { reverseGeocode, placesAtLocation } from "../../../lib/heremaps";
+import {
+  reverseGeocode,
+  placesAtLocation,
+  getAccessToken,
+  validOrRefreshToken,
+} from "../../../lib/heremaps";
 import { HERE_ACCESS_TOKEN } from "../../../constants/cache";
 
 const redisClient = getRedisClient();
@@ -9,17 +14,14 @@ export default class LocationController {
   public reverseGeocode = async (req: Request, res: Response): Promise<any> => {
     if (!req.body.lat || !req.body.lon) return;
 
+    // get location coords
     let lat = +req.body.lat;
     let lon = +req.body.lon;
 
-    await redisClient.connect();
-    const hereToken = await redisClient.get(HERE_ACCESS_TOKEN);
+    // get here token
+    const hereToken = await validOrRefreshToken(await getAccessToken());
 
-    if (!hereToken) return;
-
-    const address = await reverseGeocode(lat, lon, hereToken);
-
-    await redisClient.disconnect();
+    const address = await reverseGeocode(lat, lon, hereToken!);
 
     return res.send({ data: address?.data });
   };
@@ -30,17 +32,15 @@ export default class LocationController {
   ): Promise<any> => {
     if (!req.body.lat || !req.body.lon) return;
 
+    // get location coords
     let lat = +req.body.lat;
     let lon = +req.body.lon;
 
-    await redisClient.connect();
-    const hereToken = await redisClient.get(HERE_ACCESS_TOKEN);
+    // get here token
+    const hereToken = await validOrRefreshToken(await getAccessToken());
 
-    if (!hereToken) return;
+    const places = await placesAtLocation(lat, lon, hereToken!);
 
-    const places = await placesAtLocation(lat, lon, hereToken);
-
-    await redisClient.disconnect();
     return res.send({ data: places?.data });
   };
 }

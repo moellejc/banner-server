@@ -1,6 +1,5 @@
 import { createClient } from "redis";
-
-type RedisClientType = ReturnType<typeof createClient>;
+import { RedisClientType } from "../../types/Redis";
 
 export const getRedisClient = (): RedisClientType => {
   const client = createClient({
