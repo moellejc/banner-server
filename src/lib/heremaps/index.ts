@@ -42,6 +42,12 @@ export const getAccessToken = async (): Promise<
   return;
 };
 
+export const isAccessTokenValid = async (): Promise<boolean> => {
+  return true;
+};
+
+export const refreshAccessToken = async (): Promise<void> => {};
+
 export const reverseGeocode = async (
   lat: number,
   lon: number,
@@ -64,4 +70,24 @@ export const reverseGeocode = async (
   return;
 };
 
-export const updateLocation = () => {};
+export const placesAtLocation = async (
+  lat: number,
+  lon: number,
+  token: string
+): Promise<AxiosResponse<any, any> | undefined> => {
+  try {
+    let places = await axios.get(
+      `https://browse.search.hereapi.com/v1/browse?at=${lat},${lon}&limit=10`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return places;
+  } catch (error) {
+    console.log(error);
+  }
+
+  return;
+};

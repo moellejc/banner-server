@@ -1,0 +1,1 @@
+export const HERE_ACCESS_TOKEN = "HERE_ACCESS_TOKEN";
