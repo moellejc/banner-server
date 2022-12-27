@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import OAuth from "oauth-1.0a";
 import * as Crypto from "crypto";
+import jwt from "jsonwebtoken";
 
 interface HereTokenResponse {
   access_token: string;
@@ -49,7 +50,19 @@ export const getAccessToken = async (): Promise<
   return;
 };
 
-export const isAccessTokenValid = async (): Promise<boolean> => {
+export const isAccessTokenValid = (token: string): boolean => {
+  try {
+    let dateNow = new Date();
+    let decoded = jwt.decode(token, { complete: true }) as any;
+    // if token not expired then don't get a new token
+    if (dateNow.getTime() / 1000 < decoded.header.exp) {
+      return false;
+    }
+  } catch (err) {
+    console.log("Here.com Token Error");
+    console.log(err);
+    return false;
+  }
   return true;
 };
 
