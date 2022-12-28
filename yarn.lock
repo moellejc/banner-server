@@ -3125,9 +3125,9 @@ graphql@^15.3.0, graphql@^15.4.0:
   integrity sha512-EB3zgGchcabbsU9cFe1j+yxdzKQKAbGUWRb13DsrsMN1yyfmmIq+2+L5MqVWcDCE4V89R5AyUOi7sMOGxdsYtA==
 
 h3-js@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/h3-js/-/h3-js-4.0.0.tgz#f55efb89f4608014146f3839d1d01d7a2767b3ba"
-  integrity sha512-zIx1NIflzkQ6Jw0tzVOba1wkJvZ/uwVHnuOrgK6VGFzsWdM/QUC3h2ALk2RizyxSNAi0UibmftniyfVK3BVf7A==
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/h3-js/-/h3-js-4.0.1.tgz#3146307b7c669a82059664ef54c73fa264fce6f2"
+  integrity sha512-cZvkHAorS4QG5/t1XyWS6hnBFn2oKh/oDbl+nIMsbZfRfm1KP2robxH6cdVvYSr9gzwL02zAGUm5fGYw/VqCww==
 
 has-ansi@^2.0.0:
   version "2.0.0"

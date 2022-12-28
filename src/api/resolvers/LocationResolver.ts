@@ -8,30 +8,54 @@ import {
   UseMiddleware,
 } from "type-graphql";
 import { LocationCell } from "../entities/LocationCell";
+import { LocationInput } from "./inputs/LocationInputs";
 import { Place } from "../entities/Place";
-import { PlaceResponse } from "./responses/PlaceResponse";
+import { PlaceResponse, PlacesResponse } from "./responses/PlaceResponse";
 import { AppContext } from "../../context/AppContext";
+import h3 from "h3-js";
+import { placesAtLocation, getAccessToken } from "../../lib/heremaps";
+import { Coordinates } from "../entities/Coordinates";
 
 @Resolver()
 export class LocationResolver {
-  @Query(() => Place)
-  async getPlaceFromLocation(
-    @Arg("cell", () => LocationCell) cell: LocationCell,
+  @Query(() => PlacesResponse)
+  async getPlacesFromLocation(
+    @Arg("location", () => LocationInput) location: LocationInput,
     @Ctx() { prisma }: AppContext
-  ): Promise<PlaceResponse> {
+  ): Promise<PlacesResponse> {
+    if (!location.coords && !location.cell) return { errors: [] };
+
     try {
-      // look for place in data
+      // get cell and coords from input
+      let cell = location.cell
+        ? location.cell
+        : h3.latLngToCell(location.coords?.lat!, location.coords?.lon!, 7);
+      let coords = location.coords
+        ? location.coords
+        : ((): Coordinates => {
+            let tempCoordList = h3.cellToLatLng(cell);
+            return { lat: tempCoordList[0], lon: tempCoordList[1] };
+          })();
+      let cellDisk = h3.gridDisk(cell, 1);
 
-      // look for place from ReverseGeocode
+      // get all the places in the disk around the current location
+      let dbPlaces = await prisma.place.findMany({
+        where: {
+          cell: {
+            geoCellRes7: { in: cellDisk },
+          },
+        },
+      });
 
-      // add place to database
+      // get places from Here Maps
+      const token = await getAccessToken();
+      let herePlaces = await placesAtLocation(coords.lat, coords.lon, token!);
 
-      // return place
+      // merge lists
 
-      // return { user: await prisma.user.findUniqueOrThrow({ where: { id } }) };
-      return {
-        place: await prisma.place.findUniqueOrThrow({ where: { id: 0 } }),
-      };
+      // add new place to database
+
+      return { places: dbPlaces };
     } catch (err) {
       return { errors: [] };
     }

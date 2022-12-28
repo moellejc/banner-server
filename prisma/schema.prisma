@@ -161,21 +161,21 @@ model LocationCell {
   id           Int      @id @default(autoincrement())
   lat          Float
   lon          Float
-  geoCellRes1  String
-  geoCellRes2  String
-  geoCellRes3  String
-  geoCellRes4  String
-  geoCellRes5  String
-  geoCellRes6  String
-  geoCellRes7  String
-  geoCellRes8  String
-  geoCellRes9  String
-  geoCellRes10 String
-  geoCellRes11 String
-  geoCellRes12 String
-  geoCellRes13 String
-  geoCellRes14 String
-  geoCellRes15 String
+  geoCellRes1  String   @db.VarChar(30)
+  geoCellRes2  String   @db.VarChar(30)
+  geoCellRes3  String   @db.VarChar(30)
+  geoCellRes4  String   @db.VarChar(30)
+  geoCellRes5  String   @db.VarChar(30)
+  geoCellRes6  String   @db.VarChar(30)
+  geoCellRes7  String   @db.VarChar(30)
+  geoCellRes8  String   @db.VarChar(30)
+  geoCellRes9  String   @db.VarChar(30)
+  geoCellRes10 String   @db.VarChar(30)
+  geoCellRes11 String   @db.VarChar(30)
+  geoCellRes12 String   @db.VarChar(30)
+  geoCellRes13 String   @db.VarChar(30)
+  geoCellRes14 String   @db.VarChar(30)
+  geoCellRes15 String   @db.VarChar(30)
   createdAt    DateTime @default(now())
   users        User[]
   posts        Post[]
