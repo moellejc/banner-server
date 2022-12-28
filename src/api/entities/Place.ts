@@ -48,3 +48,6 @@ export class Place {
   @Field({ nullable: false })
   createdAt: Date;
 }
+
+export const hereMapsPlaceToBannerPlace = () => {};
+export const hereMapsPlacesToBannerPlaces = () => {};
