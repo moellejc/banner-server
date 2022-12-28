@@ -22,6 +22,11 @@ export interface HereMapsPlace {
   categories: [HereMapsCagetory];
   contacts: [HereMapsContact];
   openingHours: [HereMapsOpeningHours];
+  chains?: [HereMapsChain];
+  foodTypes?: [HereMapsFoodType];
+  references?: [HereMapsReference];
+  payment?: HereMapsPayments;
+  mayView?: HereMapsMapsView;
 }
 
 export interface HereMapsAddress {
@@ -36,11 +41,6 @@ export interface HereMapsAddress {
   street?: string;
   postalCode?: string;
   houseNumber?: string;
-  chains?: [HereMapsChain];
-  foodTypes?: [HereMapsFoodType];
-  references?: [HereMapsReference];
-  payment?: HereMapsPayments;
-  mayView?: HereMapsMapsView;
 }
 
 export interface HereMapsCoordinates {
