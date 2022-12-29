@@ -1,6 +1,6 @@
 import { Field, InputType } from "type-graphql";
 import { Coordinates } from "../../entities/Coordinates";
-import { LocationCell } from "../../entities/LocationCell";
+import { Location } from "../../entities/Location";
 
 @InputType()
 export class LocationInput {

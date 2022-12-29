@@ -7,7 +7,7 @@ import {
   Resolver,
   UseMiddleware,
 } from "type-graphql";
-import { LocationCell } from "../entities/LocationCell";
+import { Location } from "../entities/Location";
 import { LocationInput } from "./inputs/LocationInputs";
 import { Place } from "../entities/Place";
 import { PlaceResponse, PlacesResponse } from "./responses/PlaceResponse";

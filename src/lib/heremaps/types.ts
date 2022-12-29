@@ -114,5 +114,3 @@ export interface HereMapsReference {
   };
   id: string;
 }
-
-// 39.35886716118358, -84.36526661390532

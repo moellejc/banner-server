@@ -5,7 +5,7 @@ import { Like } from "./Like";
 import { Media } from "./Media";
 import { PostReply } from "./PostReply";
 import { User } from "./User";
-import { LocationCell } from "./LocationCell";
+import { Location } from "./Location";
 import { Prisma, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -41,8 +41,8 @@ export class Post {
   @Field(() => Int, { nullable: true })
   cellID?: number | null;
 
-  @Field(() => LocationCell, { nullable: true })
-  cell?: LocationCell | null;
+  @Field(() => Location, { nullable: true })
+  cell?: Location | null;
 
   @Field(() => String, { nullable: true })
   text?: String | null;

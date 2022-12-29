@@ -3,7 +3,9 @@ import { UserRoles, UserStatuses, UserVerifications } from "@prisma/client";
 import { Like } from "./Like";
 import { Media } from "./Media";
 import { Post } from "./Post";
-import { LocationCell } from "./LocationCell";
+import { Location } from "./Location";
+import { UserLocationPath } from "./UserLocationPath";
+import { UserVisitHistory } from "./UserVisitHistory";
 import { Prisma, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -85,8 +87,8 @@ export class User {
   @Field(() => Int, { nullable: true })
   cellID?: number | null;
 
-  @Field(() => LocationCell, { nullable: true })
-  cell?: LocationCell | null;
+  @Field(() => Location, { nullable: true })
+  cell?: Location | null;
 
   @Field(() => [Post], { nullable: true })
   posts?: Post[] | null;
@@ -111,6 +113,12 @@ export class User {
 
   @Field(() => Int, { defaultValue: 0 })
   totalFollowingPlaces: number;
+
+  @Field(() => [UserLocationPath], { nullable: true })
+  locationPath?: UserLocationPath[] | null;
+
+  @Field(() => [UserVisitHistory], { nullable: true })
+  visitHistory?: UserVisitHistory[] | null;
 
   @Field(() => Date)
   lastActiveAt: Date;
