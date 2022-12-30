@@ -53,7 +53,7 @@ export class PostResolver {
     const post = await prisma.post.create({
       data: {
         authorID: creator.id,
-        cellID: 111,
+        locationID: 111,
         text: options.text,
       },
       include: {

@@ -17,7 +17,7 @@ export type UserWithRelations = Prisma.PromiseReturnType<
 async function getUserWithRelations() {
   return await prisma.user.findFirst({
     include: {
-      cell: true,
+      location: true,
       posts: true,
       postReplies: true,
       likes: true,
@@ -85,10 +85,10 @@ export class User {
   isVerified: boolean;
 
   @Field(() => Int, { nullable: true })
-  cellID?: number | null;
+  locationID?: number | null;
 
   @Field(() => Location, { nullable: true })
-  cell?: Location | null;
+  location?: Location | null;
 
   @Field(() => [Post], { nullable: true })
   posts?: Post[] | null;

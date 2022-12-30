@@ -18,7 +18,7 @@ async function getPostWithRelations() {
   const posts = await prisma.post.findFirst({
     include: {
       author: true,
-      cell: true,
+      location: true,
       place: true,
       likes: true,
       replies: true,

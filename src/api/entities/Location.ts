@@ -3,6 +3,8 @@ import { LocationTypes } from "@prisma/client";
 import { User } from "./User";
 import { Post } from "./Post";
 import { Place } from "./Place";
+import { Coordinates } from "./Coordinates";
+import h3 from "h3-js";
 
 @ObjectType()
 export class Location {
@@ -85,11 +87,11 @@ export class Location {
   @Field(() => String, { nullable: false })
   geoCellRes15: string;
 
-  @Field(() => [Float], { nullable: true })
-  bbox: number[];
+  @Field({ nullable: true })
+  bbox: string;
 
-  @Field(() => [String], { nullable: true })
-  accessPoints: string[];
+  @Field({ nullable: true })
+  accessPoints: string;
 
   @Field(() => Date, { nullable: false })
   updatedAt: Date;
@@ -106,3 +108,27 @@ export class Location {
   @Field(() => [Place], { nullable: true })
   places?: Place[] | null;
 }
+
+export const locationFromCoords = (coords: Coordinates): Location => {
+  let loc = new Location();
+  loc.lat = coords.lat;
+  loc.lon = coords.lon;
+  loc.geoCellRes0 = h3.latLngToCell(coords.lat, coords.lon, 0);
+  loc.geoCellRes1 = h3.latLngToCell(coords.lat, coords.lon, 1);
+  loc.geoCellRes2 = h3.latLngToCell(coords.lat, coords.lon, 2);
+  loc.geoCellRes3 = h3.latLngToCell(coords.lat, coords.lon, 3);
+  loc.geoCellRes4 = h3.latLngToCell(coords.lat, coords.lon, 4);
+  loc.geoCellRes5 = h3.latLngToCell(coords.lat, coords.lon, 5);
+  loc.geoCellRes6 = h3.latLngToCell(coords.lat, coords.lon, 6);
+  loc.geoCellRes7 = h3.latLngToCell(coords.lat, coords.lon, 7);
+  loc.geoCellRes8 = h3.latLngToCell(coords.lat, coords.lon, 8);
+  loc.geoCellRes9 = h3.latLngToCell(coords.lat, coords.lon, 9);
+  loc.geoCellRes10 = h3.latLngToCell(coords.lat, coords.lon, 10);
+  loc.geoCellRes11 = h3.latLngToCell(coords.lat, coords.lon, 11);
+  loc.geoCellRes12 = h3.latLngToCell(coords.lat, coords.lon, 12);
+  loc.geoCellRes13 = h3.latLngToCell(coords.lat, coords.lon, 13);
+  loc.geoCellRes14 = h3.latLngToCell(coords.lat, coords.lon, 14);
+  loc.geoCellRes15 = h3.latLngToCell(coords.lat, coords.lon, 15);
+
+  return loc;
+};

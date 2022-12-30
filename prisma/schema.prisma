@@ -180,12 +180,11 @@ model Like {
 model Place {
   id             Int                @id @default(autoincrement())
   name           String             @db.VarChar(200)
-  label          String             @db.VarChar(200)
   language       String             @default("en") @db.VarChar(3)
   placeType      PlaceTypes
   locationID     Int
   location       Location           @relation(fields: [locationID], references: [id])
-  parentID       Int
+  parentID       Int?
   parent         Place?             @relation("PlaceHierarchy", fields: [parentID], references: [id])
   children       Place[]            @relation("PlaceHierarchy")
   addressID      Int
@@ -195,8 +194,8 @@ model Place {
   categories     Json?
   contacts       Json?
   hours          Json?
-  organizationID Int
-  organization   Organization       @relation(fields: [organizationID], references: [id])
+  organizationID Int?
+  organization   Organization?      @relation(fields: [organizationID], references: [id])
   updatedAt      DateTime           @default(now())
   createdAt      DateTime           @default(now())
   posts          Post[]
@@ -244,8 +243,8 @@ model Location {
   geoCellRes13     String        @db.VarChar(30)
   geoCellRes14     String        @db.VarChar(30)
   geoCellRes15     String        @db.VarChar(30)
-  bbox             Float[]
-  accessPoints     String[]
+  bbox             Json?
+  accessPoints     Json?
   updatedAt        DateTime      @default(now())
   createdAt        DateTime      @default(now())
   users            User[]

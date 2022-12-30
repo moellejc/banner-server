@@ -8,7 +8,7 @@ export interface HereMapsTokenResponse {
 export interface HereMapsPlace {
   id?: string;
   ontologyId?: string;
-  title?: string;
+  title: string;
   language?: string;
   resultType?: string;
   localityType?: string;
@@ -17,14 +17,14 @@ export interface HereMapsPlace {
   houseNumberType?: string;
   address?: HereMapsAddress;
   position?: HereMapsCoordinates;
-  access?: [HereMapsCoordinates];
+  access?: string;
   distance: number;
-  categories: [HereMapsCagetory];
-  contacts: [HereMapsContact];
-  openingHours: [HereMapsOpeningHours];
+  categories?: string;
+  contacts?: string;
+  openingHours?: string;
   chains?: [HereMapsChain];
   foodTypes?: [HereMapsFoodType];
-  references?: [HereMapsReference];
+  references?: string;
   payment?: HereMapsPayments;
   mayView?: HereMapsMapsView;
 }

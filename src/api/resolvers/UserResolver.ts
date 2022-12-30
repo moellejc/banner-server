@@ -39,6 +39,7 @@ import {
   UserResponse,
 } from "./responses/UserResponses";
 import { latLngToAllCellLevels } from "../../utils/CellUtils";
+import { LocationTypes } from "@prisma/client";
 
 @Resolver()
 export class UserResolver {
@@ -81,10 +82,12 @@ export class UserResolver {
           screenName: options.screenName,
           email: options.email,
           password: hashedPassword,
-          cell: {
+          location: {
             create: {
               lat: options.lat!,
               lon: options.lon!,
+              locationType: LocationTypes.User,
+              primaryCellLevel: 12,
               ...cellsLevels!,
             },
           },

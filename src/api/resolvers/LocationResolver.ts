@@ -9,7 +9,7 @@ import {
 } from "type-graphql";
 import { Location } from "../entities/Location";
 import { LocationInput } from "./inputs/LocationInputs";
-import { Place } from "../entities/Place";
+import { Place, hereMapsPlacesToBannerPlaces } from "../entities/Place";
 import { PlaceResponse, PlacesResponse } from "./responses/PlaceResponse";
 import { AppContext } from "../../context/AppContext";
 import h3 from "h3-js";
@@ -41,7 +41,7 @@ export class LocationResolver {
       // get all the places in the disk around the current location
       let dbPlaces = await prisma.place.findMany({
         where: {
-          cell: {
+          location: {
             geoCellRes7: { in: cellDisk },
           },
         },
@@ -50,12 +50,13 @@ export class LocationResolver {
       // get places from Here Maps
       const token = await getAccessToken();
       let herePlaces = await placesAtLocation(coords.lat, coords.lon, token!);
+      let herePlacesConverted = hereMapsPlacesToBannerPlaces(herePlaces?.data);
 
       // merge lists
 
       // add new place to database
 
-      return { places: dbPlaces };
+      return { places: herePlacesConverted };
     } catch (err) {
       return { errors: [] };
     }

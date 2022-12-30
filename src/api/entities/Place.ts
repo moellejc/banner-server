@@ -1,10 +1,13 @@
 import { Field, Int, ObjectType } from "type-graphql";
-import { PlaceTypes } from "@prisma/client";
+import { Prisma, PlaceTypes, PrismaClient } from "@prisma/client";
 import { Location } from "./Location";
 import { Address } from "./Address";
 import { Organization } from "./Organization";
 import { UserLocationPath } from "./UserLocationPath";
 import { UserVisitHistory } from "./UserVisitHistory";
+import { HereMapsPlace } from "../../lib/heremaps";
+import { Coordinates } from "./Coordinates";
+import { objectEnumValues } from "@prisma/client/runtime";
 
 @ObjectType()
 export class Place {
@@ -15,19 +18,16 @@ export class Place {
   name: string;
 
   @Field(() => String, { nullable: false })
-  label: string;
-
-  @Field(() => String, { nullable: false })
   language: string;
 
   @Field(() => PlaceTypes, { nullable: false })
   placeType: PlaceTypes;
 
   @Field(() => Int, { nullable: true })
-  cellID?: number | null;
+  locationID?: number | null;
 
   @Field(() => Location, { nullable: true })
-  cell?: Location | null;
+  location?: Location | null;
 
   @Field(() => Int, { nullable: true })
   parentID?: number | null;
@@ -44,17 +44,17 @@ export class Place {
   @Field(() => Address, { nullable: true })
   address?: Address | null;
 
-  @Field(() => String, { nullable: true })
-  references?: string | null;
+  @Field({ nullable: true })
+  references: string;
 
-  @Field(() => String, { nullable: true })
-  categories?: string | null;
+  @Field({ nullable: true })
+  categories: string;
 
-  @Field(() => String, { nullable: true })
-  contacts?: string | null;
+  @Field({ nullable: true })
+  contacts: string;
 
-  @Field(() => String, { nullable: true })
-  hours?: string | null;
+  @Field({ nullable: true })
+  hours: string;
 
   @Field(() => Int, { nullable: true })
   organizationID?: number | null;
@@ -62,7 +62,7 @@ export class Place {
   @Field(() => Organization, { nullable: true })
   organization?: Organization | null;
 
-  @Field()
+  @Field({ defaultValue: 0 })
   peopleHere: number;
 
   @Field(() => [UserVisitHistory], { nullable: true })
@@ -75,5 +75,49 @@ export class Place {
   createdAt: Date;
 }
 
-export const hereMapsPlaceToBannerPlace = () => {};
-export const hereMapsPlacesToBannerPlaces = () => {};
+export const hereMapsPlaceToBannerPlace = (herePlace: HereMapsPlace): Place => {
+  let place = new Place();
+  place.name = herePlace.title!;
+  place.language = herePlace.language!;
+  place.placeType = PlaceTypes.Commercial;
+
+  place.location = new Location();
+  place.location.primaryCellLevel = 12; // TODO: adjust based on Here Maps type place
+  if (herePlace.access) place.location.accessPoints = herePlace.access;
+
+  place.address = new Address();
+  if (herePlace.address) {
+    if (herePlace.address.countryCode)
+      place.address.countryCode = herePlace.address.countryCode;
+    if (herePlace.address.countryName)
+      place.address.countryName = herePlace.address.countryName;
+    if (herePlace.address.state) place.address.state = herePlace.address.state;
+    if (herePlace.address.stateCode)
+      place.address.stateCode = herePlace.address.stateCode;
+    if (herePlace.address.county)
+      place.address.county = herePlace.address.county;
+    if (herePlace.address.city) place.address.city = herePlace.address.city;
+    if (herePlace.address.district)
+      place.address.district = herePlace.address.district;
+    if (herePlace.address.street)
+      place.address.street = herePlace.address.street;
+    if (herePlace.address.houseNumber)
+      place.address.houseNumber = herePlace.address.houseNumber;
+    if (herePlace.address.postalCode)
+      place.address.postalCode = herePlace.address.postalCode;
+  }
+
+  if (herePlace.categories) place.categories = herePlace.categories;
+  if (herePlace.contacts) place.contacts = herePlace.contacts;
+  if (herePlace.openingHours) place.hours = herePlace.openingHours;
+  if (herePlace.references) place.references = herePlace.references;
+
+  return place;
+};
+export const hereMapsPlacesToBannerPlaces = (
+  herePlaces: HereMapsPlace[]
+): Place[] => {
+  return herePlaces.map((p, i) => {
+    return hereMapsPlaceToBannerPlace(p);
+  });
+};
