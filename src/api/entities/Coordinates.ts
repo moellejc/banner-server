@@ -1,6 +1,6 @@
-import { Field, Int, ObjectType, Float } from "type-graphql";
+import { Field, Int, ObjectType, InputType, Float } from "type-graphql";
 
-@ObjectType()
+@InputType()
 export class Coordinates {
   constructor(lat?: number, lon?: number) {
     if (lat && lon) {

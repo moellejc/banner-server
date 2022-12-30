@@ -12,28 +12,28 @@ export class Address {
   @Field()
   countryName: string;
 
-  @Field({ nullable: false })
+  @Field(() => String, { nullable: false })
   stateCode?: string | null;
 
-  @Field({ nullable: false })
+  @Field(() => String, { nullable: false })
   state?: string | null;
 
-  @Field({ nullable: false })
+  @Field(() => String, { nullable: false })
   county?: string | null;
 
-  @Field({ nullable: false })
+  @Field(() => String, { nullable: false })
   city?: string | null;
 
-  @Field({ nullable: false })
+  @Field(() => String, { nullable: false })
   district?: string | null;
 
-  @Field({ nullable: false })
+  @Field(() => String, { nullable: false })
   street?: string | null;
 
-  @Field({ nullable: false })
+  @Field(() => String, { nullable: false })
   houseNumber?: string | null;
 
-  @Field({ nullable: false })
+  @Field(() => String, { nullable: false })
   postalCode: string;
 
   @Field(() => [Place], { nullable: true })

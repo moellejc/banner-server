@@ -3,6 +3,26 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+type Address {
+  city: String!
+  countryCode: String!
+  countryName: String!
+  county: String!
+  district: String!
+  houseNumber: String!
+  id: Float!
+  places: [Place!]
+  postalCode: String!
+  state: String!
+  stateCode: String!
+  street: String!
+}
+
+input Coordinates {
+  lat: Float!
+  lon: Float!
+}
+
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
@@ -23,8 +43,11 @@ type Like {
   userID: Int!
 }
 
-type LocationCell {
+type Location {
+  accessPoints: String
+  bbox: String
   createdAt: DateTime!
+  geoCellRes0: String!
   geoCellRes1: String!
   geoCellRes2: String!
   geoCellRes3: String!
@@ -42,10 +65,24 @@ type LocationCell {
   geoCellRes15: String!
   id: Int!
   lat: Float!
+  locationType: LocationTypes!
   lon: Float!
   places: [Place!]
   posts: [Post!]
+  primaryCellLevel: Int!
+  updatedAt: DateTime!
   users: [User!]
+}
+
+input LocationInput {
+  cell: String
+  coords: Coordinates
+}
+
+"""LocationTypes"""
+enum LocationTypes {
+  Place
+  User
 }
 
 type LoginResponse {
@@ -87,22 +124,57 @@ type Mutation {
   updateUser(id: Int!, options: UserUpdateInput!): Boolean!
 }
 
-type Place {
-  cell: LocationCell
-  cellID: Int
-  city: String!
-  countryCode: String!
-  countryName: String!
-  county: String!
-  createdAt: DateTime!
-  id: Float!
+type Organization {
+  id: Int!
   name: String!
-  peopleHere: Float!
-  postalCode: String!
-  state: String!
-  stateCode: String!
-  street: String!
-  streetNum: String!
+  places: [Place!]
+}
+
+type Place {
+  address: Address
+  addressID: Int
+  categories: String
+  children: [Place!]
+  contacts: String
+  createdAt: DateTime!
+  hours: String
+  id: Float!
+  language: String!
+  location: Location
+  locationID: Int
+  name: String!
+  organization: Organization
+  organizationID: Int
+  parent: Place
+  parentID: Int
+  peopleHere: Float
+  placeType: PlaceTypes!
+  references: String
+  updatedAt: DateTime!
+  visitorHistory: [UserVisitHistory!]
+}
+
+enum PlaceTypes {
+  Administrative
+  Commercial
+  Community
+  Continent
+  Country
+  Educational
+  Geographic
+  Landmark
+  Medical
+  Municipality
+  Province
+  Religious
+  Residential
+  State
+  Transit
+}
+
+type PlacesResponse {
+  errors: [FieldError!]
+  places: [Place!]
 }
 
 """A set of coordinates. x, y"""
@@ -111,7 +183,7 @@ scalar Point
 type Post {
   author: User!
   authorID: Int!
-  cell: LocationCell
+  cell: Location
   cellID: Int
   createdAt: DateTime!
   id: Int!
@@ -149,6 +221,7 @@ type PostResponse {
 }
 
 type Query {
+  getPlacesFromLocation(location: LocationInput!): PlacesResponse!
   me: User
   myPosts: [Post!]!
   user(id: Int!): User!
@@ -162,8 +235,6 @@ type RegisterResponse {
 }
 
 type User {
-  cell: LocationCell
-  cellID: Int
   createdAt: DateTime!
   email: String!
   firstName: String!
@@ -173,6 +244,9 @@ type User {
   lastActiveAt: DateTime!
   lastName: String!
   likes: [Like!]
+  location: Location
+  locationID: Int
+  locationPath: [UserLocationPath!]
   media: [Media!]
   posts: [Post!]
   profilePic: String
@@ -186,11 +260,16 @@ type User {
   totalLikes: Int
   totalPosts: Int
   verificationType: UserVerifications
+  visitHistory: [UserVisitHistory!]
 }
 
 input UserCheckEmailScreenNameInputs {
   email: String!
   screenName: String!
+}
+
+type UserLocationPath {
+  id: Int!
 }
 
 input UserLoginInput {
@@ -239,4 +318,8 @@ enum UserVerifications {
   DEVELOPER
   OFFICIAL
   STANDARD
+}
+
+type UserVisitHistory {
+  id: Int!
 }

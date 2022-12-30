@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType, Float } from "type-graphql";
+import { Field, Int, ObjectType, Float, registerEnumType } from "type-graphql";
 import { LocationTypes } from "@prisma/client";
 import { User } from "./User";
 import { Post } from "./Post";
@@ -6,21 +6,28 @@ import { Place } from "./Place";
 import { Coordinates } from "./Coordinates";
 import h3 from "h3-js";
 
+registerEnumType(LocationTypes, {
+  name: "LocationTypes",
+  description: "LocationTypes",
+});
+
 @ObjectType()
 export class Location {
   @Field(() => Int)
   id: number;
 
-  @Field((type) => LocationTypes, { nullable: false })
+  @Field(() => LocationTypes, {
+    nullable: false,
+  })
   locationType: LocationTypes;
 
-  @Field((type) => Int, { nullable: false })
+  @Field(() => Int, { nullable: false })
   primaryCellLevel: number;
 
-  @Field((type) => Float, { nullable: false })
+  @Field(() => Float, { nullable: false })
   lat: number;
 
-  @Field((type) => Float, { nullable: false })
+  @Field(() => Float, { nullable: false })
   lon: number;
 
   // Avg Edge: 1107.712591(km) 688.301(mi)

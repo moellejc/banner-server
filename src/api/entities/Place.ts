@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType, registerEnumType } from "type-graphql";
 import { Prisma, PlaceTypes, PrismaClient } from "@prisma/client";
 import { Location } from "./Location";
 import { Address } from "./Address";
@@ -8,6 +8,11 @@ import { UserVisitHistory } from "./UserVisitHistory";
 import { HereMapsPlace } from "../../lib/heremaps";
 import { Coordinates } from "./Coordinates";
 import { objectEnumValues } from "@prisma/client/runtime";
+
+registerEnumType(PlaceTypes, {
+  name: "PlaceTypes",
+  description: undefined,
+});
 
 @ObjectType()
 export class Place {
