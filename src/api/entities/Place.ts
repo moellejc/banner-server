@@ -1,13 +1,12 @@
 import { Field, Int, ObjectType, registerEnumType } from "type-graphql";
 import { Prisma, PlaceTypes, PrismaClient } from "@prisma/client";
-import { Location } from "./Location";
+import { Location, locationFromCoords } from "./Location";
 import { Address } from "./Address";
 import { Organization } from "./Organization";
 import { UserLocationPath } from "./UserLocationPath";
 import { UserVisitHistory } from "./UserVisitHistory";
 import { HereMapsPlace } from "../../lib/heremaps";
 import { Coordinates } from "./Coordinates";
-import { objectEnumValues } from "@prisma/client/runtime";
 
 registerEnumType(PlaceTypes, {
   name: "PlaceTypes",
@@ -86,7 +85,12 @@ export const hereMapsPlaceToBannerPlace = (herePlace: HereMapsPlace): Place => {
   place.language = herePlace.language!;
   place.placeType = PlaceTypes.Commercial;
 
-  place.location = new Location();
+  place.location = herePlace.position
+    ? locationFromCoords({
+        lat: herePlace.position?.lat,
+        lon: herePlace.position?.lng,
+      })
+    : new Location();
   place.location.primaryCellLevel = 12; // TODO: adjust based on Here Maps type place
   if (herePlace.access) place.location.accessPoints = herePlace.access;
 
@@ -112,17 +116,23 @@ export const hereMapsPlaceToBannerPlace = (herePlace: HereMapsPlace): Place => {
       place.address.postalCode = herePlace.address.postalCode;
   }
 
-  if (herePlace.categories) place.categories = herePlace.categories;
-  if (herePlace.contacts) place.contacts = herePlace.contacts;
-  if (herePlace.openingHours) place.hours = herePlace.openingHours;
-  if (herePlace.references) place.references = herePlace.references;
+  if (herePlace.categories)
+    place.categories = JSON.stringify(herePlace.categories);
+  if (herePlace.contacts) place.contacts = JSON.stringify(herePlace.contacts);
+  if (herePlace.openingHours)
+    place.hours = JSON.stringify(herePlace.openingHours);
+  if (herePlace.references)
+    place.references = JSON.stringify(herePlace.references); // need to add HERE as a reference
 
+  console.log(place);
   return place;
 };
 export const hereMapsPlacesToBannerPlaces = (
   herePlaces: HereMapsPlace[]
 ): Place[] => {
-  return herePlaces.map((p, i) => {
-    return hereMapsPlaceToBannerPlace(p);
+  let places: Place[] = [];
+  herePlaces.forEach((p, i) => {
+    places.push(hereMapsPlaceToBannerPlace(p));
   });
+  return places;
 };

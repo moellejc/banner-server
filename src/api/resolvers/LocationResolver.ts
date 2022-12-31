@@ -15,6 +15,7 @@ import { AppContext } from "../../context/AppContext";
 import h3 from "h3-js";
 import { placesAtLocation, getAccessToken } from "../../lib/heremaps";
 import { Coordinates } from "../entities/Coordinates";
+import { HereMapsPlace } from "../../lib/heremaps";
 
 @Resolver()
 export class LocationResolver {
@@ -39,18 +40,20 @@ export class LocationResolver {
       let cellDisk = h3.gridDisk(cell, 1);
 
       // get all the places in the disk around the current location
-      let dbPlaces = await prisma.place.findMany({
-        where: {
-          location: {
-            geoCellRes7: { in: cellDisk },
-          },
-        },
-      });
+      // let dbPlaces = await prisma.place.findMany({
+      //   where: {
+      //     location: {
+      //       geoCellRes7: { in: cellDisk },
+      //     },
+      //   },
+      // });
 
       // get places from Here Maps
       const token = await getAccessToken();
       let herePlaces = await placesAtLocation(coords.lat, coords.lon, token!);
-      let herePlacesConverted = hereMapsPlacesToBannerPlaces(herePlaces?.data);
+      let herePlacesConverted = hereMapsPlacesToBannerPlaces(
+        herePlaces?.data.items as HereMapsPlace[]
+      );
 
       // merge lists
 
