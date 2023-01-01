@@ -12,7 +12,7 @@ import { LocationInput } from "./inputs/LocationInputs";
 import {
   Place,
   fromBannerPlaces,
-  upsertPlaces,
+  createPlaces,
   PlaceWithIncludes,
 } from "../entities/Place";
 import { PlaceResponse, PlacesResponse } from "./responses/PlaceResponse";
@@ -21,7 +21,6 @@ import h3 from "h3-js";
 import { placesAtLocation, getAccessToken } from "../../lib/heremaps";
 import { Coordinates } from "../entities/Coordinates";
 import { HereMapsPlace } from "../../lib/heremaps";
-import { Prisma } from "@prisma/client";
 
 @Resolver()
 export class LocationResolver {
@@ -45,21 +44,28 @@ export class LocationResolver {
           })();
       let cellDisk = h3.gridDisk(cell, 1);
 
-      // get all the places in the disk around the current location
-      let dbPlaces: PlaceWithIncludes[] = await prisma.place.findMany({
-        where: {
-          location: {
-            geoCellRes7: { in: cellDisk },
-          },
-        },
-        include: {
-          address: true,
-          location: true,
-        },
-      });
+      console.log(process.env.DATABASE_URL);
 
-      // get places from Here Maps
-      let mergedPlaces: Place[] = [];
+      // get all the places in the disk around the current location
+      let dbPlaces: PlaceWithIncludes[] = [];
+      try {
+        dbPlaces = await prisma.place.findMany({
+          where: {
+            location: {
+              geoCellRes7: { in: cellDisk },
+            },
+          },
+          include: {
+            address: true,
+            location: true,
+          },
+        });
+      } catch (error) {
+        console.log("Failed to find places in cell");
+      }
+
+      // get places from Here Maps]
+      let mergedPlaces: Place[] = dbPlaces as Place[];
       if (!dbPlaces || dbPlaces.length < 5) {
         const token = await getAccessToken();
         let herePlaces = await placesAtLocation(coords.lat, coords.lon, token!);
@@ -70,13 +76,22 @@ export class LocationResolver {
         // merge lists
         let newPlaces: Place[] = [];
         herePlacesConverted.forEach((p) => {
-          if (!p.inList(dbPlaces)) mergedPlaces.push(p);
+          if (!dbPlaces || dbPlaces.length <= 0 || !p.inList(dbPlaces)) {
+            mergedPlaces.push(p);
+            newPlaces.push(p);
+          }
         });
 
         // add new place to database
-        upsertPlaces(newPlaces, prisma);
+        console.log("Before upsertPlaces");
+        try {
+          await createPlaces(newPlaces, prisma);
+        } catch (error) {
+          console.log(error);
+        }
       }
 
+      console.log("return merged places");
       return { places: mergedPlaces };
     } catch (err) {
       return { errors: [] };

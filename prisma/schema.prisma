@@ -200,13 +200,13 @@ model Place {
   name           String             @db.VarChar(200)
   language       String             @default("en") @db.VarChar(3)
   placeType      PlaceTypes
-  locationID     Int
-  location       Location           @relation(fields: [locationID], references: [id])
+  locationID     Int?
+  location       Location?          @relation(fields: [locationID], references: [id])
   parentID       Int?
   parent         Place?             @relation("PlaceHierarchy", fields: [parentID], references: [id])
   children       Place[]            @relation("PlaceHierarchy")
-  addressID      Int
-  address        Address            @relation(fields: [addressID], references: [id])
+  addressID      Int?
+  address        Address?           @relation(fields: [addressID], references: [id])
   peopleHere     Int                @default(0)
   references     Json?
   categories     Json?
@@ -225,6 +225,7 @@ model Place {
 
 model PlaceFavorite {
   id Int @id @default(autoincrement())
+
   @@map("place_favorites")
 }
 
@@ -292,7 +293,6 @@ model Location {
   @@index([geoCellRes13], type: Hash)
   @@index([geoCellRes14], type: Hash)
   @@index([geoCellRes15], type: Hash)
-
   @@map("locations")
 }
 

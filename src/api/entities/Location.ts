@@ -1,5 +1,9 @@
 import { Field, Int, ObjectType, Float, registerEnumType } from "type-graphql";
-import { LocationTypes } from "@prisma/client";
+import {
+  LocationTypes,
+  PrismaClient,
+  Location as LocationPrisma,
+} from "@prisma/client";
 import { User } from "./User";
 import { Post } from "./Post";
 import { Place } from "./Place";
@@ -114,6 +118,33 @@ export class Location {
 
   @Field(() => [Place], { nullable: true })
   places?: Place[] | null;
+
+  toCreateObject(): any {
+    return {
+      lat: this.lat,
+      lon: this.lon,
+      locationType: this.locationType ? this.locationType : LocationTypes.Place,
+      primaryCellLevel: this.primaryCellLevel,
+      accessPoints: this.accessPoints,
+      bbox: this.bbox ? this.bbox : undefined,
+      geoCellRes0: this.geoCellRes0,
+      geoCellRes1: this.geoCellRes1,
+      geoCellRes2: this.geoCellRes2,
+      geoCellRes3: this.geoCellRes3,
+      geoCellRes4: this.geoCellRes4,
+      geoCellRes5: this.geoCellRes5,
+      geoCellRes6: this.geoCellRes6,
+      geoCellRes7: this.geoCellRes7,
+      geoCellRes8: this.geoCellRes8,
+      geoCellRes9: this.geoCellRes9,
+      geoCellRes10: this.geoCellRes10,
+      geoCellRes11: this.geoCellRes11,
+      geoCellRes12: this.geoCellRes12,
+      geoCellRes13: this.geoCellRes13,
+      geoCellRes14: this.geoCellRes14,
+      geoCellRes15: this.geoCellRes15,
+    };
+  }
 }
 
 export const fromCoords = (coords: Coordinates): Location => {
@@ -138,4 +169,19 @@ export const fromCoords = (coords: Coordinates): Location => {
   loc.geoCellRes15 = h3.latLngToCell(coords.lat, coords.lon, 15);
 
   return loc;
+};
+
+export const createLocation = async (
+  location: Location,
+  prisma: PrismaClient
+): Promise<LocationPrisma | undefined> => {
+  try {
+    return await prisma.location.create({
+      data: location.toCreateObject(),
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  return;
 };

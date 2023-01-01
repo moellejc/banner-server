@@ -4,16 +4,17 @@ import {
   PlaceTypes,
   PrismaClient,
   PrismaPromise,
-  Place as PlacePris,
+  Place as PlacePrisma,
 } from "@prisma/client";
-import { Location, fromCoords } from "./Location";
-import { Address } from "./Address";
+import { Location, fromCoords, createLocation } from "./Location";
+import { Address, createAddress } from "./Address";
 import { Organization } from "./Organization";
 import { UserLocationPath } from "./UserLocationPath";
 import { UserVisitHistory } from "./UserVisitHistory";
 import { HereMapsPlace } from "../../lib/heremaps";
 import { HereMapsReference } from "../../lib/heremaps/types";
 import h3 from "h3-js";
+import { LocationTypes } from "@prisma/client";
 
 registerEnumType(PlaceTypes, {
   name: "PlaceTypes",
@@ -28,6 +29,13 @@ const placeInclude = Prisma.validator<Prisma.PlaceInclude>()({
 export type PlaceWithIncludes = Prisma.PlaceGetPayload<{
   include: typeof placeInclude;
 }>;
+
+interface PlaceCreateRefOptions {
+  createAddress?: boolean;
+  createLocation?: boolean;
+  connectAddressID?: number;
+  connectLocationID?: number;
+}
 
 @ObjectType()
 export class Place {
@@ -64,17 +72,17 @@ export class Place {
   @Field(() => Address, { nullable: true })
   address?: Address | null;
 
-  @Field({ nullable: true })
-  references: string;
+  @Field(() => String, { nullable: true })
+  references?: string | null;
 
-  @Field({ nullable: true })
-  categories: string;
+  @Field(() => String, { nullable: true })
+  categories?: string | null;
 
-  @Field({ nullable: true })
-  contacts: string;
+  @Field(() => String, { nullable: true })
+  contacts?: string | null;
 
-  @Field({ nullable: true })
-  hours: string;
+  @Field(() => String, { nullable: true })
+  hours?: string | null;
 
   @Field(() => Int, { nullable: true })
   organizationID?: number | null;
@@ -94,60 +102,66 @@ export class Place {
   @Field({ nullable: false })
   createdAt: Date;
 
-  toCreateObject(): any {
-    // TODO: update with parent if applicable
-    return {
+  toCreateObject(createRefOptions?: PlaceCreateRefOptions): any {
+    if (!createRefOptions)
+      createRefOptions = { createAddress: false, createLocation: false };
+
+    let placeCreateObj: any = {
       name: this.name,
       language: this.language,
       placeType: this.placeType,
-      location: {
-        create: [
-          {
-            lat: this.location?.lat,
-            lon: this.location?.lon,
-            locationType: this.location?.locationType,
-            primaryCellLevel: this.location?.primaryCellLevel,
-            accessPoints: this.location?.accessPoints,
-            geoCellRes0: this.location?.geoCellRes0,
-            geoCellRes1: this.location?.geoCellRes1,
-            geoCellRes2: this.location?.geoCellRes2,
-            geoCellRes3: this.location?.geoCellRes3,
-            geoCellRes4: this.location?.geoCellRes4,
-            geoCellRes5: this.location?.geoCellRes5,
-            geoCellRes6: this.location?.geoCellRes6,
-            geoCellRes7: this.location?.geoCellRes7,
-            geoCellRes8: this.location?.geoCellRes8,
-            geoCellRes9: this.location?.geoCellRes9,
-            geoCellRes10: this.location?.geoCellRes10,
-            geoCellRes11: this.location?.geoCellRes11,
-            geoCellRes12: this.location?.geoCellRes12,
-            geoCellRes13: this.location?.geoCellRes13,
-            geoCellRes14: this.location?.geoCellRes14,
-            geoCellRes15: this.location?.geoCellRes15,
-          },
-        ],
-      },
-      address: {
-        create: [
-          {
-            countryCode: this.address?.countryCode,
-            countryName: this.address?.countryName,
-            state: this.address?.state,
-            stateCode: this.address?.stateCode,
-            county: this.address?.county,
-            city: this.address?.city,
-            district: this.address?.district,
-            street: this.address?.state,
-            houseNumbe: this.address?.houseNumber,
-            postalCode: this.address?.postalCode,
-          },
-        ],
-      },
-      categories: this.categories,
-      contacts: this.contacts,
-      references: this.references,
-      hours: this.hours,
+      categories: this.categories ? this.categories : undefined,
+      contacts: this.contacts ? this.contacts : undefined,
+      references: this.references ? this.references : undefined,
+      hours: this.hours ? this.hours : undefined,
     };
+
+    // create new location
+    if (createRefOptions.createLocation) {
+      placeCreateObj = {
+        ...placeCreateObj,
+        location: {
+          create: [...this.location?.toCreateObject()],
+        },
+      };
+    }
+
+    // connect existing location
+    if (createRefOptions.connectLocationID != undefined) {
+      placeCreateObj = {
+        ...placeCreateObj,
+        location: {
+          connect: [{ id: createRefOptions.connectLocationID }],
+        },
+      };
+    }
+
+    // create new address
+    if (createRefOptions.createAddress) {
+      placeCreateObj = {
+        ...placeCreateObj,
+        address: {
+          create: [
+            {
+              ...this.address?.toCreateObject(),
+            },
+          ],
+        },
+      };
+    }
+
+    // connect existing address
+    if (createRefOptions.connectAddressID != undefined) {
+      placeCreateObj = {
+        ...placeCreateObj,
+        address: {
+          connect: [{ id: createRefOptions.connectAddressID }],
+        },
+      };
+    }
+
+    // TODO: add references for parent and organization
+    return placeCreateObj;
   }
 
   comparePlace(place: Place): number {
@@ -246,28 +260,59 @@ export const fromBannerPlaces = (herePlaces: HereMapsPlace[]): Place[] => {
   return places;
 };
 
-export const upsertPlaces = async (
+export const createPlace = async (
+  place: Place,
+  prisma: PrismaClient
+): Promise<PlaceWithIncludes | undefined> => {
+  try {
+    // create location
+    let location = place.location
+      ? await createLocation(place.location, prisma)
+      : undefined;
+
+    // create address
+    let address = place.address
+      ? await createAddress(place.address, prisma)
+      : undefined;
+
+    // create place
+    return await prisma.place.create({
+      data: place.toCreateObject({
+        connectLocationID: location ? location.id : undefined,
+        connectAddressID: address ? address.id : undefined,
+      }),
+      include: {
+        location: true,
+        address: true,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  return;
+};
+
+export const createPlaces = async (
   places: Place[],
   prisma: PrismaClient
-): Promise<boolean> => {
-  let placesToAdd: any[] = [];
+): Promise<PlaceWithIncludes[]> => {
+  let placesAdded: PlaceWithIncludes[] = [];
 
   places.forEach(async (p) => {
-    let foundPlaces = await prisma.$queryRawUnsafe(
-      "SELECT id FROM places INNER JOIN addresses ON places.addressID = addresses.id WHERE addresses.countryName = '$1' AND addresses.state = $2 AND addresses.city = $3 AND addresses.street = $4 AND addresses.houseNumber = $5 AND addresses.postalCode = $6",
-      p.address?.countryName,
-      p.address?.state,
-      p.address?.city,
-      p.address?.street,
-      p.address?.houseNumber,
-      p.address?.postalCode
-    );
+    // let foundPlaces = await prisma.$queryRawUnsafe(
+    //   "SELECT id FROM places INNER JOIN addresses ON places.addressID = addresses.id WHERE addresses.countryName = '$1' AND addresses.state = $2 AND addresses.city = $3 AND addresses.street = $4 AND addresses.houseNumber = $5 AND addresses.postalCode = $6",
+    //   p.address?.countryName,
+    //   p.address?.state,
+    //   p.address?.city,
+    //   p.address?.street,
+    //   p.address?.houseNumber,
+    //   p.address?.postalCode
+    // );
 
-    if (foundPlaces) placesToAdd.push(p.toCreateObject());
+    let newPlace = await createPlace(p, prisma);
+    if (newPlace) placesAdded.push(newPlace);
   });
 
-  await prisma.place.createMany({
-    data: placesToAdd,
-  });
-  return true;
+  return placesAdded;
 };

@@ -52,24 +52,24 @@ services:
     ports:
       - 5555:5555
 
-  pgadmin:
-    container_name: pgadmin4_container
-    image: dpage/pgadmin4
-    restart: always
-    depends_on:
-      - postgres
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: root
-      PGADMIN_LISTEN_PORT: 80
-    ports:
-      - "5050:80"
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
-    links:
-      - "postgres:pgsql-server"
+  # pgadmin:
+  #   container_name: pgadmin4_container
+  #   image: dpage/pgadmin4
+  #   restart: always
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@admin.com
+  #     PGADMIN_DEFAULT_PASSWORD: root
+  #     PGADMIN_LISTEN_PORT: 80
+  #   ports:
+  #     - "5050:80"
+  #   volumes:
+  #     - pgadmin-data:/var/lib/pgadmin
+  #   links:
+  #     - "postgres:pgsql-server"
 
 volumes:
   postgres-data:
-  pgadmin-data:
   cache-data:
+  # pgadmin-data:
