@@ -17,14 +17,14 @@ export interface HereMapsPlace {
   houseNumberType?: string;
   address?: HereMapsAddress;
   position?: HereMapsCoordinates;
-  access?: string;
+  access?: [HereMapsCoordinates];
   distance: number;
-  categories?: string;
-  contacts?: string;
-  openingHours?: string;
+  categories?: [HereMapsCagetory];
+  contacts?: HereMapsContact;
+  openingHours?: HereMapsOpeningHours;
   chains?: [HereMapsChain];
   foodTypes?: [HereMapsFoodType];
-  references?: string;
+  references?: [HereMapsReference];
   payment?: HereMapsPayments;
   mayView?: HereMapsMapsView;
 }

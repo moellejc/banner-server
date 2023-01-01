@@ -1,17 +1,33 @@
 import { Field, Int, ObjectType, registerEnumType } from "type-graphql";
-import { Prisma, PlaceTypes, PrismaClient } from "@prisma/client";
-import { Location, locationFromCoords } from "./Location";
+import {
+  Prisma,
+  PlaceTypes,
+  PrismaClient,
+  PrismaPromise,
+  Place as PlacePris,
+} from "@prisma/client";
+import { Location, fromCoords } from "./Location";
 import { Address } from "./Address";
 import { Organization } from "./Organization";
 import { UserLocationPath } from "./UserLocationPath";
 import { UserVisitHistory } from "./UserVisitHistory";
 import { HereMapsPlace } from "../../lib/heremaps";
-import { Coordinates } from "./Coordinates";
+import { HereMapsReference } from "../../lib/heremaps/types";
+import h3 from "h3-js";
 
 registerEnumType(PlaceTypes, {
   name: "PlaceTypes",
   description: undefined,
 });
+
+const placeInclude = Prisma.validator<Prisma.PlaceInclude>()({
+  address: true,
+  location: true,
+});
+
+export type PlaceWithIncludes = Prisma.PlaceGetPayload<{
+  include: typeof placeInclude;
+}>;
 
 @ObjectType()
 export class Place {
@@ -77,22 +93,111 @@ export class Place {
 
   @Field({ nullable: false })
   createdAt: Date;
+
+  toCreateObject(): any {
+    // TODO: update with parent if applicable
+    return {
+      name: this.name,
+      language: this.language,
+      placeType: this.placeType,
+      location: {
+        create: [
+          {
+            lat: this.location?.lat,
+            lon: this.location?.lon,
+            locationType: this.location?.locationType,
+            primaryCellLevel: this.location?.primaryCellLevel,
+            accessPoints: this.location?.accessPoints,
+            geoCellRes0: this.location?.geoCellRes0,
+            geoCellRes1: this.location?.geoCellRes1,
+            geoCellRes2: this.location?.geoCellRes2,
+            geoCellRes3: this.location?.geoCellRes3,
+            geoCellRes4: this.location?.geoCellRes4,
+            geoCellRes5: this.location?.geoCellRes5,
+            geoCellRes6: this.location?.geoCellRes6,
+            geoCellRes7: this.location?.geoCellRes7,
+            geoCellRes8: this.location?.geoCellRes8,
+            geoCellRes9: this.location?.geoCellRes9,
+            geoCellRes10: this.location?.geoCellRes10,
+            geoCellRes11: this.location?.geoCellRes11,
+            geoCellRes12: this.location?.geoCellRes12,
+            geoCellRes13: this.location?.geoCellRes13,
+            geoCellRes14: this.location?.geoCellRes14,
+            geoCellRes15: this.location?.geoCellRes15,
+          },
+        ],
+      },
+      address: {
+        create: [
+          {
+            countryCode: this.address?.countryCode,
+            countryName: this.address?.countryName,
+            state: this.address?.state,
+            stateCode: this.address?.stateCode,
+            county: this.address?.county,
+            city: this.address?.city,
+            district: this.address?.district,
+            street: this.address?.state,
+            houseNumbe: this.address?.houseNumber,
+            postalCode: this.address?.postalCode,
+          },
+        ],
+      },
+      categories: this.categories,
+      contacts: this.contacts,
+      references: this.references,
+      hours: this.hours,
+    };
+  }
+
+  comparePlace(place: Place): number {
+    // TODO: implement comparison threshold for places
+    return 1;
+  }
+
+  isSamePlace(place: Place | PlaceWithIncludes): boolean {
+    // check address
+    if (this.address?.countryCode != place.address?.countryCode) return false;
+    if (this.address?.state != place.address?.state) return false;
+    if (this.address?.city != place.address?.city) return false;
+    if (this.address?.street != place.address?.street) return false;
+    if (this.address?.houseNumber != place.address?.houseNumber) return false;
+
+    return true;
+  }
+
+  inList(places: Place[] | PlaceWithIncludes[]): boolean {
+    let foundSamePlace = false;
+    let castPlaces = places as Place[];
+    castPlaces.every((p) => {
+      if (this.isSamePlace(p)) {
+        foundSamePlace = true;
+        return false; // ".every" breaks when falsey is returned
+      }
+    });
+    return foundSamePlace;
+  }
 }
 
-export const hereMapsPlaceToBannerPlace = (herePlace: HereMapsPlace): Place => {
+export const fromBannerPlace = (herePlace: HereMapsPlace): Place => {
   let place = new Place();
   place.name = herePlace.title!;
   place.language = herePlace.language!;
   place.placeType = PlaceTypes.Commercial;
 
   place.location = herePlace.position
-    ? locationFromCoords({
+    ? fromCoords({
         lat: herePlace.position?.lat,
         lon: herePlace.position?.lng,
       })
     : new Location();
   place.location.primaryCellLevel = 12; // TODO: adjust based on Here Maps type place
-  if (herePlace.access) place.location.accessPoints = herePlace.access;
+  if (herePlace.access)
+    place.location.accessPoints = JSON.stringify(
+      herePlace.access.map((coords, i) => {
+        return h3.latLngToCell(coords.lat, coords.lng, 15);
+      })
+    );
 
   place.address = new Address();
   if (herePlace.address) {
@@ -121,18 +226,48 @@ export const hereMapsPlaceToBannerPlace = (herePlace: HereMapsPlace): Place => {
   if (herePlace.contacts) place.contacts = JSON.stringify(herePlace.contacts);
   if (herePlace.openingHours)
     place.hours = JSON.stringify(herePlace.openingHours);
-  if (herePlace.references)
-    place.references = JSON.stringify(herePlace.references); // need to add HERE as a reference
+  if (herePlace.references) {
+    herePlace.references.push({
+      supplier: {
+        id: "HERE",
+      },
+      id: herePlace.id,
+    } as HereMapsReference);
+    place.references = JSON.stringify(herePlace.references);
+  }
 
-  console.log(place);
   return place;
 };
-export const hereMapsPlacesToBannerPlaces = (
-  herePlaces: HereMapsPlace[]
-): Place[] => {
+export const fromBannerPlaces = (herePlaces: HereMapsPlace[]): Place[] => {
   let places: Place[] = [];
   herePlaces.forEach((p, i) => {
-    places.push(hereMapsPlaceToBannerPlace(p));
+    places.push(fromBannerPlace(p));
   });
   return places;
+};
+
+export const upsertPlaces = async (
+  places: Place[],
+  prisma: PrismaClient
+): Promise<boolean> => {
+  let placesToAdd: any[] = [];
+
+  places.forEach(async (p) => {
+    let foundPlaces = await prisma.$queryRawUnsafe(
+      "SELECT id FROM places INNER JOIN addresses ON places.addressID = addresses.id WHERE addresses.countryName = '$1' AND addresses.state = $2 AND addresses.city = $3 AND addresses.street = $4 AND addresses.houseNumber = $5 AND addresses.postalCode = $6",
+      p.address?.countryName,
+      p.address?.state,
+      p.address?.city,
+      p.address?.street,
+      p.address?.houseNumber,
+      p.address?.postalCode
+    );
+
+    if (foundPlaces) placesToAdd.push(p.toCreateObject());
+  });
+
+  await prisma.place.createMany({
+    data: placesToAdd,
+  });
+  return true;
 };

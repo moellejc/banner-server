@@ -103,6 +103,8 @@ model User {
   totalFollowingPlaces Int                @default(0)
   lastActiveAt         DateTime           @default(now())
   createdAt            DateTime           @default(now())
+
+  @@map("users")
 }
 
 model UserVisitHistory {
@@ -113,6 +115,8 @@ model UserVisitHistory {
   place    Place    @relation(fields: [placeID], references: [id])
   departAt DateTime
   arriveAt DateTime @default(now())
+
+  @@map("user_visit_histories")
 }
 
 model UserLocationPath {
@@ -122,14 +126,20 @@ model UserLocationPath {
   geoCell      String
   geoCellLevel Int
   createdAt    DateTime @default(now())
+
+  @@map("user_location_paths")
 }
 
-model Friends {
+model Friend {
   id Int @id @default(autoincrement())
+
+  @@map("friends")
 }
 
-model Followers {
+model Follower {
   id Int @id @default(autoincrement())
+
+  @@map("followers")
 }
 
 model Post {
@@ -147,6 +157,8 @@ model Post {
   replyCount Int         @default(0)
   likes      Like[]
   likeCount  Int         @default(0)
+
+  @@map("posts")
 }
 
 model PostReply {
@@ -156,6 +168,8 @@ model PostReply {
   authorID Int
   author   User   @relation(fields: [authorID], references: [id])
   text     String
+
+  @@map("post_replies")
 }
 
 model Media {
@@ -167,6 +181,8 @@ model Media {
   mediaURL   String
   mediaIndex Int             @default(0)
   createdAt  DateTime        @default(now())
+
+  @@map("media")
 }
 
 model Like {
@@ -175,6 +191,8 @@ model Like {
   liker   User @relation(fields: [likerID], references: [id])
   postID  Int
   post    Post @relation(fields: [postID], references: [id])
+
+  @@map("likes")
 }
 
 model Place {
@@ -200,10 +218,14 @@ model Place {
   createdAt      DateTime           @default(now())
   posts          Post[]
   visitorHistory UserVisitHistory[]
+
+  @@index([name], type: Hash)
+  @@map("places")
 }
 
-model PlaceFavorites {
+model PlaceFavorite {
   id Int @id @default(autoincrement())
+  @@map("place_favorites")
 }
 
 model Address {
@@ -219,6 +241,8 @@ model Address {
   postalCode  String? @db.VarChar(100)
   houseNumber String? @db.VarChar(100)
   places      Place[]
+
+  @@map("addresses")
 }
 
 model Location {
@@ -268,10 +292,14 @@ model Location {
   @@index([geoCellRes13], type: Hash)
   @@index([geoCellRes14], type: Hash)
   @@index([geoCellRes15], type: Hash)
+
+  @@map("locations")
 }
 
 model Organization {
   id     Int     @id @default(autoincrement())
   name   String  @db.VarChar(200)
   places Place[]
+
+  @@map("organizations")
 }

@@ -116,7 +116,7 @@ export class Location {
   places?: Place[] | null;
 }
 
-export const locationFromCoords = (coords: Coordinates): Location => {
+export const fromCoords = (coords: Coordinates): Location => {
   let loc = new Location();
   loc.lat = coords.lat;
   loc.lon = coords.lon;
