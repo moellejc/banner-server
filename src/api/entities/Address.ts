@@ -50,7 +50,7 @@ export class Address {
       city: this.city,
       district: this.district,
       street: this.state,
-      houseNumbe: this.houseNumber,
+      houseNumber: this.houseNumber,
       postalCode: this.postalCode,
     };
   }
