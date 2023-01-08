@@ -41,7 +41,7 @@ export class Address {
   places?: Place[] | null;
 
   toCreateObject(): any {
-    return {
+    let createObj: any = {
       countryCode: this.countryCode,
       countryName: this.countryName,
       state: this.state,
@@ -49,10 +49,20 @@ export class Address {
       county: this.county,
       city: this.city,
       district: this.district,
-      street: this.state,
+      street: this.street,
       houseNumber: this.houseNumber,
       postalCode: this.postalCode,
     };
+
+    // if (placeID)
+    //   createObj = {
+    //     ...createObj,
+    //     places: {
+    //       connect: [{ id: placeID }],
+    //     },
+    //   };
+
+    return createObj;
   }
 }
 
@@ -65,6 +75,7 @@ export const createAddress = async (
       data: address.toCreateObject(),
     });
   } catch (error) {
+    console.log("CREATE ADDRESS ERROR");
     console.log(error);
   }
 

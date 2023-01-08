@@ -3,7 +3,6 @@ import {
   Prisma,
   PlaceTypes,
   PrismaClient,
-  PrismaPromise,
   Place as PlacePrisma,
 } from "@prisma/client";
 import { Location, fromCoords, createLocation } from "./Location";
@@ -110,10 +109,10 @@ export class Place {
       name: this.name,
       language: this.language,
       placeType: this.placeType,
-      categories: this.categories ? this.categories : undefined,
-      contacts: this.contacts ? this.contacts : undefined,
-      references: this.references ? this.references : undefined,
-      hours: this.hours ? this.hours : undefined,
+      categories: this.categories ? this.categories : "",
+      contacts: this.contacts ? this.contacts : "",
+      references: this.references ? this.references : "",
+      hours: this.hours ? this.hours : "",
     };
 
     // create new location
@@ -121,7 +120,7 @@ export class Place {
       placeCreateObj = {
         ...placeCreateObj,
         location: {
-          create: [...this.location?.toCreateObject()],
+          create: [this.location?.toCreateObject()],
         },
       };
     }
@@ -130,9 +129,10 @@ export class Place {
     if (createRefOptions.connectLocationID != undefined) {
       placeCreateObj = {
         ...placeCreateObj,
-        location: {
-          connect: [{ id: createRefOptions.connectLocationID }],
-        },
+        locationID: createRefOptions.connectLocationID,
+        // location: {
+        //   connect: [{ id: createRefOptions.connectLocationID }],
+        // },
       };
     }
 
@@ -141,11 +141,7 @@ export class Place {
       placeCreateObj = {
         ...placeCreateObj,
         address: {
-          create: [
-            {
-              ...this.address?.toCreateObject(),
-            },
-          ],
+          create: [this.address?.toCreateObject()],
         },
       };
     }
@@ -154,13 +150,15 @@ export class Place {
     if (createRefOptions.connectAddressID != undefined) {
       placeCreateObj = {
         ...placeCreateObj,
-        address: {
-          connect: [{ id: createRefOptions.connectAddressID }],
-        },
+        addressID: createRefOptions.connectAddressID,
+        // address: {
+        //   connect: [{ id: createRefOptions.connectAddressID }],
+        // },
       };
     }
 
     // TODO: add references for parent and organization
+    console.log(placeCreateObj);
     return placeCreateObj;
   }
 
@@ -265,6 +263,18 @@ export const createPlace = async (
   prisma: PrismaClient
 ): Promise<PlaceWithIncludes | undefined> => {
   try {
+    // // create place
+    // let bannerPlace = await prisma.place.create({
+    //   data: place.toCreateObject({
+    //     connectLocationID: undefined,
+    //     connectAddressID: undefined,
+    //   }),
+    //   include: {
+    //     location: true,
+    //     address: true,
+    //   },
+    // });
+
     // create location
     let location = place.location
       ? await createLocation(place.location, prisma)
@@ -286,7 +296,19 @@ export const createPlace = async (
         address: true,
       },
     });
+
+    // return await prisma.place.create({
+    //   data: place.toCreateObject({
+    //     createAddress: true,
+    //     createLocation: true,
+    //   }),
+    //   include: {
+    //     location: true,
+    //     address: true,
+    //   },
+    // });
   } catch (error) {
+    console.log("CREATE PLACE ERROR");
     console.log(error);
   }
 

@@ -276,7 +276,6 @@ model Location {
   posts            Post[]
   places           Place[]
 
-  @@unique([geoCellRes0, geoCellRes1, geoCellRes2, geoCellRes3, geoCellRes4, geoCellRes5, geoCellRes6, geoCellRes7, geoCellRes8, geoCellRes9, geoCellRes10, geoCellRes11, geoCellRes12, geoCellRes13, geoCellRes14, geoCellRes15])
   @@index([geoCellRes0], type: Hash)
   @@index([geoCellRes1], type: Hash)
   @@index([geoCellRes2], type: Hash)

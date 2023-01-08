@@ -120,13 +120,13 @@ export class Location {
   places?: Place[] | null;
 
   toCreateObject(): any {
-    return {
+    let createObj: any = {
       lat: this.lat,
       lon: this.lon,
       locationType: this.locationType ? this.locationType : LocationTypes.Place,
       primaryCellLevel: this.primaryCellLevel,
       accessPoints: this.accessPoints,
-      bbox: this.bbox ? this.bbox : undefined,
+      bbox: this.bbox ? this.bbox : "",
       geoCellRes0: this.geoCellRes0,
       geoCellRes1: this.geoCellRes1,
       geoCellRes2: this.geoCellRes2,
@@ -144,6 +144,16 @@ export class Location {
       geoCellRes14: this.geoCellRes14,
       geoCellRes15: this.geoCellRes15,
     };
+
+    // if (placeID)
+    //   createObj = {
+    //     ...createObj,
+    //     places: {
+    //       connect: [{ id: placeID }],
+    //     },
+    //   };
+
+    return createObj;
   }
 }
 
@@ -180,6 +190,7 @@ export const createLocation = async (
       data: location.toCreateObject(),
     });
   } catch (error) {
+    console.log("CREATE LOCATION ERROR");
     console.log(error);
   }
 

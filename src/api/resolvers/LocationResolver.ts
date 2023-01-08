@@ -83,15 +83,13 @@ export class LocationResolver {
         });
 
         // add new place to database
-        console.log("Before upsertPlaces");
         try {
-          await createPlaces(newPlaces, prisma);
+          return { places: (await createPlaces(newPlaces, prisma)) as Place[] };
         } catch (error) {
           console.log(error);
         }
       }
 
-      console.log("return merged places");
       return { places: mergedPlaces };
     } catch (err) {
       return { errors: [] };
