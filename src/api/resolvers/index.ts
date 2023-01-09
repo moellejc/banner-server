@@ -1,4 +1,4 @@
-import { PostResolver } from "./PostResolver";
+import { PostResolver } from "./PostResolver/resolver";
 import { UserResolver } from "./UserResolver";
 import { LocationResolver } from "./LocationResolver";
 import { Coordinates } from "../entities/Coordinates";

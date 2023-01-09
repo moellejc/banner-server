@@ -1,4 +1,4 @@
-import { User } from "../api/entities/User";
+import { User } from "../api/entities/User/User";
 import { Response } from "express";
 import { sign } from "jsonwebtoken";
 import { isDEV } from "../utils/IsEnv";

@@ -4,7 +4,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from "class-validator";
-import { User } from "../entities/User";
+import { User } from "../entities/User/User";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();

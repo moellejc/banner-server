@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { verify } from "jsonwebtoken";
 import { createAccessToken } from "../../../auth/auth";
-import { User } from "../../entities/User";
+import { User } from "../../entities/User/User";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
