@@ -10,6 +10,8 @@ import { Place } from "../Place";
 import { Coordinates } from "../Coordinates";
 import h3 from "h3-js";
 
+const DEFAULT_LEVEL = 12;
+
 registerEnumType(LocationTypes, {
   name: "LocationTypes",
   description: "LocationTypes",
@@ -25,7 +27,7 @@ export class Location {
   })
   locationType: LocationTypes;
 
-  @Field(() => Int, { nullable: false })
+  @Field(() => Int, { defaultValue: DEFAULT_LEVEL })
   primaryCellLevel: number;
 
   @Field(() => Float, { nullable: false })
@@ -124,7 +126,9 @@ export class Location {
       lat: this.lat,
       lon: this.lon,
       locationType: this.locationType ? this.locationType : LocationTypes.Place,
-      primaryCellLevel: this.primaryCellLevel,
+      primaryCellLevel: this.primaryCellLevel
+        ? this.primaryCellLevel
+        : DEFAULT_LEVEL,
       accessPoints: this.accessPoints,
       bbox: this.bbox ? this.bbox : "",
       geoCellRes0: this.geoCellRes0,
@@ -161,6 +165,7 @@ export const fromCoords = (coords: Coordinates): Location => {
   let loc = new Location();
   loc.lat = coords.lat;
   loc.lon = coords.lon;
+  loc.primaryCellLevel = DEFAULT_LEVEL;
   loc.geoCellRes0 = h3.latLngToCell(coords.lat, coords.lon, 0);
   loc.geoCellRes1 = h3.latLngToCell(coords.lat, coords.lon, 1);
   loc.geoCellRes2 = h3.latLngToCell(coords.lat, coords.lon, 2);

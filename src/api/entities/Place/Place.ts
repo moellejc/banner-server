@@ -6,9 +6,10 @@ import {
   Place as PlacePrisma,
 } from "@prisma/client";
 import { Location, fromCoords, createLocation } from "../Location";
-import { Address, createAddress } from "../Address";
+import { Address, createAddress, addressFromGraphQLInput } from "../Address";
 import { Organization } from "../Organization";
 import { UserLocationPath, UserVisitHistory } from "../User";
+import { CreatePlaceInput } from "../../resolvers/PlaceResolver";
 import { HereMapsPlace } from "../../../lib/heremaps";
 import { HereMapsReference } from "../../../lib/heremaps/types";
 import h3 from "h3-js";
@@ -248,12 +249,24 @@ export const fromBannerPlace = (herePlace: HereMapsPlace): Place => {
 
   return place;
 };
+
 export const fromBannerPlaces = (herePlaces: HereMapsPlace[]): Place[] => {
   let places: Place[] = [];
   herePlaces.forEach((p, i) => {
     places.push(fromBannerPlace(p));
   });
   return places;
+};
+
+export const fromPlaceGraphQLInput = (input: CreatePlaceInput) => {
+  const place = new Place();
+  place.name = input.name;
+  place.language = "en";
+  place.placeType = input.placeType;
+  place.location = fromCoords(input.coords!);
+  place.address = addressFromGraphQLInput(input.address!);
+
+  return place;
 };
 
 export const createPlace = async (
@@ -320,16 +333,6 @@ export const createPlaces = async (
   let placesAdded: PlaceWithIncludes[] = [];
 
   places.forEach(async (p) => {
-    // let foundPlaces = await prisma.$queryRawUnsafe(
-    //   "SELECT id FROM places INNER JOIN addresses ON places.addressID = addresses.id WHERE addresses.countryName = '$1' AND addresses.state = $2 AND addresses.city = $3 AND addresses.street = $4 AND addresses.houseNumber = $5 AND addresses.postalCode = $6",
-    //   p.address?.countryName,
-    //   p.address?.state,
-    //   p.address?.city,
-    //   p.address?.street,
-    //   p.address?.houseNumber,
-    //   p.address?.postalCode
-    // );
-
     let newPlace = await createPlace(p, prisma);
     if (newPlace) placesAdded.push(newPlace);
   });

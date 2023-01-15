@@ -44,8 +44,6 @@ export class LocationResolver {
           })();
       let cellDisk = h3.gridDisk(cell, 1);
 
-      console.log(process.env.DATABASE_URL);
-
       // get all the places in the disk around the current location
       let dbPlaces: PlaceWithIncludes[] = [];
       try {
@@ -95,4 +93,19 @@ export class LocationResolver {
       return { errors: [] };
     }
   }
+
+  @Query(() => PlacesResponse)
+  async getNearInfo(
+    @Arg("location", () => LocationInput) location: LocationInput,
+    @Ctx() { prisma }: AppContext
+  ): Promise<PlacesResponse> {
+    if (!location.coords && !location.cell) return { errors: [] };
+    return { places: [] };
+  }
+
+  @Query(() => PlacesResponse)
+  async getHereInfo(
+    @Arg("location", () => LocationInput) location: LocationInput,
+    @Ctx() { prisma }: AppContext
+  ): Promise<void> {}
 }

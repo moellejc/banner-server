@@ -18,9 +18,29 @@ type Address {
   street: String!
 }
 
+input AddressInput {
+  city: String!
+  countryCode: String!
+  countryName: String!
+  county: String
+  district: String
+  houseNumber: String!
+  postalCode: String!
+  state: String!
+  stateCode: String!
+  street: String!
+}
+
 input Coordinates {
   lat: Float!
   lon: Float!
+}
+
+input CreatePlaceInput {
+  address: AddressInput
+  coords: Coordinates
+  name: String!
+  placeType: PlaceTypes!
 }
 
 """
@@ -32,6 +52,11 @@ type FieldError {
   constraints: [String!]
   field: String
   message: String
+}
+
+input GetPlaceInfoInput {
+  id: Int!
+  includes: PlaceIncludes
 }
 
 type Like {
@@ -69,7 +94,7 @@ type Location {
   lon: Float!
   places: [Place!]
   posts: [Post!]
-  primaryCellLevel: Int!
+  primaryCellLevel: Int
   updatedAt: DateTime!
   users: [User!]
 }
@@ -115,12 +140,14 @@ enum MediaTypes {
 
 type Mutation {
   checkEmail(options: UserCheckEmailScreenNameInputs!): UserResponse!
+  createPlace(placeData: CreatePlaceInput!): PlaceResponse!
   createPost(options: PostCreateInput!): PostResponse!
   deletePost(id: Int!): Boolean!
   deleteUser(id: Int!): Boolean!
   login(options: UserLoginInput!): LoginResponse!
   logout: Boolean!
   register(options: UserRegisterInput!): RegisterResponse!
+  updatePlace(placeData: CreatePlaceInput!): PlacesResponse!
   updateUser(id: Int!, options: UserUpdateInput!): Boolean!
 }
 
@@ -152,6 +179,16 @@ type Place {
   references: String
   updatedAt: DateTime!
   visitorHistory: [UserVisitHistory!]
+}
+
+input PlaceIncludes {
+  address: Boolean
+  location: Boolean
+}
+
+type PlaceResponse {
+  errors: [FieldError!]
+  place: Place
 }
 
 enum PlaceTypes {
@@ -221,6 +258,9 @@ type PostResponse {
 }
 
 type Query {
+  getHereInfo(location: LocationInput!): PlacesResponse!
+  getNearInfo(location: LocationInput!): PlacesResponse!
+  getPlaceInfo(options: GetPlaceInfoInput!): PlacesResponse!
   getPlacesFromLocation(location: LocationInput!): PlacesResponse!
   me: User
   myPosts: [Post!]!

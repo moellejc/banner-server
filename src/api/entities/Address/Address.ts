@@ -1,6 +1,7 @@
 import { Field, Int, ObjectType, Float } from "type-graphql";
 import { PrismaClient, Address as AddressPrisma } from "@prisma/client";
 import { Place } from "../Place/Place";
+import { AddressInput } from "../../resolvers/AddressResolver";
 
 @ObjectType()
 export class Address {
@@ -80,4 +81,18 @@ export const createAddress = async (
   }
 
   return;
+};
+
+export const addressFromGraphQLInput = (input: AddressInput): Address => {
+  const address = new Address();
+  address.houseNumber = input.houseNumber;
+  address.street = input.street;
+  address.city = input.city;
+  address.state = input.state;
+  address.stateCode = input.stateCode;
+  address.postalCode = input.postalCode;
+  address.countryName = input.countryName;
+  address.countryCode = input.countryCode;
+
+  return address;
 };
