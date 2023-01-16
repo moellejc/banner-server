@@ -50,59 +50,115 @@ enum MediaExtensions {
   GLTF
 }
 
+enum PlaceTypes {
+  Transit // road, intersection, railway
+  Residential // house
+  Commercial // store
+  Educational // school, university
+  Medical // hospital
+  Religious // church
+  Community // neighborhood, group of people
+  Municipality // city, town, village
+  Administrative // government building, district
+  State
+  Province
+  Country
+  Continent
+  Geographic
+  Landmark
+}
+
+enum LocationTypes {
+  Place
+  User
+}
+
 model User {
-  id                   Int               @id @default(autoincrement())
-  email                String            @unique
-  firstName            String            @db.VarChar(200)
-  lastName             String            @db.VarChar(200)
-  screenName           String            @db.VarChar(200)
+  id                   Int                @id @default(autoincrement())
+  email                String             @unique
+  firstName            String             @db.VarChar(200)
+  lastName             String             @db.VarChar(200)
+  screenName           String             @db.VarChar(200)
   password             String
   tempPassword         String?
   tempPasswordExpires  DateTime?
-  hasTempPassword      Boolean           @default(false)
-  tokenVersion         Int               @default(0)
+  hasTempPassword      Boolean            @default(false)
+  tokenVersion         Int                @default(0)
   profilePic           String?
-  role                 UserRoles         @default(USER)
-  status               UserStatuses      @default(ACTIVE)
-  isVerified           Boolean           @default(false)
-  verificationType     UserVerifications @default(STANDARD)
-  cellID               Int?
-  cell                 LocationCell?     @relation(fields: [cellID], references: [id])
+  role                 UserRoles          @default(USER)
+  status               UserStatuses       @default(ACTIVE)
+  isVerified           Boolean            @default(false)
+  verificationType     UserVerifications  @default(STANDARD)
+  locationID           Int?
+  location             Location?          @relation(fields: [locationID], references: [id])
   posts                Post[]
   postReplies          PostReply[]
-  totalPosts           Int               @default(0)
+  totalPosts           Int                @default(0)
   likes                Like[]
-  totalLikes           Int               @default(0)
-  totalFollowers       Int               @default(0)
-  totalFollowing       Int               @default(0)
-  totalFollowingPlaces Int               @default(0)
-  lastActiveAt         DateTime          @default(now())
-  createdAt            DateTime          @default(now())
+  locationPath         UserLocationPath[]
+  visitHistory         UserVisitHistory[]
+  totalLikes           Int                @default(0)
+  totalFollowers       Int                @default(0)
+  totalFollowing       Int                @default(0)
+  totalFollowingPlaces Int                @default(0)
+  lastActiveAt         DateTime           @default(now())
+  createdAt            DateTime           @default(now())
+
+  @@map("users")
 }
 
-model Friends {
-  id Int @id @default(autoincrement())
+model UserVisitHistory {
+  id       Int      @id @default(autoincrement())
+  userID   Int
+  user     User     @relation(fields: [userID], references: [id])
+  placeID  Int
+  place    Place    @relation(fields: [placeID], references: [id])
+  departAt DateTime
+  arriveAt DateTime @default(now())
+
+  @@map("user_visit_histories")
 }
 
-model Followers {
+model UserLocationPath {
+  id           Int      @id @default(autoincrement())
+  userID       Int
+  user         User     @relation(fields: [userID], references: [id])
+  geoCell      String
+  geoCellLevel Int
+  createdAt    DateTime @default(now())
+
+  @@map("user_location_paths")
+}
+
+model Friend {
   id Int @id @default(autoincrement())
+
+  @@map("friends")
+}
+
+model Follower {
+  id Int @id @default(autoincrement())
+
+  @@map("followers")
 }
 
 model Post {
-  id         Int          @id @default(autoincrement())
+  id         Int         @id @default(autoincrement())
   authorID   Int
-  author     User         @relation(fields: [authorID], references: [id])
-  cellID     Int
-  cell       LocationCell @relation(fields: [cellID], references: [id])
+  author     User        @relation(fields: [authorID], references: [id])
+  locationID Int
+  location   Location    @relation(fields: [locationID], references: [id])
   placeID    Int?
-  place      Place?       @relation(fields: [placeID], references: [id])
-  text       String?    
+  place      Place?      @relation(fields: [placeID], references: [id])
+  text       String?
   media      Media[]
-  createdAt  DateTime     @default(now())
+  createdAt  DateTime    @default(now())
   replies    PostReply[]
-  replyCount Int          @default(0)
+  replyCount Int         @default(0)
   likes      Like[]
-  likeCount  Int          @default(0)
+  likeCount  Int         @default(0)
+
+  @@map("posts")
 }
 
 model PostReply {
@@ -112,6 +168,8 @@ model PostReply {
   authorID Int
   author   User   @relation(fields: [authorID], references: [id])
   text     String
+
+  @@map("post_replies")
 }
 
 model Media {
@@ -123,6 +181,8 @@ model Media {
   mediaURL   String
   mediaIndex Int             @default(0)
   createdAt  DateTime        @default(now())
+
+  @@map("media")
 }
 
 model Like {
@@ -131,57 +191,92 @@ model Like {
   liker   User @relation(fields: [likerID], references: [id])
   postID  Int
   post    Post @relation(fields: [postID], references: [id])
+
+  @@map("likes")
 }
 
 model Place {
-  id          Int          @id @default(autoincrement())
-  name        String       @db.VarChar(200)
-  cellID      Int
-  cell        LocationCell @relation(fields: [cellID], references: [id])
-  streetNum   String       @db.VarChar(200)
-  street      String       @db.VarChar(200)
-  city        String       @db.VarChar(200)
-  state       String       @db.VarChar(200)
-  stateCode   String       @db.VarChar(5)
-  postalCode  String       @db.VarChar(20)
-  county      String       @db.VarChar(200)
-  countryName String       @db.VarChar(200)
-  countryCode String       @db.VarChar(5)
-  peopleHere  Int          @default(0)
-  updatedAt   DateTime     @default(now())
-  createdAt   DateTime     @default(now())
-  posts       Post[]
+  id             Int                @id @default(autoincrement())
+  name           String             @db.VarChar(200)
+  language       String             @default("en") @db.VarChar(3)
+  placeType      PlaceTypes
+  locationID     Int?
+  location       Location?          @relation(fields: [locationID], references: [id])
+  parentID       Int?
+  parent         Place?             @relation("PlaceHierarchy", fields: [parentID], references: [id])
+  children       Place[]            @relation("PlaceHierarchy")
+  addressID      Int?
+  address        Address?           @relation(fields: [addressID], references: [id])
+  peopleHere     Int                @default(0)
+  references     Json?
+  categories     Json?
+  contacts       Json?
+  hours          Json?
+  organizationID Int?
+  organization   Organization?      @relation(fields: [organizationID], references: [id])
+  updatedAt      DateTime           @default(now())
+  createdAt      DateTime           @default(now())
+  posts          Post[]
+  visitorHistory UserVisitHistory[]
+
+  @@index([name], type: Hash)
+  @@map("places")
 }
 
-model PlaceFavorites {
+model PlaceFavorite {
   id Int @id @default(autoincrement())
+
+  @@map("place_favorites")
 }
 
-model LocationCell {
-  id           Int      @id @default(autoincrement())
-  lat          Float
-  lon          Float
-  geoCellRes1  String
-  geoCellRes2  String
-  geoCellRes3  String
-  geoCellRes4  String
-  geoCellRes5  String
-  geoCellRes6  String
-  geoCellRes7  String
-  geoCellRes8  String
-  geoCellRes9  String
-  geoCellRes10 String
-  geoCellRes11 String
-  geoCellRes12 String
-  geoCellRes13 String
-  geoCellRes14 String
-  geoCellRes15 String
-  createdAt    DateTime @default(now())
-  users        User[]
-  posts        Post[]
-  places       Place[]
+model Address {
+  id          Int     @id @default(autoincrement())
+  countryCode String  @db.VarChar(100)
+  countryName String  @db.VarChar(100)
+  stateCode   String? @db.VarChar(100)
+  state       String? @db.VarChar(100)
+  county      String? @db.VarChar(100)
+  city        String? @db.VarChar(100)
+  district    String? @db.VarChar(100)
+  street      String? @db.VarChar(100)
+  postalCode  String? @db.VarChar(100)
+  houseNumber String? @db.VarChar(100)
+  places      Place[]
 
-  @@unique([geoCellRes1, geoCellRes2, geoCellRes3, geoCellRes4, geoCellRes5, geoCellRes6, geoCellRes7, geoCellRes8, geoCellRes9, geoCellRes10, geoCellRes11, geoCellRes12, geoCellRes13, geoCellRes14, geoCellRes15])
+  @@map("addresses")
+}
+
+model Location {
+  id               Int           @id @default(autoincrement())
+  locationType     LocationTypes
+  primaryCellLevel Int
+  lat              Float
+  lon              Float
+  geoCellRes0      String        @db.VarChar(16)
+  geoCellRes1      String        @db.VarChar(16)
+  geoCellRes2      String        @db.VarChar(16)
+  geoCellRes3      String        @db.VarChar(16)
+  geoCellRes4      String        @db.VarChar(16)
+  geoCellRes5      String        @db.VarChar(16)
+  geoCellRes6      String        @db.VarChar(16)
+  geoCellRes7      String        @db.VarChar(16)
+  geoCellRes8      String        @db.VarChar(16)
+  geoCellRes9      String        @db.VarChar(16)
+  geoCellRes10     String        @db.VarChar(16)
+  geoCellRes11     String        @db.VarChar(16)
+  geoCellRes12     String        @db.VarChar(16)
+  geoCellRes13     String        @db.VarChar(16)
+  geoCellRes14     String        @db.VarChar(16)
+  geoCellRes15     String        @db.VarChar(16)
+  bbox             Json?
+  accessPoints     Json?
+  updatedAt        DateTime      @default(now())
+  createdAt        DateTime      @default(now())
+  users            User[]
+  posts            Post[]
+  places           Place[]
+
+  @@index([geoCellRes0], type: Hash)
   @@index([geoCellRes1], type: Hash)
   @@index([geoCellRes2], type: Hash)
   @@index([geoCellRes3], type: Hash)
@@ -197,4 +292,13 @@ model LocationCell {
   @@index([geoCellRes13], type: Hash)
   @@index([geoCellRes14], type: Hash)
   @@index([geoCellRes15], type: Hash)
+  @@map("locations")
+}
+
+model Organization {
+  id     Int     @id @default(autoincrement())
+  name   String  @db.VarChar(200)
+  places Place[]
+
+  @@map("organizations")
 }

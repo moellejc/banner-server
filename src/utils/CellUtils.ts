@@ -1,6 +1,7 @@
 import { latLngToCell } from "h3-js";
 
 export interface CellsAtLevels {
+  geoCellRes0: string;
   geoCellRes1: string;
   geoCellRes2: string;
   geoCellRes3: string;
@@ -25,6 +26,7 @@ export const latLngToAllCellLevels = (
   if (!lat || !lon) return null;
 
   return {
+    geoCellRes0: latLngToCell(lat, lon, 0),
     geoCellRes1: latLngToCell(lat, lon, 1),
     geoCellRes2: latLngToCell(lat, lon, 2),
     geoCellRes3: latLngToCell(lat, lon, 3),

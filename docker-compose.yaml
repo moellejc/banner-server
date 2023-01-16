@@ -18,7 +18,7 @@ services:
       - /app/node_modules
 
   postgres:
-    image: postgis/postgis:13-master
+    image: postgres:13.9
     hostname: postgres
     restart: always
     ports:
@@ -39,37 +39,37 @@ services:
     volumes:
       - cache-data:/data
 
-  prisma-studio:
-    container_name: prisma-studio
-    image: timothyjmiller/prisma-studio:latest
-    restart: unless-stopped
-    depends_on:
-      - postgres
-    env_file:
-      - .env
-    environment:
-      POSTGRES_URL: postgres://postgres:postgres@postgres:5432/bannerdb
-    ports:
-      - 5555:5555
+  # prisma-studio:
+  #   container_name: prisma-studio
+  #   image: timothyjmiller/prisma-studio:latest
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - postgres
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     POSTGRES_URL: postgresql://postgres:postgres@postgres:5432/bannerdb
+  #   ports:
+  #     - 5555:5555
 
-  pgadmin:
-    container_name: pgadmin4_container
-    image: dpage/pgadmin4
-    restart: always
-    depends_on:
-      - postgres
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: root
-      PGADMIN_LISTEN_PORT: 80
-    ports:
-      - "5050:80"
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
-    links:
-      - "postgres:pgsql-server"
+  # pgadmin:
+  #   container_name: pgadmin4_container
+  #   image: dpage/pgadmin4
+  #   restart: always
+  #   depends_on:
+  #     - postgres
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@admin.com
+  #     PGADMIN_DEFAULT_PASSWORD: root
+  #     PGADMIN_LISTEN_PORT: 80
+  #   ports:
+  #     - "5050:80"
+  #   volumes:
+  #     - pgadmin-data:/var/lib/pgadmin
+  #   links:
+  #     - "postgres:pgsql-server"
 
 volumes:
   postgres-data:
-  pgadmin-data:
   cache-data:
+  # pgadmin-data:
