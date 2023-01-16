@@ -201,3 +201,17 @@ export const createLocation = async (
 
   return;
 };
+
+export const diskGridFromLocation = (
+  level: number,
+  coords?: Coordinates,
+  cell?: string
+): string[] => {
+  if (!coords && !cell) return [];
+
+  let centerCell = cell
+    ? cell
+    : h3.latLngToCell(coords!.lat, coords!.lon, level);
+
+  return h3.gridDisk(centerCell, 1);
+};

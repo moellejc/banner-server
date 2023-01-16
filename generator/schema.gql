@@ -258,8 +258,8 @@ type PostResponse {
 }
 
 type Query {
-  getHereInfo(location: LocationInput!): PlacesResponse!
-  getNearInfo(location: LocationInput!): PlacesResponse!
+  getHereInfo(options: LocationInput!): PlacesResponse!
+  getNearInfo(options: LocationInput!): PlacesResponse!
   getPlaceInfo(options: GetPlaceInfoInput!): PlacesResponse!
   getPlacesFromLocation(location: LocationInput!): PlacesResponse!
   me: User

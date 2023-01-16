@@ -7,7 +7,7 @@ import {
   Resolver,
   UseMiddleware,
 } from "type-graphql";
-import { Location } from "../../entities/Location";
+import { diskGridFromLocation } from "../../entities/Location";
 import { LocationInput } from "./inputs";
 import {
   Place,
@@ -21,6 +21,7 @@ import h3 from "h3-js";
 import { placesAtLocation, getAccessToken } from "../../../lib/heremaps";
 import { Coordinates } from "../../entities/Coordinates";
 import { HereMapsPlace } from "../../../lib/heremaps";
+import { FieldError } from "../../errors";
 
 @Resolver()
 export class LocationResolver {
@@ -96,16 +97,40 @@ export class LocationResolver {
 
   @Query(() => PlacesResponse)
   async getNearInfo(
-    @Arg("location", () => LocationInput) location: LocationInput,
+    @Arg("options", () => LocationInput) options: LocationInput,
     @Ctx() { prisma }: AppContext
   ): Promise<PlacesResponse> {
-    if (!location.coords && !location.cell) return { errors: [] };
-    return { places: [] };
+    if (!options.coords && !options.cell) return { errors: [] };
+
+    const cellDisk = diskGridFromLocation(7, options.coords!, options.cell!);
+
+    let errors: FieldError[] = [];
+    try {
+      const dbPlaces = await prisma.place.findMany({
+        where: {
+          location: {
+            geoCellRes7: { in: cellDisk },
+          },
+        },
+        include: {
+          address: true,
+          location: true,
+        },
+      });
+      return { places: dbPlaces as Place[] };
+    } catch (error) {
+      errors.push({
+        field: "id",
+        message: `Places not found near coords:${options.coords} | cell:${options.cell}`,
+      });
+    }
+
+    return { errors };
   }
 
   @Query(() => PlacesResponse)
   async getHereInfo(
-    @Arg("location", () => LocationInput) location: LocationInput,
+    @Arg("options", () => LocationInput) options: LocationInput,
     @Ctx() { prisma }: AppContext
   ): Promise<void> {}
 }
