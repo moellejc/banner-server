@@ -262,6 +262,9 @@ type Query {
   getNearInfo(options: LocationInput!): PlacesResponse!
   getPlaceInfo(options: GetPlaceInfoInput!): PlacesResponse!
   getPlacesFromLocation(location: LocationInput!): PlacesResponse!
+
+  """Return an address and information given Lat/Lon coords"""
+  getReverseGeocode(options: LocationInput!): PlaceResponse!
   me: User
   myPosts: [Post!]!
   user(id: Int!): User!
