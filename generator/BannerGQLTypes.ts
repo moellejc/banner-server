@@ -17,12 +17,58 @@ export type Scalars = {
   Point: any;
 };
 
+export type Address = {
+  __typename?: 'Address';
+  city: Scalars['String'];
+  countryCode: Scalars['String'];
+  countryName: Scalars['String'];
+  county: Scalars['String'];
+  district: Scalars['String'];
+  houseNumber: Scalars['String'];
+  id: Scalars['Float'];
+  places?: Maybe<Array<Place>>;
+  postalCode: Scalars['String'];
+  state: Scalars['String'];
+  stateCode: Scalars['String'];
+  street: Scalars['String'];
+};
+
+export type AddressInput = {
+  city: Scalars['String'];
+  countryCode: Scalars['String'];
+  countryName: Scalars['String'];
+  county?: Maybe<Scalars['String']>;
+  district?: Maybe<Scalars['String']>;
+  houseNumber: Scalars['String'];
+  postalCode: Scalars['String'];
+  state: Scalars['String'];
+  stateCode: Scalars['String'];
+  street: Scalars['String'];
+};
+
+export type Coordinates = {
+  lat: Scalars['Float'];
+  lon: Scalars['Float'];
+};
+
+export type CreatePlaceInput = {
+  address?: Maybe<AddressInput>;
+  coords?: Maybe<Coordinates>;
+  name: Scalars['String'];
+  placeType: PlaceTypes;
+};
+
 
 export type FieldError = {
   __typename?: 'FieldError';
   constraints?: Maybe<Array<Scalars['String']>>;
   field?: Maybe<Scalars['String']>;
   message?: Maybe<Scalars['String']>;
+};
+
+export type GetPlaceInfoInput = {
+  id: Scalars['Int'];
+  includes?: Maybe<PlaceIncludes>;
 };
 
 export type Like = {
@@ -35,9 +81,12 @@ export type Like = {
   userID: Scalars['Int'];
 };
 
-export type LocationCell = {
-  __typename?: 'LocationCell';
+export type Location = {
+  __typename?: 'Location';
+  accessPoints?: Maybe<Scalars['String']>;
+  bbox?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
+  geoCellRes0: Scalars['String'];
   geoCellRes1: Scalars['String'];
   geoCellRes2: Scalars['String'];
   geoCellRes3: Scalars['String'];
@@ -55,11 +104,25 @@ export type LocationCell = {
   geoCellRes15: Scalars['String'];
   id: Scalars['Int'];
   lat: Scalars['Float'];
+  locationType: LocationTypes;
   lon: Scalars['Float'];
   places?: Maybe<Array<Place>>;
   posts?: Maybe<Array<Post>>;
+  primaryCellLevel?: Maybe<Scalars['Int']>;
+  updatedAt: Scalars['DateTime'];
   users?: Maybe<Array<User>>;
 };
+
+export type LocationInput = {
+  cell?: Maybe<Scalars['String']>;
+  coords?: Maybe<Coordinates>;
+};
+
+/** LocationTypes */
+export enum LocationTypes {
+  Place = 'Place',
+  User = 'User'
+}
 
 export type LoginResponse = {
   __typename?: 'LoginResponse';
@@ -92,18 +155,25 @@ export enum MediaTypes {
 export type Mutation = {
   __typename?: 'Mutation';
   checkEmail: UserResponse;
+  createPlace: PlaceResponse;
   createPost: PostResponse;
   deletePost: Scalars['Boolean'];
   deleteUser: Scalars['Boolean'];
   login: LoginResponse;
   logout: Scalars['Boolean'];
   register: RegisterResponse;
+  updatePlace: PlacesResponse;
   updateUser: Scalars['Boolean'];
 };
 
 
 export type MutationCheckEmailArgs = {
   options: UserCheckEmailScreenNameInputs;
+};
+
+
+export type MutationCreatePlaceArgs = {
+  placeData: CreatePlaceInput;
 };
 
 
@@ -132,28 +202,81 @@ export type MutationRegisterArgs = {
 };
 
 
+export type MutationUpdatePlaceArgs = {
+  placeData: CreatePlaceInput;
+};
+
+
 export type MutationUpdateUserArgs = {
   id: Scalars['Int'];
   options: UserUpdateInput;
 };
 
+export type Organization = {
+  __typename?: 'Organization';
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  places?: Maybe<Array<Place>>;
+};
+
 export type Place = {
   __typename?: 'Place';
-  cell?: Maybe<LocationCell>;
-  cellID?: Maybe<Scalars['Int']>;
-  city: Scalars['String'];
-  countryCode: Scalars['String'];
-  countryName: Scalars['String'];
-  county: Scalars['String'];
+  address?: Maybe<Address>;
+  addressID?: Maybe<Scalars['Int']>;
+  categories?: Maybe<Scalars['String']>;
+  children?: Maybe<Array<Place>>;
+  contacts?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
+  hours?: Maybe<Scalars['String']>;
   id: Scalars['Float'];
+  language: Scalars['String'];
+  location?: Maybe<Location>;
+  locationID?: Maybe<Scalars['Int']>;
   name: Scalars['String'];
-  peopleHere: Scalars['Float'];
-  postalCode: Scalars['String'];
-  state: Scalars['String'];
-  stateCode: Scalars['String'];
-  street: Scalars['String'];
-  streetNum: Scalars['String'];
+  organization?: Maybe<Organization>;
+  organizationID?: Maybe<Scalars['Int']>;
+  parent?: Maybe<Place>;
+  parentID?: Maybe<Scalars['Int']>;
+  peopleHere?: Maybe<Scalars['Float']>;
+  placeType: PlaceTypes;
+  references?: Maybe<Scalars['String']>;
+  updatedAt: Scalars['DateTime'];
+  visitorHistory?: Maybe<Array<UserVisitHistory>>;
+};
+
+export type PlaceIncludes = {
+  address?: Maybe<Scalars['Boolean']>;
+  location?: Maybe<Scalars['Boolean']>;
+};
+
+export type PlaceResponse = {
+  __typename?: 'PlaceResponse';
+  errors?: Maybe<Array<FieldError>>;
+  place?: Maybe<Place>;
+};
+
+export enum PlaceTypes {
+  Administrative = 'Administrative',
+  Commercial = 'Commercial',
+  Community = 'Community',
+  Continent = 'Continent',
+  Country = 'Country',
+  Educational = 'Educational',
+  Geographic = 'Geographic',
+  Landmark = 'Landmark',
+  Medical = 'Medical',
+  Municipality = 'Municipality',
+  Province = 'Province',
+  Religious = 'Religious',
+  Residential = 'Residential',
+  State = 'State',
+  Transit = 'Transit'
+}
+
+export type PlacesResponse = {
+  __typename?: 'PlacesResponse';
+  errors?: Maybe<Array<FieldError>>;
+  places?: Maybe<Array<Place>>;
 };
 
 
@@ -161,7 +284,7 @@ export type Post = {
   __typename?: 'Post';
   author: User;
   authorID: Scalars['Int'];
-  cell?: Maybe<LocationCell>;
+  cell?: Maybe<Location>;
   cellID?: Maybe<Scalars['Int']>;
   createdAt: Scalars['DateTime'];
   id: Scalars['Int'];
@@ -202,10 +325,41 @@ export type PostResponse = {
 
 export type Query = {
   __typename?: 'Query';
+  getHereInfo: PlacesResponse;
+  getNearInfo: PlacesResponse;
+  getPlaceInfo: PlacesResponse;
+  getPlacesFromLocation: PlacesResponse;
+  /** Return an address and information given Lat/Lon coords */
+  getReverseGeocode: PlacesResponse;
   me?: Maybe<User>;
   myPosts: Array<Post>;
   user: User;
   users: Array<User>;
+};
+
+
+export type QueryGetHereInfoArgs = {
+  options: LocationInput;
+};
+
+
+export type QueryGetNearInfoArgs = {
+  options: LocationInput;
+};
+
+
+export type QueryGetPlaceInfoArgs = {
+  options: GetPlaceInfoInput;
+};
+
+
+export type QueryGetPlacesFromLocationArgs = {
+  location: LocationInput;
+};
+
+
+export type QueryGetReverseGeocodeArgs = {
+  options: LocationInput;
 };
 
 
@@ -222,8 +376,6 @@ export type RegisterResponse = {
 
 export type User = {
   __typename?: 'User';
-  cell?: Maybe<LocationCell>;
-  cellID?: Maybe<Scalars['Int']>;
   createdAt: Scalars['DateTime'];
   email: Scalars['String'];
   firstName: Scalars['String'];
@@ -233,6 +385,9 @@ export type User = {
   lastActiveAt: Scalars['DateTime'];
   lastName: Scalars['String'];
   likes?: Maybe<Array<Like>>;
+  location?: Maybe<Location>;
+  locationID?: Maybe<Scalars['Int']>;
+  locationPath?: Maybe<Array<UserLocationPath>>;
   media?: Maybe<Array<Media>>;
   posts?: Maybe<Array<Post>>;
   profilePic?: Maybe<Scalars['String']>;
@@ -246,11 +401,17 @@ export type User = {
   totalLikes?: Maybe<Scalars['Int']>;
   totalPosts?: Maybe<Scalars['Int']>;
   verificationType?: Maybe<UserVerifications>;
+  visitHistory?: Maybe<Array<UserVisitHistory>>;
 };
 
 export type UserCheckEmailScreenNameInputs = {
   email: Scalars['String'];
   screenName: Scalars['String'];
+};
+
+export type UserLocationPath = {
+  __typename?: 'UserLocationPath';
+  id: Scalars['Int'];
 };
 
 export type UserLoginInput = {
@@ -301,3 +462,8 @@ export enum UserVerifications {
   Official = 'OFFICIAL',
   Standard = 'STANDARD'
 }
+
+export type UserVisitHistory = {
+  __typename?: 'UserVisitHistory';
+  id: Scalars['Int'];
+};

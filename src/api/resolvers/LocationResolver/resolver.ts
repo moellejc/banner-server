@@ -11,6 +11,7 @@ import { diskGridFromLocation } from "../../entities/Location";
 import { LocationInput } from "./inputs";
 import {
   Place,
+  fromBannerPlace,
   fromBannerPlaces,
   createPlaces,
   PlaceWithIncludes,
@@ -18,9 +19,13 @@ import {
 import { PlaceResponse, PlacesResponse } from "../PlaceResolver/responses";
 import { AppContext } from "../../../context/AppContext";
 import h3 from "h3-js";
-import { placesAtLocation, getAccessToken } from "../../../lib/heremaps";
+import {
+  HereMapsPlace,
+  placesAtLocation,
+  getAccessToken,
+  reverseGeocode,
+} from "../../../lib/heremaps";
 import { Coordinates } from "../../entities/Coordinates";
-import { HereMapsPlace } from "../../../lib/heremaps";
 import { FieldError } from "../../errors";
 
 @Resolver()
@@ -93,6 +98,31 @@ export class LocationResolver {
     } catch (err) {
       return { errors: [] };
     }
+  }
+
+  @Query(() => PlaceResponse, {
+    description: "Return an address and information given Lat/Lon coords",
+  })
+  async getReverseGeocode(
+    @Arg("options", () => LocationInput) options: LocationInput,
+    @Ctx() { prisma }: AppContext
+  ): Promise<PlaceResponse> {
+    if (!options.coords && !options.cell) return { errors: [] };
+    const coords = options.coords
+      ? options.coords
+      : ((c: h3.CoordPair) => {
+          return { lat: c[0], lon: c[1] };
+        })(h3.cellToLatLng(options.cell!));
+
+    const token = await getAccessToken();
+    const herePlace = await reverseGeocode(coords.lat, coords.lon, token!);
+
+    if (!herePlace || !herePlace.data.items[0]) return { errors: [] };
+
+    const place = fromBannerPlace(herePlace.data.items[0]);
+    place.id = -1; // TODO: should probably handle this temporary id more gracefully
+
+    return { place };
   }
 
   @Query(() => PlacesResponse)

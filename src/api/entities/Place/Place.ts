@@ -192,8 +192,8 @@ export class Place {
 
 export const fromBannerPlace = (herePlace: HereMapsPlace): Place => {
   let place = new Place();
-  place.name = herePlace.title!;
-  place.language = herePlace.language!;
+  place.name = herePlace.title ? herePlace.title : "NO TITLE AVAILABLE";
+  place.language = herePlace.language ? herePlace.language : "en";
   place.placeType = PlaceTypes.Commercial;
 
   place.location = herePlace.position
