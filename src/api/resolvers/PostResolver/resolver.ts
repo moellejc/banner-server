@@ -23,8 +23,7 @@ import {
 } from "../../errors/PostErrors";
 import { PostCreateInput } from "./inputs";
 import { PostResponse } from "./responses";
-import { Post as PostPris, prisma } from "@prisma/client";
-import { Prisma } from "@prisma/client";
+import { Post as PostPris } from "@prisma/client";
 
 @Resolver()
 export class PostResolver {
