@@ -24,7 +24,6 @@ import {
 import { PostCreateInput } from "./inputs";
 import { PostResponse } from "./responses";
 import { Post as PostPris, prisma } from "@prisma/client";
-import { Prisma } from "@prisma/client";
 
 @Resolver()
 export class PostResolver {
