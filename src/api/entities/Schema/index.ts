@@ -8,6 +8,7 @@ import { organizations, organizationsRelations } from "../Organization";
 import { likes } from "../Like";
 import { addresses, addressesRelations } from "../Address";
 
+// export as an object
 export const schema = {
   ...users,
   ...usersRelations,
@@ -27,3 +28,14 @@ export const schema = {
   ...organizationsRelations,
   ...likes,
 };
+
+// export individual schema objects from each entity
+export { users, usersRelations } from "../User";
+export { places, placesRelations } from "../Place";
+export { locations, locationsRelations } from "../Location";
+export { posts, postsRelations } from "../Post";
+export { postReplies, postRepliesRelations } from "../Post";
+export { media, mediaRelations } from "../Media";
+export { organizations, organizationsRelations } from "../Organization";
+export { likes } from "../Like";
+export { addresses, addressesRelations } from "../Address";

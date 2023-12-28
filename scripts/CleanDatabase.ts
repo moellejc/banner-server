@@ -3,7 +3,7 @@ import { createConnection } from "typeorm";
 import { Follow } from "../src/api/entities/Follow";
 import { Like } from "../src/api/entities/Like";
 import { Post } from "../src/api/entities/Post";
-import { PostReply } from "../src/api/entities/PostReply";
+import { PostReply } from "../src/api/entities/Post";
 import { User } from "../src/api/entities/User";
 import { EnvLevels } from "../src/constants/EnvLevels";
 

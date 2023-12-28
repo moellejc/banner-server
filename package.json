@@ -14,7 +14,10 @@
     "clean:database": "npx ts-node scripts/CleanDatabase.ts",
     "generate": "graphql-codegen --config codegen.yml",
     "migrate:create": "npx prisma migrate dev --create-only",
-    "migrate:deploy": "npx prisma migrate deploy"
+    "migrate:deploy": "npx prisma migrate deploy",
+    "drizzle:migration:generate": "drizzle-kit generate:pg --config=drizzle.config.ts",
+    "drizzle:migration:push": "drizzle-kit push:pg",
+    "drizzle:migration:deploy": "npx ts-node scripts/RunMigration.ts"
   },
   "repository": {
     "type": "git",

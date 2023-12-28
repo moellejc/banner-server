@@ -5,45 +5,21 @@ import {
   PrismaClient,
   Place as PlacePrisma,
 } from "@prisma/client";
-import {
-  serial,
-  varchar,
-  text,
-  pgTable,
-  timestamp,
-  boolean,
-  integer,
-  pgEnum,
-  json,
-  AnyPgColumn,
-  index,
-} from "drizzle-orm/pg-core";
-import { relations, sql } from "drizzle-orm";
 import { dzlClient } from "../../../lib/drizzle";
-import { Location, fromCoords, createLocation, locations } from "../Location";
-import {
-  Address,
-  createAddress,
-  addressFromGraphQLInput,
-  addresses,
-} from "../Address";
-import { Organization, organizations } from "../Organization";
+import { Location, fromCoords, createLocation } from "../Location";
+import { Address, createAddress, addressFromGraphQLInput } from "../Address";
+import { Organization } from "../Organization";
 import { User, UserLocationPath, UserVisitHistory, users } from "../User";
+import { places } from "./schema";
 import { CreatePlaceInput } from "../../resolvers/PlaceResolver";
 import { HereMapsPlace } from "../../../lib/heremaps";
 import { HereMapsReference } from "../../../lib/heremaps/types";
 import h3 from "h3-js";
-import { posts } from "../Post";
 
 registerEnumType(PlaceTypes, {
   name: "PlaceTypes",
   description: undefined,
 });
-
-export const PlaceTypesDZL = pgEnum(
-  "place_types",
-  Object.values(PlaceTypes) as [string]
-);
 
 const placeInclude = Prisma.validator<Prisma.PlaceInclude>()({
   address: true,
@@ -304,7 +280,7 @@ export const fromPlaceGraphQLInput = (input: CreatePlaceInput) => {
 export const createPlace = async (
   place: Place,
   prisma: PrismaClient
-): Promise<PlaceWithIncludes | undefined> => {
+): Promise<Place | undefined> => {
   try {
     // // create place
     // let bannerPlace = await prisma.place.create({
@@ -337,13 +313,11 @@ export const createPlace = async (
       .values({
         name: place.name,
         placeType: PlaceTypes.Commercial,
-
         locationID: place.locationID,
-
         addressID: place.addressID,
       })
       .returning();
-    return createdPlace as PlaceWithIncludes;
+    return createdPlace as Place;
     // return await prisma.place.create({
     //   data: place.toCreateObject({
     //     connectLocationID: location ? location.id : undefined,
@@ -376,8 +350,8 @@ export const createPlace = async (
 export const createPlaces = async (
   places: Place[],
   prisma: PrismaClient
-): Promise<PlaceWithIncludes[]> => {
-  let placesAdded: PlaceWithIncludes[] = [];
+): Promise<Place[]> => {
+  let placesAdded: Place[] = [];
 
   places.forEach(async (p) => {
     let newPlace = await createPlace(p, prisma);
@@ -386,59 +360,3 @@ export const createPlaces = async (
 
   return placesAdded;
 };
-
-export const places = pgTable(
-  "places",
-  {
-    id: serial("id").primaryKey(),
-    name: varchar("name", { length: 256 }).notNull(),
-    language: varchar("language", { length: 3 }).default("en"),
-    placeType: PlaceTypesDZL("place_type"),
-    createdByID: integer("created_by_id").references(() => users.id),
-    locationID: integer("location_id").references(() => locations.id),
-    parentID: integer("parent_id").references((): AnyPgColumn => places.id),
-    addressID: integer("address_id").references(() => addresses.id),
-    peopleHere: integer("people_here").default(0),
-    references: json("references"),
-    categories: json("categories"),
-    contacts: json("contacts"),
-    hours: json("hours"),
-    organizationID: integer("organization_id").references(
-      () => organizations.id
-    ),
-    updatedAt: timestamp("updated_at").default(sql`now()`),
-    createdAt: timestamp("created_at").default(sql`now()`),
-    // visitorHistory UserVisitHistory[]
-  },
-  (table) => {
-    return {
-      nameIdx: index("name_idx").on(table.name),
-      addressIDIdx: index("address_id_idx").on(table.addressID),
-    };
-  }
-);
-
-export const placesRelations = relations(places, ({ one, many }) => ({
-  createdBy: one(users, {
-    fields: [places.createdByID],
-    references: [users.id],
-  }),
-  location: one(locations, {
-    fields: [places.locationID],
-    references: [locations.id],
-  }),
-  address: one(addresses, {
-    fields: [places.addressID],
-    references: [addresses.id],
-  }),
-  organization: one(organizations, {
-    fields: [places.organizationID],
-    references: [organizations.id],
-  }),
-  parent: one(places, {
-    fields: [places.parentID],
-    references: [places.id],
-  }),
-  children: many(places),
-  posts: many(posts),
-}));
