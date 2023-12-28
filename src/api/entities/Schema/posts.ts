@@ -12,10 +12,10 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
-import { users } from "../User";
-import { places } from "../Place";
-import { media } from "../Media";
-import { locations } from "../Location";
+import { users } from "./users";
+import { places } from "./places";
+import { media } from "./media";
+import { locations } from "./locations";
 
 export const posts = pgTable("posts", {
   id: serial("id").primaryKey(),

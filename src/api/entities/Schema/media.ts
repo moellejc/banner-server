@@ -12,7 +12,7 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
-import { posts } from "../Post";
+import { posts } from "./posts";
 import { MediaTypes, MediaExtensions } from "@prisma/client";
 
 export const MediaTypesDZL = pgEnum(

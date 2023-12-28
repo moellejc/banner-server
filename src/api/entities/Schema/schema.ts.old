@@ -1,0 +1,338 @@
+import {
+  serial,
+  varchar,
+  text,
+  pgTable,
+  timestamp,
+  boolean,
+  integer,
+  pgEnum,
+  json,
+  doublePrecision,
+  AnyPgColumn,
+  index,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
+import { relations, sql } from "drizzle-orm";
+import { LocationTypes } from "@prisma/client";
+import { MediaTypes, MediaExtensions } from "@prisma/client";
+import { PlaceTypes } from "@prisma/client";
+import { UserRoles, UserStatuses, UserVerifications } from "@prisma/client";
+
+export const addresses = pgTable("addresses", {
+  id: serial("id").primaryKey(),
+  countryCode: varchar("country_code", { length: 100 }),
+  countryName: varchar("country_name", { length: 100 }),
+  stateCode: varchar("state_code", { length: 100 }),
+  state: varchar("state", { length: 100 }),
+  county: varchar("county", { length: 100 }),
+  city: varchar("city", { length: 100 }),
+  district: varchar("district", { length: 100 }),
+  street: varchar("street", { length: 100 }),
+  postalCode: varchar("postal_code", { length: 100 }),
+  houseNumber: varchar("house_number", { length: 100 }),
+});
+
+export const addressesRelations = relations(addresses, ({ many }) => ({
+  places: many(places),
+}));
+
+export const likes = pgTable("likes", {
+  id: serial("id").primaryKey(),
+  likerID: integer("liker_id"),
+  // liker   User @relation(fields: [likerID], references: [id])
+  postID: integer("post_id"),
+  // post    Post @relation(fields: [postID], references: [id])
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
+export const LocationTypesDZL = pgEnum(
+  "location_types",
+  Object.values(LocationTypes) as [string]
+);
+
+export const locations = pgTable(
+  "locations",
+  {
+    id: serial("id").primaryKey(),
+    locationType: LocationTypesDZL("location_type"),
+    primaryCellLevel: integer("primary_cell_level"),
+    lat: doublePrecision("lat"),
+    lon: doublePrecision("lon"),
+    geoCellRes0: varchar("geom_cell_res_0", { length: 16 }),
+    geoCellRes1: varchar("geom_cell_res_1", { length: 16 }),
+    geoCellRes2: varchar("geom_cell_res_2", { length: 16 }),
+    geoCellRes3: varchar("geom_cell_res_3", { length: 16 }),
+    geoCellRes4: varchar("geom_cell_res_4", { length: 16 }),
+    geoCellRes5: varchar("geom_cell_res_5", { length: 16 }),
+    geoCellRes6: varchar("geom_cell_res_6", { length: 16 }),
+    geoCellRes7: varchar("geom_cell_res_7", { length: 16 }),
+    geoCellRes8: varchar("geom_cell_res_8", { length: 16 }),
+    geoCellRes9: varchar("geom_cell_res_9", { length: 16 }),
+    geoCellRes10: varchar("geom_cell_res_10", { length: 16 }),
+    geoCellRes11: varchar("geom_cell_res_11", { length: 16 }),
+    geoCellRes12: varchar("geom_cell_res_12", { length: 16 }),
+    geoCellRes13: varchar("geom_cell_res_13", { length: 16 }),
+    geoCellRes14: varchar("geom_cell_res_14", { length: 16 }),
+    geoCellRes15: varchar("geom_cell_res_15", { length: 16 }),
+    bbox: json("bbox"), // TODO: should move to its own place_borders table
+    accessPoints: json("access_points"), // TODO: should move to places table
+    updatedAt: timestamp("updated_at").default(sql`now()`),
+    createdAt: timestamp("created_at").default(sql`now()`),
+  },
+  (table) => {
+    return {
+      geoCellRes0Idx: index("geom_cell_res_0_idx").on(table.geoCellRes0),
+      geoCellRes1Idx: index("geom_cell_res_1_idx").on(table.geoCellRes1),
+      geoCellRes2Idx: index("geom_cell_res_2_idx").on(table.geoCellRes2),
+      geoCellRes3Idx: index("geom_cell_res_3_idx").on(table.geoCellRes3),
+      geoCellRes4Idx: index("geom_cell_res_4_idx").on(table.geoCellRes4),
+      geoCellRes5Idx: index("geom_cell_res_5_idx").on(table.geoCellRes5),
+      geoCellRes6Idx: index("geom_cell_res_6_idx").on(table.geoCellRes6),
+      geoCellRes7Idx: index("geom_cell_res_7_idx").on(table.geoCellRes7),
+      geoCellRes8Idx: index("geom_cell_res_8_idx").on(table.geoCellRes8),
+      geoCellRes9Idx: index("geom_cell_res_9_idx").on(table.geoCellRes9),
+      geoCellRes10Idx: index("geom_cell_res_10_idx").on(table.geoCellRes10),
+      geoCellRes11Idx: index("geom_cell_res_11_idx").on(table.geoCellRes11),
+      geoCellRes12Idx: index("geom_cell_res_12_idx").on(table.geoCellRes12),
+      geoCellRes13Idx: index("geom_cell_res_13_idx").on(table.geoCellRes13),
+      geoCellRes14Idx: index("geom_cell_res_14_idx").on(table.geoCellRes14),
+      geoCellRes15Idx: index("geom_cell_res_15_idx").on(table.geoCellRes15),
+    };
+  }
+);
+
+export const locationsRelations = relations(locations, ({ many }) => ({
+  users: many(users),
+  places: many(places),
+  posts: many(posts),
+}));
+
+export const MediaTypesDZL = pgEnum(
+  "media_types",
+  Object.values(MediaTypes) as [string]
+);
+
+export const MediaExtensionsDZL = pgEnum(
+  "media_extensions",
+  Object.values(MediaExtensions) as [string]
+);
+
+export const media = pgTable(
+  "media",
+  {
+    id: serial("id").primaryKey(),
+    extension: MediaExtensionsDZL("extension"),
+    mediaType: MediaTypesDZL("media_type"),
+    postID: integer("post_id").references(() => posts.id), // TODO: add action here
+    mediaURL: text("media_url"),
+    mediaIndex: integer("media_index").default(0),
+    createdAt: timestamp("created_at").default(sql`now()`),
+  },
+  (table) => {
+    return {
+      postIDIdx: index("post_id_idx").on(table.postID),
+    };
+  }
+);
+
+export const mediaRelations = relations(media, ({ one }) => ({
+  post: one(posts, {
+    fields: [media.postID],
+    references: [posts.id],
+  }),
+}));
+
+export const organizations = pgTable(
+  "organizations",
+  {
+    id: serial("id").primaryKey(),
+    name: varchar("name", { length: 256 }).notNull(),
+    createdAt: timestamp("created_at").default(sql`now()`),
+  },
+  (table) => {
+    return {
+      organizationNameIdx: index("organization_name_idx").on(table.name),
+    };
+  }
+);
+
+export const organizationsRelations = relations(organizations, ({ many }) => ({
+  places: many(places),
+}));
+
+export const PlaceTypesDZL = pgEnum(
+  "place_types",
+  Object.values(PlaceTypes) as [string]
+);
+
+export const places = pgTable(
+  "places",
+  {
+    id: serial("id").primaryKey(),
+    name: varchar("name", { length: 256 }).notNull(),
+    language: varchar("language", { length: 3 }).default("en"),
+    placeType: PlaceTypesDZL("place_type"),
+    createdByID: integer("created_by_id").references(() => users.id),
+    locationID: integer("location_id").references(() => locations.id),
+    parentID: integer("parent_id").references((): AnyPgColumn => places.id),
+    addressID: integer("address_id").references(() => addresses.id),
+    peopleHere: integer("people_here").default(0),
+    references: json("references"),
+    categories: json("categories"),
+    contacts: json("contacts"),
+    hours: json("hours"),
+    organizationID: integer("organization_id").references(
+      () => organizations.id
+    ),
+    updatedAt: timestamp("updated_at").default(sql`now()`),
+    createdAt: timestamp("created_at").default(sql`now()`),
+    // visitorHistory UserVisitHistory[]
+  },
+  (table) => {
+    return {
+      placeNameIdx: index("place_name_idx").on(table.name),
+      addressIDIdx: index("address_id_idx").on(table.addressID),
+    };
+  }
+);
+
+export const placesRelations = relations(places, ({ one, many }) => ({
+  createdBy: one(users, {
+    fields: [places.createdByID],
+    references: [users.id],
+  }),
+  location: one(locations, {
+    fields: [places.locationID],
+    references: [locations.id],
+  }),
+  address: one(addresses, {
+    fields: [places.addressID],
+    references: [addresses.id],
+  }),
+  organization: one(organizations, {
+    fields: [places.organizationID],
+    references: [organizations.id],
+  }),
+  parent: one(places, {
+    fields: [places.parentID],
+    references: [places.id],
+  }),
+  children: many(places),
+  posts: many(posts),
+}));
+
+export const posts = pgTable("posts", {
+  id: serial("id").primaryKey(),
+  authorID: integer("author_id").references(() => users.id),
+  locationID: integer("location_id").references(() => locations.id),
+  placeID: integer("place_id").references(() => places.id),
+  text: text("text"),
+  replyCount: integer("reply_count").default(0),
+  // likes      Like[]
+  likeCount: integer("like_count").default(0),
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
+export const postsRelations = relations(posts, ({ one, many }) => ({
+  author: one(users, {
+    fields: [posts.authorID],
+    references: [users.id],
+  }),
+  location: one(locations, {
+    fields: [posts.locationID],
+    references: [locations.id],
+  }),
+  place: one(places, {
+    fields: [posts.placeID],
+    references: [places.id],
+  }),
+  media: many(media),
+  replies: many(postReplies),
+}));
+
+// TODO: this needs some work. Parents, children, likes, media? etc
+export const postReplies = pgTable("post_replies", {
+  id: serial("id").primaryKey(),
+  postID: integer("post_id").references(() => posts.id),
+  authorID: integer("author_id").references(() => users.id),
+  text: text("text"),
+  updatedAt: timestamp("updated_at").default(sql`now()`),
+  createdAt: timestamp("created_at").default(sql`now()`),
+});
+
+export const postRepliesRelations = relations(postReplies, ({ one, many }) => ({
+  author: one(users, {
+    fields: [postReplies.authorID],
+    references: [users.id],
+  }),
+  post: one(posts, {
+    fields: [postReplies.postID],
+    references: [posts.id],
+  }),
+}));
+
+export const UserRolesDZL = pgEnum(
+  "user_roles",
+  Object.values(UserRoles) as [string]
+);
+
+export const UserStatusesDZL = pgEnum(
+  "user_statuses",
+  Object.values(UserStatuses) as [string]
+);
+
+export const UserVerificationsDZL = pgEnum(
+  "user_verifications",
+  Object.values(UserVerifications) as [string]
+);
+
+export const users = pgTable(
+  "users",
+  {
+    id: serial("id").primaryKey(),
+    email: varchar("email", { length: 256 }).unique(),
+    firstName: varchar("first_name", { length: 256 }).notNull(),
+    lastName: varchar("last_name", { length: 256 }).notNull(),
+    screenName: varchar("screen_name", { length: 200 }).notNull(),
+    password: text("password").notNull(),
+    tempPassword: text("temp_password"),
+    tempPasswordExpires: timestamp("temp_password_expires"),
+    hasTempPassword: boolean("has_template_password").default(false),
+    tokenVersion: integer("token_version").default(0),
+    profilePic: text("profile_pic"),
+    role: UserRolesDZL("role").default("USER"),
+    status: UserStatusesDZL("user_statuses").default("ACTIVE"),
+    isVerified: boolean("is_verified").default(false),
+    verificationType:
+      UserVerificationsDZL("user_verifications").default("STANDARD"),
+    locationID: integer("location_id").references(() => locations.id),
+    totalPosts: integer("total_posts").default(0),
+    // likes                Like[]
+    // locationPath         UserLocationPath[]
+    // visitHistory         UserVisitHistory[]
+    totalLikes: integer("total_likes").default(0),
+    totalFollowers: integer("total_followers").default(0),
+    totalFollowing: integer("total_following").default(0),
+    totalFollowingPlaces: integer("total_following_places").default(0),
+    lastActiveAt: timestamp("last_active_at").default(sql`now()`),
+    createdAt: timestamp("created_at").default(sql`now()`),
+  },
+  (table) => {
+    return {
+      emailIdx: uniqueIndex("email_idx").on(table.email),
+      screenNameIdx: uniqueIndex("screen_name_idx").on(table.screenName),
+      locationIDIdx: index("location_id_idx").on(table.locationID),
+    };
+  }
+);
+
+export const usersRelations = relations(users, ({ one, many }) => ({
+  location: one(locations, {
+    fields: [users.locationID],
+    references: [locations.id],
+  }),
+  places: many(places),
+  posts: many(posts),
+  postReplies: many(postReplies),
+}));

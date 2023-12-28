@@ -10,7 +10,7 @@ import { Location, fromCoords, createLocation } from "../Location";
 import { Address, createAddress, addressFromGraphQLInput } from "../Address";
 import { Organization } from "../Organization";
 import { User, UserLocationPath, UserVisitHistory, users } from "../User";
-import { places } from "./schema";
+import { places } from "../Schema/places";
 import { CreatePlaceInput } from "../../resolvers/PlaceResolver";
 import { HereMapsPlace } from "../../../lib/heremaps";
 import { HereMapsReference } from "../../../lib/heremaps/types";

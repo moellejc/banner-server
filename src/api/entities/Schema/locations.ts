@@ -12,9 +12,9 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
-import { users } from "../User";
-import { posts } from "../Post";
-import { places } from "../Place";
+import { users } from "./users";
+import { posts } from "./posts";
+import { places } from "./places";
 import { LocationTypes } from "@prisma/client";
 
 export const LocationTypesDZL = pgEnum(

@@ -11,11 +11,9 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
-import { Like } from "../Like";
-import { Media } from "../Media";
-import { Post, posts, postReplies } from "../Post";
-import { Location, locations } from "../Location";
-import { places } from "../Place";
+import { posts, postReplies } from "./posts";
+import { locations } from "./locations";
+import { places } from "./places";
 import { UserRoles, UserStatuses, UserVerifications } from "@prisma/client";
 
 export const UserRolesDZL = pgEnum(

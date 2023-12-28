@@ -11,7 +11,7 @@ import {
   doublePrecision,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
-import { places } from "../Place";
+import { places } from "./places";
 
 export const addresses = pgTable("addresses", {
   id: serial("id").primaryKey(),

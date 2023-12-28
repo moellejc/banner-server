@@ -12,7 +12,7 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
-import { places } from "../Place";
+import { places } from "./places";
 
 export const organizations = pgTable(
   "organizations",
@@ -23,7 +23,7 @@ export const organizations = pgTable(
   },
   (table) => {
     return {
-      nameIdx: index("name_idx").on(table.name),
+      organizationNameIdx: index("organization_name_idx").on(table.name),
     };
   }
 );

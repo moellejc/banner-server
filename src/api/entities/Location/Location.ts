@@ -8,7 +8,7 @@ import { dzlClient } from "../../../lib/drizzle";
 import { User } from "../User";
 import { Post } from "../Post";
 import { Place } from "../Place";
-import { locations } from "./schema";
+import { locations } from "../Schema/locations";
 import { Coordinates } from "../Coordinates";
 import h3 from "h3-js";
 

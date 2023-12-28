@@ -12,11 +12,11 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
-import { users } from "../User";
-import { addresses } from "../Address";
-import { organizations } from "../Organization";
-import { posts } from "../Post";
-import { locations } from "../Location";
+import { users } from "./users";
+import { addresses } from "./addresses";
+import { organizations } from "./organizations";
+import { posts } from "./posts";
+import { locations } from "./locations";
 import { PlaceTypes } from "@prisma/client";
 
 export const PlaceTypesDZL = pgEnum(
@@ -49,7 +49,7 @@ export const places = pgTable(
   },
   (table) => {
     return {
-      nameIdx: index("name_idx").on(table.name),
+      placeNameIdx: index("place_name_idx").on(table.name),
       addressIDIdx: index("address_id_idx").on(table.addressID),
     };
   }
