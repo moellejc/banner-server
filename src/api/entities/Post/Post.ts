@@ -2,10 +2,10 @@ import { Point } from "geojson";
 import { Field, Int, ObjectType } from "type-graphql";
 import { PointScalar } from "../../../types/Point";
 import { Like } from "../Like/Like";
-import { Media } from "../Media/Media";
-import { PostReply } from "./PostReply";
-import { User } from "../User/User";
-import { Location } from "../Location/Location";
+import { Media, media } from "../Media";
+import { PostReply, postReplies } from "./PostReply";
+import { User, users } from "../User";
+import { Location, locations } from "../Location";
 import { Prisma, PrismaClient } from "@prisma/client";
 import {
   serial,
@@ -20,6 +20,7 @@ import {
   doublePrecision,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
+import { places } from "../Place";
 
 const prisma = new PrismaClient();
 
@@ -81,18 +82,29 @@ export class Post {
 
 export const posts = pgTable("posts", {
   id: serial("id").primaryKey(),
-  // authorID   Int
-  // author     User        @relation(fields: [authorID], references: [id])
-  // locationID Int
-  // location   Location    @relation(fields: [locationID], references: [id])
-  // placeID    Int?
-  // place      Place?      @relation(fields: [placeID], references: [id])
+  authorID: integer("author_id").references(() => users.id),
+  locationID: integer("location_id").references(() => locations.id),
+  placeID: integer("place_id").references(() => places.id),
   text: text("text"),
-  // media      Media[]
-
-  // replies    PostReply[]
   replyCount: integer("reply_count").default(0),
   // likes      Like[]
   likeCount: integer("like_count").default(0),
   createdAt: timestamp("created_at").default(sql`now()`),
 });
+
+export const postsRelations = relations(posts, ({ one, many }) => ({
+  author: one(users, {
+    fields: [posts.authorID],
+    references: [users.id],
+  }),
+  location: one(locations, {
+    fields: [posts.locationID],
+    references: [locations.id],
+  }),
+  place: one(places, {
+    fields: [posts.placeID],
+    references: [places.id],
+  }),
+  media: many(media),
+  replies: many(postReplies),
+}));

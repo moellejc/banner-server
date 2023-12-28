@@ -13,7 +13,7 @@ import {
   doublePrecision,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
-import { Place } from "../Place/Place";
+import { Place, places } from "../Place";
 import { AddressInput } from "../../resolvers/AddressResolver";
 
 @ObjectType()
@@ -92,8 +92,11 @@ export const addresses = pgTable("addresses", {
   street: varchar("street", { length: 100 }),
   postalCode: varchar("postal_code", { length: 100 }),
   houseNumber: varchar("house_number", { length: 100 }),
-  // places      Place[]
 });
+
+export const addressesRelations = relations(addresses, ({ many }) => ({
+  places: many(places),
+}));
 
 export const createAddress = async (
   address: Address,

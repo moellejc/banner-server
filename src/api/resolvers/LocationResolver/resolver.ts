@@ -63,6 +63,7 @@ export class LocationResolver {
           .rightJoin(locations, eq(places.locationID, locations.id))
           .where(inArray(locations.geoCellRes7, cellDisk))
           .leftJoin(addresses, eq(places.addressID, addresses.id));
+        // dbPlaces = foundPlaces as PlaceWithIncludes[];
 
         dbPlaces = await prisma.place.findMany({
           where: {

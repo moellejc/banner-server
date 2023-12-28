@@ -1,6 +1,6 @@
 import { Field, Int, ObjectType } from "type-graphql";
-import { Post } from "./Post";
-import { User } from "../User";
+import { Post, posts } from "./Post";
+import { User, users } from "../User";
 import {
   serial,
   varchar,
@@ -48,13 +48,23 @@ export class PostReply {
   createdAt: Date;
 }
 
+// TODO: this needs some work. Parents, children, likes, media? etc
 export const postReplies = pgTable("post_replies", {
   id: serial("id").primaryKey(),
-  postID: integer("post_id"),
-  // post     Post   @relation(fields: [postID], references: [id])
-  authorID: integer("author_id"),
-  // author   User   @relation(fields: [authorID], references: [id])
+  postID: integer("post_id").references(() => posts.id),
+  authorID: integer("author_id").references(() => users.id),
   text: text("text"),
   updatedAt: timestamp("updated_at").default(sql`now()`),
   createdAt: timestamp("created_at").default(sql`now()`),
 });
+
+export const postRepliesRelations = relations(postReplies, ({ one, many }) => ({
+  author: one(users, {
+    fields: [postReplies.authorID],
+    references: [users.id],
+  }),
+  post: one(posts, {
+    fields: [postReplies.postID],
+    references: [posts.id],
+  }),
+}));
