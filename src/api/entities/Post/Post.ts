@@ -7,6 +7,19 @@ import { PostReply } from "./PostReply";
 import { User } from "../User/User";
 import { Location } from "../Location/Location";
 import { Prisma, PrismaClient } from "@prisma/client";
+import {
+  serial,
+  varchar,
+  text,
+  pgTable,
+  timestamp,
+  boolean,
+  integer,
+  pgEnum,
+  json,
+  doublePrecision,
+} from "drizzle-orm/pg-core";
+import { relations, sql } from "drizzle-orm";
 
 const prisma = new PrismaClient();
 
@@ -65,3 +78,21 @@ export class Post {
   @Field(() => Date)
   createdAt: Date;
 }
+
+export const posts = pgTable("posts", {
+  id: serial("id").primaryKey(),
+  // authorID   Int
+  // author     User        @relation(fields: [authorID], references: [id])
+  // locationID Int
+  // location   Location    @relation(fields: [locationID], references: [id])
+  // placeID    Int?
+  // place      Place?      @relation(fields: [placeID], references: [id])
+  text: text("text"),
+  // media      Media[]
+
+  // replies    PostReply[]
+  replyCount: integer("reply_count").default(0),
+  // likes      Like[]
+  likeCount: integer("like_count").default(0),
+  createdAt: timestamp("created_at").default(sql`now()`),
+});

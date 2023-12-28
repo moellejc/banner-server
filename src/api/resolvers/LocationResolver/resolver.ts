@@ -11,6 +11,7 @@ import { diskGridFromLocation } from "../../entities/Location";
 import { LocationInput } from "./inputs";
 import {
   Place,
+  places,
   fromBannerPlace,
   fromBannerPlaces,
   createPlaces,
@@ -27,13 +28,16 @@ import {
 } from "../../../lib/heremaps";
 import { Coordinates } from "../../entities/Coordinates";
 import { FieldError } from "../../errors";
+import { locations } from "../../entities/Location";
+import { relations, eq, sql, inArray } from "drizzle-orm";
+import { addresses } from "../../entities/Address";
 
 @Resolver()
 export class LocationResolver {
   @Query(() => PlacesResponse)
   async getPlacesFromLocation(
     @Arg("location", () => LocationInput) location: LocationInput,
-    @Ctx() { prisma }: AppContext
+    @Ctx() { db, prisma }: AppContext
   ): Promise<PlacesResponse> {
     if (!location.coords && !location.cell) return { errors: [] };
 
@@ -53,6 +57,13 @@ export class LocationResolver {
       // get all the places in the disk around the current location
       let dbPlaces: PlaceWithIncludes[] = [];
       try {
+        const foundPlaces = await db
+          .select()
+          .from(places)
+          .rightJoin(locations, eq(places.locationID, locations.id))
+          .where(inArray(locations.geoCellRes7, cellDisk))
+          .leftJoin(addresses, eq(places.addressID, addresses.id));
+
         dbPlaces = await prisma.place.findMany({
           where: {
             location: {

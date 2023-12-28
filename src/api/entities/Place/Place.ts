@@ -5,6 +5,19 @@ import {
   PrismaClient,
   Place as PlacePrisma,
 } from "@prisma/client";
+import {
+  serial,
+  varchar,
+  text,
+  pgTable,
+  timestamp,
+  boolean,
+  integer,
+  pgEnum,
+  json,
+} from "drizzle-orm/pg-core";
+import { relations, sql } from "drizzle-orm";
+import { dzlClient } from "../../../lib/drizzle";
 import { Location, fromCoords, createLocation } from "../Location";
 import { Address, createAddress, addressFromGraphQLInput } from "../Address";
 import { Organization } from "../Organization";
@@ -18,6 +31,11 @@ registerEnumType(PlaceTypes, {
   name: "PlaceTypes",
   description: undefined,
 });
+
+export const PlaceTypesDZL = pgEnum(
+  "place_types",
+  Object.values(PlaceTypes) as [string]
+);
 
 const placeInclude = Prisma.validator<Prisma.PlaceInclude>()({
   address: true,
@@ -297,16 +315,31 @@ export const createPlace = async (
       : undefined;
 
     // create place
-    return await prisma.place.create({
-      data: place.toCreateObject({
-        connectLocationID: location ? location.id : undefined,
-        connectAddressID: address ? address.id : undefined,
-      }),
-      include: {
-        location: true,
-        address: true,
-      },
-    });
+    const placeObj = place.toCreateObject();
+    place.addressID = address?.id;
+    place.locationID = location?.id;
+    const [createdPlace] = await dzlClient
+      .insert(places)
+      .values({
+        name: place.name,
+        placeType: PlaceTypes.Commercial,
+
+        locationID: place.locationID,
+
+        addressID: place.addressID,
+      })
+      .returning();
+    return createdPlace as PlaceWithIncludes;
+    // return await prisma.place.create({
+    //   data: place.toCreateObject({
+    //     connectLocationID: location ? location.id : undefined,
+    //     connectAddressID: address ? address.id : undefined,
+    //   }),
+    //   include: {
+    //     location: true,
+    //     address: true,
+    //   },
+    // });
 
     // return await prisma.place.create({
     //   data: place.toCreateObject({
@@ -339,3 +372,28 @@ export const createPlaces = async (
 
   return placesAdded;
 };
+
+export const places = pgTable("places", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 256 }).notNull(),
+  language: varchar("language", { length: 3 }).default("en"),
+  placeType: PlaceTypesDZL("place_type"),
+  locationID: integer("location_id"),
+  // location       Location?          @relation(fields: [locationID], references: [id])
+  parentID: integer("parent_id"),
+  // parent         Place?             @relation("PlaceHierarchy", fields: [parentID], references: [id])
+  // children       Place[]            @relation("PlaceHierarchy")
+  addressID: integer("address_id"),
+  // address        Address?           @relation(fields: [addressID], references: [id])
+  peopleHere: integer("people_here").default(0),
+  references: json("references"),
+  categories: json("categories"),
+  contacts: json("contacts"),
+  hours: json("hours"),
+  organizationID: integer("organization_id"),
+  // organization   Organization?      @relation(fields: [organizationID], references: [id])
+  updatedAt: timestamp("updated_at").default(sql`now()`),
+  createdAt: timestamp("created_at").default(sql`now()`),
+  // posts          Post[]
+  // visitorHistory UserVisitHistory[]
+});

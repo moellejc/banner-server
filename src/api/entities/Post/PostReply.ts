@@ -1,6 +1,19 @@
 import { Field, Int, ObjectType } from "type-graphql";
 import { Post } from "./Post";
 import { User } from "../User";
+import {
+  serial,
+  varchar,
+  text,
+  pgTable,
+  timestamp,
+  boolean,
+  integer,
+  pgEnum,
+  json,
+  doublePrecision,
+} from "drizzle-orm/pg-core";
+import { relations, sql } from "drizzle-orm";
 
 @ObjectType()
 export class PostReply {
@@ -8,10 +21,10 @@ export class PostReply {
   id!: string;
 
   @Field()
-  creatorID: string;
+  authorID: string;
 
   @Field(() => User)
-  creator!: User;
+  author!: User;
 
   @Field()
   postID: string;
@@ -34,3 +47,14 @@ export class PostReply {
   @Field()
   createdAt: Date;
 }
+
+export const postReplies = pgTable("post_replies", {
+  id: serial("id").primaryKey(),
+  postID: integer("post_id"),
+  // post     Post   @relation(fields: [postID], references: [id])
+  authorID: integer("author_id"),
+  // author   User   @relation(fields: [authorID], references: [id])
+  text: text("text"),
+  updatedAt: timestamp("updated_at").default(sql`now()`),
+  createdAt: timestamp("created_at").default(sql`now()`),
+});

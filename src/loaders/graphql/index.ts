@@ -6,6 +6,7 @@ import { resolvers, orphanTypes } from "../../api/resolvers";
 import { evalBoolean } from "../../utils/EvalBoolean";
 import { AppContext } from "../../context/AppContext";
 import prismaClient from "../../lib/prisma";
+import { dzlClient } from "../../lib/drizzle";
 
 export const graphqlLoader = async (app: Application) => {
   const server = new ApolloServer({
@@ -20,6 +21,7 @@ export const graphqlLoader = async (app: Application) => {
       const custCtx: AppContext = {
         req,
         res,
+        db: dzlClient,
         prisma: prismaClient,
       };
       return custCtx;
