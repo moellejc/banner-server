@@ -19,7 +19,6 @@ import {
 } from "../../entities/Place";
 import { places } from "../../entities/Schema";
 import { FieldError } from "../../errors";
-// import { Prisma } from "@prisma/client";
 import { eq, sql } from "drizzle-orm";
 
 @Resolver()

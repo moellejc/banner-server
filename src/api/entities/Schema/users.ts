@@ -14,7 +14,7 @@ import { relations, sql } from "drizzle-orm";
 import { posts, postReplies } from "./posts";
 import { locations } from "./locations";
 import { places } from "./places";
-import { UserRoles, UserStatuses, UserVerifications } from "@prisma/client";
+import { UserRoles, UserStatuses, UserVerifications } from "../User";
 
 export const UserRolesDZL = pgEnum(
   "user_roles",

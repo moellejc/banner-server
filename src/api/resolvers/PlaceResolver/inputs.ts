@@ -1,4 +1,3 @@
-// import { PlaceTypes } from "@prisma/client";
 import { Field, Float, InputType, Int } from "type-graphql";
 import { Coordinates } from "../../entities/Coordinates/Coordinates";
 import { AddressInput } from "../AddressResolver";

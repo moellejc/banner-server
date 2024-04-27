@@ -4,10 +4,9 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from "class-validator";
-import { User } from "../entities/User/User";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { users } from "../entities/Schema";
+import { dzlClient } from "../../lib/drizzle";
+import { eq, sql, count } from "drizzle-orm";
 
 @ValidatorConstraint({ async: true })
 export class IsEmailAlreadyExistConstraint
@@ -15,10 +14,15 @@ export class IsEmailAlreadyExistConstraint
 {
   validate(email: string) {
     // return false if a email exists so validator fails
-    return prisma.user.count({ where: { email } }).then((total) => {
-      if (total > 0) return false;
-      return true;
-    });
+    return dzlClient
+      .select({ count: count() })
+      .from(users)
+      .where(eq(users.email, email))
+      .then((res) => {
+        const total = res[0].count;
+        if (total > 0) return false;
+        return true;
+      });
   }
 }
 

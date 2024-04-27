@@ -89,7 +89,6 @@ export class PostResolver {
   ) {
     try {
       // delete post (assuming there is only one post deleted...)
-      // const deletedPost = await prisma.post.delete({ where: { id: id } });
       const [deletedPost] = await db
         .delete(posts)
         .where(eq(posts.id, id))

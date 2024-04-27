@@ -13,7 +13,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 import { posts } from "./posts";
-import { MediaTypes, MediaExtensions } from "@prisma/client";
+import { MediaTypes, MediaExtensions } from "../Media";
 
 export const MediaTypesDZL = pgEnum(
   "media_types",

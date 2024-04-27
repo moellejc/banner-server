@@ -5,24 +5,6 @@ import { Post } from "../Post";
 import { Location } from "../Location";
 import { UserLocationPath } from "./UserLocationPath";
 import { UserVisitHistory } from "./UserVisitHistory";
-import { Prisma, PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
-
-export type UserWithRelations = Prisma.PromiseReturnType<
-  typeof getUserWithRelations
->;
-
-async function getUserWithRelations() {
-  return await prisma.user.findFirst({
-    include: {
-      location: true,
-      posts: true,
-      postReplies: true,
-      likes: true,
-    },
-  });
-}
 
 export enum UserRoles {
   Admin = "ADMIN",

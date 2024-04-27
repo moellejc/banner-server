@@ -17,7 +17,7 @@ import { addresses } from "./addresses";
 import { organizations } from "./organizations";
 import { posts } from "./posts";
 import { locations } from "./locations";
-import { PlaceTypes } from "@prisma/client";
+import { PlaceTypes } from "../Place";
 
 export const PlaceTypesDZL = pgEnum(
   "place_types",

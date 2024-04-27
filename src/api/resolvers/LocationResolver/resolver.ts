@@ -28,7 +28,6 @@ import { Coordinates } from "../../entities/Coordinates";
 import { FieldError } from "../../errors";
 import { relations, eq, sql, inArray } from "drizzle-orm";
 import { addresses, locations, places } from "../../entities/Schema";
-import { NodePgDatabase } from "drizzle-orm/node-postgres";
 
 @Resolver()
 export class LocationResolver {

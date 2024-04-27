@@ -1,7 +1,5 @@
 import { GraphQLScalarType, Kind } from "graphql";
-import { Media } from "../api/entities/Media/Media";
-import { MediaTypes } from "@prisma/client";
-// import { MediaTypes } from "../api/enums/MediaTypes";
+import { Media, MediaTypes } from "../api/entities/Media";
 
 export const MediaScalar = new GraphQLScalarType({
   name: "MediaScalar",
