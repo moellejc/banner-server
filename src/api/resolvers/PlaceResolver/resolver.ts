@@ -14,12 +14,12 @@ import { CreatePlaceInput, GetPlaceInfoInput } from "./inputs";
 import { PlaceResponse, PlacesResponse } from "./responses";
 import {
   Place,
-  places,
   createPlace,
   fromPlaceGraphQLInput,
 } from "../../entities/Place";
+import { places } from "../../entities/Schema";
 import { FieldError } from "../../errors";
-import { Prisma } from "@prisma/client";
+// import { Prisma } from "@prisma/client";
 import { eq, sql } from "drizzle-orm";
 
 @Resolver()
@@ -28,11 +28,11 @@ export class PlaceResolver {
   async createPlace(
     @Arg("placeData", () => CreatePlaceInput)
     placeData: CreatePlaceInput,
-    @Ctx() { prisma }: AppContext
+    @Ctx() { db }: AppContext
   ): Promise<PlaceResponse> {
     if (!placeData.coords || !placeData.address) return { errors: [] };
 
-    let newPlaces = await createPlace(fromPlaceGraphQLInput(placeData), prisma);
+    let newPlaces = await createPlace(fromPlaceGraphQLInput(placeData));
 
     if (!newPlaces) return { errors: [] };
 
@@ -43,14 +43,14 @@ export class PlaceResolver {
   async updatePlace(
     @Arg("placeData", () => CreatePlaceInput)
     placeData: CreatePlaceInput,
-    @Ctx() { prisma }: AppContext
+    @Ctx() { db }: AppContext
   ): Promise<void> {}
 
   @Query(() => PlacesResponse)
   async getPlaceInfo(
     @Arg("options", () => GetPlaceInfoInput)
     options: GetPlaceInfoInput,
-    @Ctx() { db, prisma }: AppContext
+    @Ctx() { db }: AppContext
   ): Promise<PlaceResponse> {
     if (!options.id) return { errors: [] };
 

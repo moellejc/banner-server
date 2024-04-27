@@ -5,7 +5,6 @@ import { buildSchema } from "type-graphql";
 import { resolvers, orphanTypes } from "../../api/resolvers";
 import { evalBoolean } from "../../utils/EvalBoolean";
 import { AppContext } from "../../context/AppContext";
-import prismaClient from "../../lib/prisma";
 import { dzlClient } from "../../lib/drizzle";
 
 export const graphqlLoader = async (app: Application) => {
@@ -22,7 +21,6 @@ export const graphqlLoader = async (app: Application) => {
         req,
         res,
         db: dzlClient,
-        prisma: prismaClient,
       };
       return custCtx;
     },

@@ -1,34 +1,37 @@
 import { Field, Int, ObjectType, registerEnumType } from "type-graphql";
-import {
-  Prisma,
-  PlaceTypes,
-  PrismaClient,
-  Place as PlacePrisma,
-} from "@prisma/client";
 import { dzlClient } from "../../../lib/drizzle";
 import { Location, fromCoords, createLocation } from "../Location";
 import { Address, createAddress, addressFromGraphQLInput } from "../Address";
 import { Organization } from "../Organization";
-import { User, UserLocationPath, UserVisitHistory, users } from "../User";
+import { User, UserVisitHistory } from "../User";
 import { places } from "../Schema/places";
 import { CreatePlaceInput } from "../../resolvers/PlaceResolver";
 import { HereMapsPlace } from "../../../lib/heremaps";
 import { HereMapsReference } from "../../../lib/heremaps/types";
 import h3 from "h3-js";
 
+export enum PlaceTypes {
+  Administrative = "Administrative",
+  Commercial = "Commercial",
+  Community = "Community",
+  Continent = "Continent",
+  Country = "Country",
+  Educational = "Educational",
+  Geographic = "Geographic",
+  Landmark = "Landmark",
+  Medical = "Medical",
+  Municipality = "Municipality",
+  Province = "Province",
+  Religious = "Religious",
+  Residential = "Residential",
+  State = "State",
+  Transit = "Transit",
+}
+
 registerEnumType(PlaceTypes, {
   name: "PlaceTypes",
   description: undefined,
 });
-
-const placeInclude = Prisma.validator<Prisma.PlaceInclude>()({
-  address: true,
-  location: true,
-});
-
-export type PlaceWithIncludes = Prisma.PlaceGetPayload<{
-  include: typeof placeInclude;
-}>;
 
 interface PlaceCreateRefOptions {
   createAddress?: boolean;
@@ -174,7 +177,7 @@ export class Place {
     return 1;
   }
 
-  isSamePlace(place: Place | PlaceWithIncludes): boolean {
+  isSamePlace(place: Place): boolean {
     // check address
     if (this.address?.countryCode != place.address?.countryCode) return false;
     if (this.address?.state != place.address?.state) return false;
@@ -185,7 +188,7 @@ export class Place {
     return true;
   }
 
-  inList(places: Place[] | PlaceWithIncludes[]): boolean {
+  inList(places: Place[]): boolean {
     let foundSamePlace = false;
     let castPlaces = places as Place[];
     castPlaces.every((p) => {
@@ -277,10 +280,7 @@ export const fromPlaceGraphQLInput = (input: CreatePlaceInput) => {
   return place;
 };
 
-export const createPlace = async (
-  place: Place,
-  prisma: PrismaClient
-): Promise<Place | undefined> => {
+export const createPlace = async (place: Place): Promise<Place | undefined> => {
   try {
     // // create place
     // let bannerPlace = await prisma.place.create({
@@ -296,12 +296,12 @@ export const createPlace = async (
 
     // create location
     let location = place.location
-      ? await createLocation(place.location, prisma)
+      ? await createLocation(place.location)
       : undefined;
 
     // create address
     let address = place.address
-      ? await createAddress(place.address, prisma)
+      ? await createAddress(place.address)
       : undefined;
 
     // create place
@@ -347,14 +347,11 @@ export const createPlace = async (
   return;
 };
 
-export const createPlaces = async (
-  places: Place[],
-  prisma: PrismaClient
-): Promise<Place[]> => {
+export const createPlaces = async (places: Place[]): Promise<Place[]> => {
   let placesAdded: Place[] = [];
 
   places.forEach(async (p) => {
-    let newPlace = await createPlace(p, prisma);
+    let newPlace = await createPlace(p);
     if (newPlace) placesAdded.push(newPlace);
   });
 

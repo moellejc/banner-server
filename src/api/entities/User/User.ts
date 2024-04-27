@@ -1,10 +1,8 @@
 import { Field, Int, ObjectType, registerEnumType } from "type-graphql";
-import { UserRoles, UserStatuses, UserVerifications } from "@prisma/client";
 import { Like } from "../Like";
 import { Media } from "../Media";
-import { Post, posts, postReplies } from "../Post";
-import { Location, locations } from "../Location";
-import { places } from "../Place";
+import { Post } from "../Post";
+import { Location } from "../Location";
 import { UserLocationPath } from "./UserLocationPath";
 import { UserVisitHistory } from "./UserVisitHistory";
 import { Prisma, PrismaClient } from "@prisma/client";
@@ -24,6 +22,27 @@ async function getUserWithRelations() {
       likes: true,
     },
   });
+}
+
+export enum UserRoles {
+  Admin = "ADMIN",
+  User = "USER",
+}
+
+export enum UserStatuses {
+  Active = "ACTIVE",
+  Archive = "ARCHIVE",
+  Deactivated = "DEACTIVATED",
+  Inactive = "INACTIVE",
+  Invited = "INVITED",
+  Removed = "REMOVED",
+}
+
+export enum UserVerifications {
+  Celebrity = "CELEBRITY",
+  Developer = "DEVELOPER",
+  Official = "OFFICIAL",
+  Standard = "STANDARD",
 }
 
 registerEnumType(UserRoles, {
@@ -73,13 +92,13 @@ export class User {
   @Field(() => String, { nullable: true })
   profilePic?: string | null;
 
-  @Field(() => UserRoles, { defaultValue: UserRoles.USER })
+  @Field(() => UserRoles, { defaultValue: UserRoles.User })
   role: UserRoles;
 
-  @Field(() => UserStatuses, { defaultValue: UserStatuses.ACTIVE })
+  @Field(() => UserStatuses, { defaultValue: UserStatuses.Active })
   status: UserStatuses;
 
-  @Field(() => UserVerifications, { defaultValue: UserVerifications.STANDARD })
+  @Field(() => UserVerifications, { defaultValue: UserVerifications.Standard })
   verificationType: UserVerifications;
 
   @Field({ defaultValue: false })

@@ -14,7 +14,8 @@ import {
   createRefreshToken,
   sendRefreshToken,
 } from "../../../auth/auth";
-import { User, users } from "../../entities/User/User";
+import { User } from "../../entities/User";
+import { users } from "../../entities/Schema";
 import { DUPLICATE_ENTRY } from "../../../constants/ErrorCodes";
 import { AppContext } from "../../../context/AppContext";
 import { isAuth } from "../../../middlewares";
@@ -35,7 +36,6 @@ import {
 } from "./inputs";
 import { LoginResponse, RegisterResponse, UserResponse } from "./responses";
 import { latLngToAllCellLevels } from "../../../utils/CellUtils";
-import { LocationTypes } from "@prisma/client";
 import { dzlClient } from "../../../lib/drizzle/index";
 import { eq, sql } from "drizzle-orm";
 
@@ -58,7 +58,7 @@ export class UserResolver {
   @Mutation(() => RegisterResponse)
   async register(
     @Arg("options", () => UserRegisterInput) options: UserRegisterInput,
-    @Ctx() { res, db, prisma }: AppContext
+    @Ctx() { res, db }: AppContext
   ): Promise<RegisterResponse> {
     const errors = convertValidationErrors(await validate(options));
     if (errors.length > 0) {
@@ -133,16 +133,12 @@ export class UserResolver {
   @Mutation(() => LoginResponse)
   async login(
     @Arg("options", () => UserLoginInput) options: UserLoginInput,
-    @Ctx() { res, db, prisma }: AppContext
+    @Ctx() { res, db }: AppContext
   ): Promise<LoginResponse> {
     const errors = convertValidationErrors(await validate(options));
     if (errors.length > 0) {
       return { errors };
     }
-
-    // const user = await prisma.user.findUnique({
-    //   where: { email: options.email },
-    // });
 
     const [userDZL] = await db
       .select()
@@ -176,18 +172,14 @@ export class UserResolver {
 
   @Query(() => User, { nullable: true })
   @UseMiddleware(isAuth)
-  async me(@Ctx() { db, prisma, jwtPayload }: AppContext) {
+  async me(@Ctx() { db, jwtPayload }: AppContext) {
     try {
       console.log("getting me");
-      // return User.findOne(context.jwtPayload?.userID);
       const [user] = await db
         .select()
         .from(users)
         .where(eq(users.id, jwtPayload?.userID!));
       return user as User;
-      // return await prisma.user.findUnique({
-      //   where: { id: jwtPayload?.userID },
-      // });
     } catch (err) {
       console.log(err);
       return null;
@@ -196,7 +188,7 @@ export class UserResolver {
 
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
-  async logout(@Ctx() { db, prisma, jwtPayload }: AppContext) {
+  async logout(@Ctx() { db, jwtPayload }: AppContext) {
     // increment token version in DB by 1
     await db
       .update(users)
@@ -234,7 +226,7 @@ export class UserResolver {
   async updateUser(
     @Arg("id", () => Int) id: number,
     @Arg("options", () => UserUpdateInput) options: UserUpdateInput,
-    @Ctx() { db, prisma }: AppContext
+    @Ctx() { db }: AppContext
   ) {
     const errors = await validate(options);
     if (errors) {
@@ -245,7 +237,6 @@ export class UserResolver {
       .update(users)
       .set({ ...options })
       .where(eq(users.id, id));
-    // await prisma.user.update({ where: { id }, data: { ...options } });
 
     return true;
   }
@@ -254,10 +245,9 @@ export class UserResolver {
   @UseMiddleware(isAuth)
   async deleteUser(
     @Arg("id", () => Int) id: number,
-    @Ctx() { db, prisma }: AppContext
+    @Ctx() { db }: AppContext
   ) {
     await db.delete(users).where(eq(users.id, id));
-    // await prisma.user.delete({ where: { id } });
     return true;
   }
 
@@ -271,12 +261,11 @@ export class UserResolver {
   @UseMiddleware(isAuth)
   async user(
     @Arg("id", () => Int) id: number,
-    @Ctx() { db, prisma }: AppContext
+    @Ctx() { db }: AppContext
   ): Promise<UserResponse> {
     try {
       const [user] = await db.select().from(users).where(eq(users.id, id));
       return { user: user as User };
-      // return { user: await prisma.user.findUniqueOrThrow({ where: { id } }) };
     } catch (err) {
       return { errors: [UserNotFound] };
     }

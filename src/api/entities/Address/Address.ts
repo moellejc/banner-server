@@ -1,7 +1,8 @@
-import { Field, Int, ObjectType, Float } from "type-graphql";
-import { PrismaClient, Address as AddressPrisma } from "@prisma/client";
+import { Field, ObjectType } from "type-graphql";
 import { Place } from "../Place";
 import { AddressInput } from "../../resolvers/AddressResolver";
+import { dzlClient } from "../../../lib/drizzle";
+import { addresses } from "../Schema";
 
 @ObjectType()
 export class Address {
@@ -55,26 +56,19 @@ export class Address {
       postalCode: this.postalCode,
     };
 
-    // if (placeID)
-    //   createObj = {
-    //     ...createObj,
-    //     places: {
-    //       connect: [{ id: placeID }],
-    //     },
-    //   };
-
     return createObj;
   }
 }
 
 export const createAddress = async (
-  address: Address,
-  prisma: PrismaClient
-): Promise<AddressPrisma | undefined> => {
+  address: Address
+): Promise<Address | undefined> => {
   try {
-    return await prisma.address.create({
-      data: address.toCreateObject(),
-    });
+    const [addressDZL] = await dzlClient
+      .insert(addresses)
+      .values({ ...address.toCreateObject() })
+      .returning();
+    return addressDZL as Address;
   } catch (error) {
     console.log("CREATE ADDRESS ERROR");
     console.log(error);

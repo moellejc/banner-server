@@ -1,9 +1,4 @@
 import { Field, Int, ObjectType, Float, registerEnumType } from "type-graphql";
-import {
-  LocationTypes,
-  PrismaClient,
-  Location as LocationPrisma,
-} from "@prisma/client";
 import { dzlClient } from "../../../lib/drizzle";
 import { User } from "../User";
 import { Post } from "../Post";
@@ -13,6 +8,11 @@ import { Coordinates } from "../Coordinates";
 import h3 from "h3-js";
 
 const DEFAULT_LEVEL = 12;
+
+export enum LocationTypes {
+  Place = "Place",
+  User = "User",
+}
 
 registerEnumType(LocationTypes, {
   name: "LocationTypes",
@@ -189,18 +189,14 @@ export const fromCoords = (coords: Coordinates): Location => {
 };
 
 export const createLocation = async (
-  location: Location,
-  prisma: PrismaClient
-): Promise<LocationPrisma | undefined> => {
+  location: Location
+): Promise<Location | undefined> => {
   try {
     const [createLocation] = await dzlClient
       .insert(locations)
       .values(location.toCreateObject())
       .returning();
-    return createLocation as LocationPrisma;
-    // return await prisma.location.create({
-    //   data: location.toCreateObject(),
-    // });
+    return createLocation as Location;
   } catch (error) {
     console.log("CREATE LOCATION ERROR");
     console.log(error);

@@ -13,7 +13,9 @@ import { logger } from "../../../lib/logger/Logger";
 import { isAuth } from "../../../middlewares/isAuth";
 import { Media } from "../../entities/Media";
 import { Post } from "../../entities/Post";
+import { posts } from "../../entities/Schema";
 import { User } from "../../entities/User";
+import { users } from "../../entities/Schema";
 import { convertValidationErrors } from "../../errors/FieldError";
 import {
   PostAuthorNotFound,
@@ -23,7 +25,7 @@ import {
 } from "../../errors/PostErrors";
 import { PostCreateInput } from "./inputs";
 import { PostResponse } from "./responses";
-import { Post as PostPris } from "@prisma/client";
+import { eq, sql } from "drizzle-orm";
 
 @Resolver()
 export class PostResolver {
@@ -31,7 +33,7 @@ export class PostResolver {
   @UseMiddleware(isAuth)
   async createPost(
     @Arg("options", () => PostCreateInput) options: PostCreateInput,
-    @Ctx() { prisma, jwtPayload }: AppContext
+    @Ctx() { db, jwtPayload }: AppContext
   ): Promise<PostResponse> {
     // validate inputs
     const errors = convertValidationErrors(await validate(options));
@@ -40,52 +42,66 @@ export class PostResolver {
       return { errors };
     }
 
-    const creator = await prisma.user.findUniqueOrThrow({
-      where: { id: jwtPayload?.userID },
-    });
+    const [creatorDZL] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, jwtPayload?.userID!));
+    const creator = creatorDZL as User;
 
     // TODO: get location cell based on coordinates
 
     // insert post
     // TODO: link media to post
     // TODO: link place to post
-    const post = await prisma.post.create({
-      data: {
+
+    const [{ id }] = await db
+      .insert(posts)
+      .values({
         authorID: creator.id,
         locationID: 111,
         text: options.text,
-      },
-      include: {
-        author: true,
-      },
+      })
+      .returning({ id: posts.id });
+
+    const postWithAuthorDZL = await db.query.posts.findFirst({
+      where: (posts, { eq }) => eq(posts.id, id),
+      with: { author: true },
     });
 
-    return { post };
+    return { post: postWithAuthorDZL as Post };
   }
 
   @Query(() => [Post])
   @UseMiddleware(isAuth)
-  async myPosts(@Ctx() { prisma, jwtPayload }: AppContext) {
-    return await prisma.post.findMany({
-      where: { authorID: jwtPayload?.userID },
+  async myPosts(@Ctx() { db, jwtPayload }: AppContext) {
+    const posts = await db.query.posts.findMany({
+      where: (posts, { eq }) => eq(posts.authorID, jwtPayload?.userID!),
     });
+
+    return posts;
   }
 
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
   async deletePost(
     @Arg("id", () => Int) id: number,
-    @Ctx() { prisma, jwtPayload }: AppContext
+    @Ctx() { db, jwtPayload }: AppContext
   ) {
     try {
       // delete post (assuming there is only one post deleted...)
-      const deletedPost = await prisma.post.delete({ where: { id: id } });
+      // const deletedPost = await prisma.post.delete({ where: { id: id } });
+      const [deletedPost] = await db
+        .delete(posts)
+        .where(eq(posts.id, id))
+        .returning();
 
       // decrement total posts from the user
-      await prisma.user.update({
-        where: { id: deletedPost.authorID },
-        data: { totalPosts: { decrement: 1 } },
-      });
+      await db
+        .update(users)
+        .set({
+          totalPosts: sql`${users.totalPosts} - 1`,
+        })
+        .where(eq(users.id, deletedPost.authorID!));
     } catch (err) {
       logger.error(err);
       return false;
