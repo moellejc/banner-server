@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import { verify } from "jsonwebtoken";
 import { createAccessToken } from "../../../auth/auth";
-import { User } from "../../entities/User/User";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { User } from "../../entities/User";
+import { users } from "../../entities/Schema";
+import { dzlClient } from "../../../lib/drizzle";
+import { eq, sql } from "drizzle-orm";
 
 export default class AuthController {
   public refreshToken = async (req: Request, res: Response): Promise<any> => {
@@ -24,7 +24,9 @@ export default class AuthController {
 
     // token is valid and
     // we can send back an access token
-    const user = await prisma.user.findFirst({ where: { id: payload.userId } });
+    const user = await dzlClient.query.users.findFirst({
+      where: (users, { eq }) => eq(users.id, payload.userId),
+    });
 
     if (!user) {
       return res.send({ ok: false, accessToken: "" });
@@ -34,7 +36,7 @@ export default class AuthController {
       return res.send({ ok: false, accessToken: "" });
     }
 
-    return res.send({ ok: true, accessToken: createAccessToken(user) });
+    return res.send({ ok: true, accessToken: createAccessToken(user as User) });
   };
 
   public logout = async (req: Request, res: Response): Promise<any> => {
@@ -54,17 +56,21 @@ export default class AuthController {
 
     // token is valid and
     // we can send back an access token
-    const user = await prisma.user.findFirst({ where: { id: payload.userId } });
+    const user = await dzlClient.query.users.findFirst({
+      where: (users, { eq }) => eq(users.id, payload.userId),
+    });
 
     if (!user) {
       return res.send({ ok: false, accessToken: "" });
     }
 
     // increment token version by 1
-    await prisma.user.update({
-      where: { id: payload.userId },
-      data: { tokenVersion: { increment: 1 } },
-    });
+    await dzlClient
+      .update(users)
+      .set({
+        totalPosts: sql`${users.tokenVersion} + 1`,
+      })
+      .where(eq(users.id, payload.userId));
 
     return res.send({ ok: true });
   };

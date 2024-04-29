@@ -1,0 +1,1164 @@
+{
+  "id": "8b6b164b-c7a5-4745-ad5d-9f608a148684",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "5",
+  "dialect": "pg",
+  "tables": {
+    "addresses": {
+      "name": "addresses",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "country_code": {
+          "name": "country_code",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "country_name": {
+          "name": "country_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "state_code": {
+          "name": "state_code",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "state": {
+          "name": "state",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "county": {
+          "name": "county",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "city": {
+          "name": "city",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "district": {
+          "name": "district",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "street": {
+          "name": "street",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "postal_code": {
+          "name": "postal_code",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "house_number": {
+          "name": "house_number",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "likes": {
+      "name": "likes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "liker_id": {
+          "name": "liker_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "post_id": {
+          "name": "post_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "locations": {
+      "name": "locations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "location_type": {
+          "name": "location_type",
+          "type": "location_types",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "primary_cell_level": {
+          "name": "primary_cell_level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lat": {
+          "name": "lat",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lon": {
+          "name": "lon",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom_cell_res_0": {
+          "name": "geom_cell_res_0",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom_cell_res_1": {
+          "name": "geom_cell_res_1",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom_cell_res_2": {
+          "name": "geom_cell_res_2",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom_cell_res_3": {
+          "name": "geom_cell_res_3",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom_cell_res_4": {
+          "name": "geom_cell_res_4",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom_cell_res_5": {
+          "name": "geom_cell_res_5",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom_cell_res_6": {
+          "name": "geom_cell_res_6",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom_cell_res_7": {
+          "name": "geom_cell_res_7",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom_cell_res_8": {
+          "name": "geom_cell_res_8",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom_cell_res_9": {
+          "name": "geom_cell_res_9",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom_cell_res_10": {
+          "name": "geom_cell_res_10",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom_cell_res_11": {
+          "name": "geom_cell_res_11",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom_cell_res_12": {
+          "name": "geom_cell_res_12",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom_cell_res_13": {
+          "name": "geom_cell_res_13",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom_cell_res_14": {
+          "name": "geom_cell_res_14",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom_cell_res_15": {
+          "name": "geom_cell_res_15",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bbox": {
+          "name": "bbox",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "access_points": {
+          "name": "access_points",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "geom_cell_res_0_idx": {
+          "name": "geom_cell_res_0_idx",
+          "columns": [
+            "geom_cell_res_0"
+          ],
+          "isUnique": false
+        },
+        "geom_cell_res_1_idx": {
+          "name": "geom_cell_res_1_idx",
+          "columns": [
+            "geom_cell_res_1"
+          ],
+          "isUnique": false
+        },
+        "geom_cell_res_2_idx": {
+          "name": "geom_cell_res_2_idx",
+          "columns": [
+            "geom_cell_res_2"
+          ],
+          "isUnique": false
+        },
+        "geom_cell_res_3_idx": {
+          "name": "geom_cell_res_3_idx",
+          "columns": [
+            "geom_cell_res_3"
+          ],
+          "isUnique": false
+        },
+        "geom_cell_res_4_idx": {
+          "name": "geom_cell_res_4_idx",
+          "columns": [
+            "geom_cell_res_4"
+          ],
+          "isUnique": false
+        },
+        "geom_cell_res_5_idx": {
+          "name": "geom_cell_res_5_idx",
+          "columns": [
+            "geom_cell_res_5"
+          ],
+          "isUnique": false
+        },
+        "geom_cell_res_6_idx": {
+          "name": "geom_cell_res_6_idx",
+          "columns": [
+            "geom_cell_res_6"
+          ],
+          "isUnique": false
+        },
+        "geom_cell_res_7_idx": {
+          "name": "geom_cell_res_7_idx",
+          "columns": [
+            "geom_cell_res_7"
+          ],
+          "isUnique": false
+        },
+        "geom_cell_res_8_idx": {
+          "name": "geom_cell_res_8_idx",
+          "columns": [
+            "geom_cell_res_8"
+          ],
+          "isUnique": false
+        },
+        "geom_cell_res_9_idx": {
+          "name": "geom_cell_res_9_idx",
+          "columns": [
+            "geom_cell_res_9"
+          ],
+          "isUnique": false
+        },
+        "geom_cell_res_10_idx": {
+          "name": "geom_cell_res_10_idx",
+          "columns": [
+            "geom_cell_res_10"
+          ],
+          "isUnique": false
+        },
+        "geom_cell_res_11_idx": {
+          "name": "geom_cell_res_11_idx",
+          "columns": [
+            "geom_cell_res_11"
+          ],
+          "isUnique": false
+        },
+        "geom_cell_res_12_idx": {
+          "name": "geom_cell_res_12_idx",
+          "columns": [
+            "geom_cell_res_12"
+          ],
+          "isUnique": false
+        },
+        "geom_cell_res_13_idx": {
+          "name": "geom_cell_res_13_idx",
+          "columns": [
+            "geom_cell_res_13"
+          ],
+          "isUnique": false
+        },
+        "geom_cell_res_14_idx": {
+          "name": "geom_cell_res_14_idx",
+          "columns": [
+            "geom_cell_res_14"
+          ],
+          "isUnique": false
+        },
+        "geom_cell_res_15_idx": {
+          "name": "geom_cell_res_15_idx",
+          "columns": [
+            "geom_cell_res_15"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "media": {
+      "name": "media",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "extension": {
+          "name": "extension",
+          "type": "media_extensions",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "media_type": {
+          "name": "media_type",
+          "type": "media_types",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "post_id": {
+          "name": "post_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "media_url": {
+          "name": "media_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "media_index": {
+          "name": "media_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "post_id_idx": {
+          "name": "post_id_idx",
+          "columns": [
+            "post_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "media_post_id_posts_id_fk": {
+          "name": "media_post_id_posts_id_fk",
+          "tableFrom": "media",
+          "tableTo": "posts",
+          "columnsFrom": [
+            "post_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "organizations": {
+      "name": "organizations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "organization_name_idx": {
+          "name": "organization_name_idx",
+          "columns": [
+            "name"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "places": {
+      "name": "places",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "language": {
+          "name": "language",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'en'"
+        },
+        "place_type": {
+          "name": "place_type",
+          "type": "place_types",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_by_id": {
+          "name": "created_by_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "location_id": {
+          "name": "location_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "address_id": {
+          "name": "address_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "people_here": {
+          "name": "people_here",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "references": {
+          "name": "references",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "categories": {
+          "name": "categories",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contacts": {
+          "name": "contacts",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hours": {
+          "name": "hours",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "organization_id": {
+          "name": "organization_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "place_name_idx": {
+          "name": "place_name_idx",
+          "columns": [
+            "name"
+          ],
+          "isUnique": false
+        },
+        "address_id_idx": {
+          "name": "address_id_idx",
+          "columns": [
+            "address_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "places_created_by_id_users_id_fk": {
+          "name": "places_created_by_id_users_id_fk",
+          "tableFrom": "places",
+          "tableTo": "users",
+          "columnsFrom": [
+            "created_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "places_location_id_locations_id_fk": {
+          "name": "places_location_id_locations_id_fk",
+          "tableFrom": "places",
+          "tableTo": "locations",
+          "columnsFrom": [
+            "location_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "places_parent_id_places_id_fk": {
+          "name": "places_parent_id_places_id_fk",
+          "tableFrom": "places",
+          "tableTo": "places",
+          "columnsFrom": [
+            "parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "places_address_id_addresses_id_fk": {
+          "name": "places_address_id_addresses_id_fk",
+          "tableFrom": "places",
+          "tableTo": "addresses",
+          "columnsFrom": [
+            "address_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "places_organization_id_organizations_id_fk": {
+          "name": "places_organization_id_organizations_id_fk",
+          "tableFrom": "places",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "organization_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "post_replies": {
+      "name": "post_replies",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "post_id": {
+          "name": "post_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "author_id": {
+          "name": "author_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "post_replies_post_id_posts_id_fk": {
+          "name": "post_replies_post_id_posts_id_fk",
+          "tableFrom": "post_replies",
+          "tableTo": "posts",
+          "columnsFrom": [
+            "post_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "post_replies_author_id_users_id_fk": {
+          "name": "post_replies_author_id_users_id_fk",
+          "tableFrom": "post_replies",
+          "tableTo": "users",
+          "columnsFrom": [
+            "author_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "posts": {
+      "name": "posts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "author_id": {
+          "name": "author_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "location_id": {
+          "name": "location_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "place_id": {
+          "name": "place_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reply_count": {
+          "name": "reply_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "like_count": {
+          "name": "like_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "posts_author_id_users_id_fk": {
+          "name": "posts_author_id_users_id_fk",
+          "tableFrom": "posts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "author_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "posts_location_id_locations_id_fk": {
+          "name": "posts_location_id_locations_id_fk",
+          "tableFrom": "posts",
+          "tableTo": "locations",
+          "columnsFrom": [
+            "location_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "posts_place_id_places_id_fk": {
+          "name": "posts_place_id_places_id_fk",
+          "tableFrom": "posts",
+          "tableTo": "places",
+          "columnsFrom": [
+            "place_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "screen_name": {
+          "name": "screen_name",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "temp_password": {
+          "name": "temp_password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "temp_password_expires": {
+          "name": "temp_password_expires",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "has_template_password": {
+          "name": "has_template_password",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "token_version": {
+          "name": "token_version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "profile_pic": {
+          "name": "profile_pic",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role": {
+          "name": "role",
+          "type": "user_roles",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'USER'"
+        },
+        "user_statuses": {
+          "name": "user_statuses",
+          "type": "user_statuses",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'ACTIVE'"
+        },
+        "is_verified": {
+          "name": "is_verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "user_verifications": {
+          "name": "user_verifications",
+          "type": "user_verifications",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'STANDARD'"
+        },
+        "location_id": {
+          "name": "location_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "total_posts": {
+          "name": "total_posts",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "total_likes": {
+          "name": "total_likes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "total_followers": {
+          "name": "total_followers",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "total_following": {
+          "name": "total_following",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "total_following_places": {
+          "name": "total_following_places",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "last_active_at": {
+          "name": "last_active_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "email_idx": {
+          "name": "email_idx",
+          "columns": [
+            "email"
+          ],
+          "isUnique": true
+        },
+        "screen_name_idx": {
+          "name": "screen_name_idx",
+          "columns": [
+            "screen_name"
+          ],
+          "isUnique": true
+        },
+        "location_id_idx": {
+          "name": "location_id_idx",
+          "columns": [
+            "location_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "users_location_id_locations_id_fk": {
+          "name": "users_location_id_locations_id_fk",
+          "tableFrom": "users",
+          "tableTo": "locations",
+          "columnsFrom": [
+            "location_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      }
+    }
+  },
+  "enums": {
+    "location_types": {
+      "name": "location_types",
+      "values": {
+        "Place": "Place",
+        "User": "User"
+      }
+    },
+    "media_extensions": {
+      "name": "media_extensions",
+      "values": {
+        "PNG": "PNG",
+        "JPG": "JPG",
+        "JPEG": "JPEG",
+        "BMP": "BMP",
+        "MP4": "MP4",
+        "AVI": "AVI",
+        "FBX": "FBX",
+        "USDZ": "USDZ",
+        "GLTF": "GLTF"
+      }
+    },
+    "media_types": {
+      "name": "media_types",
+      "values": {
+        "VIDEO": "VIDEO",
+        "PHOTO": "PHOTO",
+        "AUDIO": "AUDIO",
+        "MODEL": "MODEL"
+      }
+    },
+    "place_types": {
+      "name": "place_types",
+      "values": {
+        "Transit": "Transit",
+        "Residential": "Residential",
+        "Commercial": "Commercial",
+        "Educational": "Educational",
+        "Medical": "Medical",
+        "Religious": "Religious",
+        "Community": "Community",
+        "Municipality": "Municipality",
+        "Administrative": "Administrative",
+        "State": "State",
+        "Province": "Province",
+        "Country": "Country",
+        "Continent": "Continent",
+        "Geographic": "Geographic",
+        "Landmark": "Landmark"
+      }
+    },
+    "user_roles": {
+      "name": "user_roles",
+      "values": {
+        "USER": "USER",
+        "ADMIN": "ADMIN"
+      }
+    },
+    "user_statuses": {
+      "name": "user_statuses",
+      "values": {
+        "INVITED": "INVITED",
+        "ACTIVE": "ACTIVE",
+        "INACTIVE": "INACTIVE",
+        "ARCHIVE": "ARCHIVE",
+        "DEACTIVATED": "DEACTIVATED",
+        "REMOVED": "REMOVED"
+      }
+    },
+    "user_verifications": {
+      "name": "user_verifications",
+      "values": {
+        "STANDARD": "STANDARD",
+        "CELEBRITY": "CELEBRITY",
+        "OFFICIAL": "OFFICIAL",
+        "DEVELOPER": "DEVELOPER"
+      }
+    }
+  },
+  "schemas": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

@@ -8,10 +8,10 @@ export class PostReply {
   id!: string;
 
   @Field()
-  creatorID: string;
+  authorID: string;
 
   @Field(() => User)
-  creator!: User;
+  author!: User;
 
   @Field()
   postID: string;

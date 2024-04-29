@@ -1,28 +1,30 @@
 import { Field, Int, ObjectType, registerEnumType } from "type-graphql";
-import { UserRoles, UserStatuses, UserVerifications } from "@prisma/client";
-import { Like } from "../Like/Like";
-import { Media } from "../Media/Media";
-import { Post } from "../Post/Post";
-import { Location } from "../Location/Location";
+import { Like } from "../Like";
+import { Media } from "../Media";
+import { Post } from "../Post";
+import { Location } from "../Location";
 import { UserLocationPath } from "./UserLocationPath";
 import { UserVisitHistory } from "./UserVisitHistory";
-import { Prisma, PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
+export enum UserRoles {
+  Admin = "ADMIN",
+  User = "USER",
+}
 
-export type UserWithRelations = Prisma.PromiseReturnType<
-  typeof getUserWithRelations
->;
+export enum UserStatuses {
+  Active = "ACTIVE",
+  Archive = "ARCHIVE",
+  Deactivated = "DEACTIVATED",
+  Inactive = "INACTIVE",
+  Invited = "INVITED",
+  Removed = "REMOVED",
+}
 
-async function getUserWithRelations() {
-  return await prisma.user.findFirst({
-    include: {
-      location: true,
-      posts: true,
-      postReplies: true,
-      likes: true,
-    },
-  });
+export enum UserVerifications {
+  Celebrity = "CELEBRITY",
+  Developer = "DEVELOPER",
+  Official = "OFFICIAL",
+  Standard = "STANDARD",
 }
 
 registerEnumType(UserRoles, {
@@ -72,13 +74,13 @@ export class User {
   @Field(() => String, { nullable: true })
   profilePic?: string | null;
 
-  @Field(() => UserRoles, { defaultValue: UserRoles.USER })
+  @Field(() => UserRoles, { defaultValue: UserRoles.User })
   role: UserRoles;
 
-  @Field(() => UserStatuses, { defaultValue: UserStatuses.ACTIVE })
+  @Field(() => UserStatuses, { defaultValue: UserStatuses.Active })
   status: UserStatuses;
 
-  @Field(() => UserVerifications, { defaultValue: UserVerifications.STANDARD })
+  @Field(() => UserVerifications, { defaultValue: UserVerifications.Standard })
   verificationType: UserVerifications;
 
   @Field({ defaultValue: false })

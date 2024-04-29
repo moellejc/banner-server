@@ -1,8 +1,8 @@
-import { PlaceTypes } from "@prisma/client";
 import { Field, Float, InputType, Int } from "type-graphql";
 import { Coordinates } from "../../entities/Coordinates/Coordinates";
 import { AddressInput } from "../AddressResolver";
 import { PlaceIncludes } from "./types";
+import { PlaceTypes } from "../../entities/Place";
 
 @InputType()
 export class CreatePlaceInput {

@@ -1,30 +1,28 @@
-import { Point } from "geojson";
 import { Field, Int, ObjectType } from "type-graphql";
-import { PointScalar } from "../../../types/Point";
-import { Like } from "../Like/Like";
-import { Media } from "../Media/Media";
+import { Like } from "../Like";
+import { Media } from "../Media";
 import { PostReply } from "./PostReply";
-import { User } from "../User/User";
-import { Location } from "../Location/Location";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { User } from "../User";
+import { Location } from "../Location";
+import { dzlClient } from "../../../lib/drizzle";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
-export type PostWithRelations = Prisma.PromiseReturnType<
-  typeof getPostWithRelations
->;
+// export type PostWithRelations = Prisma.PromiseReturnType<
+//   typeof getPostWithRelations
+// >;
 
 async function getPostWithRelations() {
-  const posts = await prisma.post.findFirst({
-    include: {
-      author: true,
-      location: true,
-      place: true,
-      likes: true,
-      replies: true,
-    },
-  });
-  return posts;
+  // const posts = await prisma.post.findFirst({
+  //   include: {
+  //     author: true,
+  //     location: true,
+  //     place: true,
+  //     likes: true,
+  //     replies: true,
+  //   },
+  // });
+  // return posts;
 }
 
 @ObjectType()

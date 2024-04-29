@@ -1,4 +1,3 @@
-import { PrismaClient, User as UserPrisma } from "@prisma/client";
 import { Field, ObjectType } from "type-graphql";
 import { User } from "../../entities/User/User";
 import { FieldError } from "../../errors/FieldError";

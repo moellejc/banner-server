@@ -1,6 +1,6 @@
 import { Field, Int, ObjectType } from "type-graphql";
-import { Post } from "../Post/Post";
-import { User } from "../User/User";
+import { Post } from "../Post";
+import { User } from "../User";
 
 @ObjectType()
 export class Like {
@@ -8,10 +8,10 @@ export class Like {
   id!: number;
 
   @Field(() => Int)
-  userID: number;
+  likerID: number;
 
   @Field(() => User)
-  user: User;
+  liker: User;
 
   @Field(() => Int)
   postID: number;
