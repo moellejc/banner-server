@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY ./package*.json .
 
-COPY ./prisma ./prisma/
+COPY ./drizzle ./drizzle/
 
 COPY ./.env* .
 
@@ -20,7 +20,7 @@ RUN npm install
 
 RUN npm run build
 
-RUN npx prisma generate
+RUN npx drizzle:migration:generate
 
 EXPOSE 3000
 

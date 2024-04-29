@@ -13,8 +13,7 @@
     "prestart": "yarn generate",
     "clean:database": "npx ts-node scripts/CleanDatabase.ts",
     "generate": "graphql-codegen --config codegen.yml",
-    "migrate:create": "npx prisma migrate dev --create-only",
-    "migrate:deploy": "npx prisma migrate deploy",
+    "drizzle:studio": "yarn drizzle-kit studio --port 3000 --verbose",
     "drizzle:migration:generate": "drizzle-kit generate:pg --config=drizzle.config.ts",
     "drizzle:migration:push": "drizzle-kit push:pg",
     "drizzle:migration:deploy": "npx ts-node scripts/RunMigration.ts"
@@ -44,13 +43,11 @@
     "concurrently": "^5.3.0",
     "drizzle-kit": "^0.20.17",
     "nodemon": "^2.0.6",
-    "prisma": "^4.2.1",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.3"
   },
   "dependencies": {
     "@googlemaps/google-maps-services-js": "^3.4.0",
-    "@prisma/client": "^4.2.1",
     "@types/google.maps": "^3.55.7",
     "apollo-server-express": "^2.19.1",
     "argon2": "^0.27.1",
