@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { dzlClient } from "../lib/drizzle";
 
 export interface AppContext {
   req: Request;
   res: Response;
-  prisma: PrismaClient;
+  db: typeof dzlClient;
   jwtPayload?: { userID: number };
 }

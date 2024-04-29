@@ -17,8 +17,9 @@ import {
   createPlace,
   fromPlaceGraphQLInput,
 } from "../../entities/Place";
+import { places } from "../../entities/Schema";
 import { FieldError } from "../../errors";
-import { Prisma } from "@prisma/client";
+import { eq, sql } from "drizzle-orm";
 
 @Resolver()
 export class PlaceResolver {
@@ -26,11 +27,11 @@ export class PlaceResolver {
   async createPlace(
     @Arg("placeData", () => CreatePlaceInput)
     placeData: CreatePlaceInput,
-    @Ctx() { prisma }: AppContext
+    @Ctx() { db }: AppContext
   ): Promise<PlaceResponse> {
     if (!placeData.coords || !placeData.address) return { errors: [] };
 
-    let newPlaces = await createPlace(fromPlaceGraphQLInput(placeData), prisma);
+    let newPlaces = await createPlace(fromPlaceGraphQLInput(placeData));
 
     if (!newPlaces) return { errors: [] };
 
@@ -41,27 +42,31 @@ export class PlaceResolver {
   async updatePlace(
     @Arg("placeData", () => CreatePlaceInput)
     placeData: CreatePlaceInput,
-    @Ctx() { prisma }: AppContext
+    @Ctx() { db }: AppContext
   ): Promise<void> {}
 
   @Query(() => PlacesResponse)
   async getPlaceInfo(
     @Arg("options", () => GetPlaceInfoInput)
     options: GetPlaceInfoInput,
-    @Ctx() { prisma }: AppContext
+    @Ctx() { db }: AppContext
   ): Promise<PlaceResponse> {
     if (!options.id) return { errors: [] };
 
     let errors: FieldError[] = [];
     try {
-      let foundPlace = await prisma.place.findUniqueOrThrow({
-        where: {
-          id: options.id,
-        },
-        include: options.includes
-          ? (options.includes as Prisma.PlaceInclude)
-          : {},
-      });
+      let [foundPlace] = await db
+        .select()
+        .from(places)
+        .where(eq(places.id, options.id));
+      // let foundPlace = await prisma.place.findUniqueOrThrow({
+      //   where: {
+      //     id: options.id,
+      //   },
+      //   include: options.includes
+      //     ? (options.includes as Prisma.PlaceInclude)
+      //     : {},
+      // });
 
       return { place: foundPlace as Place };
     } catch (error) {

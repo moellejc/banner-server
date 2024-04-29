@@ -14,7 +14,8 @@ import {
   createRefreshToken,
   sendRefreshToken,
 } from "../../../auth/auth";
-import { User } from "../../entities/User/User";
+import { User } from "../../entities/User";
+import { users } from "../../entities/Schema";
 import { DUPLICATE_ENTRY } from "../../../constants/ErrorCodes";
 import { AppContext } from "../../../context/AppContext";
 import { isAuth } from "../../../middlewares";
@@ -35,7 +36,8 @@ import {
 } from "./inputs";
 import { LoginResponse, RegisterResponse, UserResponse } from "./responses";
 import { latLngToAllCellLevels } from "../../../utils/CellUtils";
-import { LocationTypes } from "@prisma/client";
+import { dzlClient } from "../../../lib/drizzle/index";
+import { eq, sql } from "drizzle-orm";
 
 @Resolver()
 export class UserResolver {
@@ -56,7 +58,7 @@ export class UserResolver {
   @Mutation(() => RegisterResponse)
   async register(
     @Arg("options", () => UserRegisterInput) options: UserRegisterInput,
-    @Ctx() { res, prisma }: AppContext
+    @Ctx() { res, db }: AppContext
   ): Promise<RegisterResponse> {
     const errors = convertValidationErrors(await validate(options));
     if (errors.length > 0) {
@@ -71,24 +73,35 @@ export class UserResolver {
     let cellsLevels = latLngToAllCellLevels(options.lat!, options.lon!);
 
     try {
-      user = await prisma.user.create({
-        data: {
+      let [userDZL] = await db
+        .insert(users)
+        .values({
           firstName: options.firstName,
           lastName: options.lastName,
           screenName: options.screenName,
           email: options.email,
           password: hashedPassword,
-          location: {
-            create: {
-              lat: options.lat!,
-              lon: options.lon!,
-              locationType: LocationTypes.User,
-              primaryCellLevel: 12,
-              ...cellsLevels!,
-            },
-          },
-        },
-      });
+        })
+        .returning();
+      user = userDZL as User;
+      // user = await prisma.user.create({
+      //   data: {
+      //     firstName: options.firstName,
+      //     lastName: options.lastName,
+      //     screenName: options.screenName,
+      //     email: options.email,
+      //     password: hashedPassword,
+      //     location: {
+      //       create: {
+      //         lat: options.lat!,
+      //         lon: options.lon!,
+      //         locationType: LocationTypes.User,
+      //         primaryCellLevel: 12,
+      //         ...cellsLevels!,
+      //       },
+      //     },
+      //   },
+      // });
     } catch (err) {
       // duplicate username error
       return {};
@@ -120,16 +133,18 @@ export class UserResolver {
   @Mutation(() => LoginResponse)
   async login(
     @Arg("options", () => UserLoginInput) options: UserLoginInput,
-    @Ctx() { res, prisma }: AppContext
+    @Ctx() { res, db }: AppContext
   ): Promise<LoginResponse> {
     const errors = convertValidationErrors(await validate(options));
     if (errors.length > 0) {
       return { errors };
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: options.email },
-    });
+    const [userDZL] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, options.email));
+    const user = userDZL as User;
 
     if (!user) {
       console.log("user doesn't exist");
@@ -157,13 +172,14 @@ export class UserResolver {
 
   @Query(() => User, { nullable: true })
   @UseMiddleware(isAuth)
-  async me(@Ctx() { prisma, jwtPayload }: AppContext) {
+  async me(@Ctx() { db, jwtPayload }: AppContext) {
     try {
       console.log("getting me");
-      // return User.findOne(context.jwtPayload?.userID);
-      return await prisma.user.findUnique({
-        where: { id: jwtPayload?.userID },
-      });
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, jwtPayload?.userID!));
+      return user as User;
     } catch (err) {
       console.log(err);
       return null;
@@ -172,12 +188,16 @@ export class UserResolver {
 
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
-  async logout(@Ctx() { prisma, jwtPayload }: AppContext) {
+  async logout(@Ctx() { db, jwtPayload }: AppContext) {
     // increment token version in DB by 1
-    await prisma.user.update({
-      where: { id: jwtPayload?.userID },
-      data: { tokenVersion: { increment: 1 } },
-    });
+    await db
+      .update(users)
+      .set({ tokenVersion: sql`tokenVersion + 1` })
+      .where(eq(users.id, jwtPayload?.userID!));
+    // await prisma.user.update({
+    //   where: { id: jwtPayload?.userID },
+    //   data: { tokenVersion: { increment: 1 } },
+    // });
 
     return true;
   }
@@ -206,14 +226,17 @@ export class UserResolver {
   async updateUser(
     @Arg("id", () => Int) id: number,
     @Arg("options", () => UserUpdateInput) options: UserUpdateInput,
-    @Ctx() { prisma }: AppContext
+    @Ctx() { db }: AppContext
   ) {
     const errors = await validate(options);
     if (errors) {
       return { errors };
     }
 
-    await prisma.user.update({ where: { id }, data: { ...options } });
+    await db
+      .update(users)
+      .set({ ...options })
+      .where(eq(users.id, id));
 
     return true;
   }
@@ -222,9 +245,9 @@ export class UserResolver {
   @UseMiddleware(isAuth)
   async deleteUser(
     @Arg("id", () => Int) id: number,
-    @Ctx() { prisma }: AppContext
+    @Ctx() { db }: AppContext
   ) {
-    await prisma.user.delete({ where: { id } });
+    await db.delete(users).where(eq(users.id, id));
     return true;
   }
 
@@ -238,10 +261,11 @@ export class UserResolver {
   @UseMiddleware(isAuth)
   async user(
     @Arg("id", () => Int) id: number,
-    @Ctx() { prisma }: AppContext
+    @Ctx() { db }: AppContext
   ): Promise<UserResponse> {
     try {
-      return { user: await prisma.user.findUniqueOrThrow({ where: { id } }) };
+      const [user] = await db.select().from(users).where(eq(users.id, id));
+      return { user: user as User };
     } catch (err) {
       return { errors: [UserNotFound] };
     }
