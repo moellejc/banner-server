@@ -1,5 +1,6 @@
 import { GraphQLScalarType, Kind } from "graphql";
-import { Media, MediaTypes } from "../api/entities/Media";
+import { Media } from "../api/entities/Media";
+import { MediaTypes } from "../api/enums";
 
 export const MediaScalar = new GraphQLScalarType({
   name: "MediaScalar",

@@ -4,29 +4,12 @@ import { Location, fromCoords, createLocation } from "../Location";
 import { Address, createAddress, addressFromGraphQLInput } from "../Address";
 import { Organization } from "../Organization";
 import { User, UserVisitHistory } from "../User";
-import { places } from "../Schema/places";
+import { places } from "../../schema/places";
 import { CreatePlaceInput } from "../../resolvers/PlaceResolver";
 import { HereMapsPlace } from "../../../lib/heremaps";
 import { HereMapsReference } from "../../../lib/heremaps/types";
+import { PlaceTypes } from "../../enums";
 import h3 from "h3-js";
-
-export enum PlaceTypes {
-  Administrative = "Administrative",
-  Commercial = "Commercial",
-  Community = "Community",
-  Continent = "Continent",
-  Country = "Country",
-  Educational = "Educational",
-  Geographic = "Geographic",
-  Landmark = "Landmark",
-  Medical = "Medical",
-  Municipality = "Municipality",
-  Province = "Province",
-  Religious = "Religious",
-  Residential = "Residential",
-  State = "State",
-  Transit = "Transit",
-}
 
 registerEnumType(PlaceTypes, {
   name: "PlaceTypes",

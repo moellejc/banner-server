@@ -75,10 +75,10 @@ export type Like = {
   __typename?: 'Like';
   createdAt: Scalars['DateTime'];
   id: Scalars['Int'];
+  liker: User;
+  likerID: Scalars['Int'];
   post: Post;
   postID: Scalars['Int'];
-  user: User;
-  userID: Scalars['Int'];
 };
 
 export type Location = {
@@ -88,6 +88,12 @@ export type Location = {
   createdAt: Scalars['DateTime'];
   geoCellRes0: Scalars['String'];
   geoCellRes1: Scalars['String'];
+  geoCellRes10: Scalars['String'];
+  geoCellRes11: Scalars['String'];
+  geoCellRes12: Scalars['String'];
+  geoCellRes13: Scalars['String'];
+  geoCellRes14: Scalars['String'];
+  geoCellRes15: Scalars['String'];
   geoCellRes2: Scalars['String'];
   geoCellRes3: Scalars['String'];
   geoCellRes4: Scalars['String'];
@@ -96,12 +102,6 @@ export type Location = {
   geoCellRes7: Scalars['String'];
   geoCellRes8: Scalars['String'];
   geoCellRes9: Scalars['String'];
-  geoCellRes10: Scalars['String'];
-  geoCellRes11: Scalars['String'];
-  geoCellRes12: Scalars['String'];
-  geoCellRes13: Scalars['String'];
-  geoCellRes14: Scalars['String'];
-  geoCellRes15: Scalars['String'];
   id: Scalars['Int'];
   lat: Scalars['Float'];
   locationType: LocationTypes;
@@ -146,10 +146,10 @@ export type Media = {
 
 
 export enum MediaTypes {
-  Audio = 'AUDIO',
-  Model = 'MODEL',
-  Photo = 'PHOTO',
-  Video = 'VIDEO'
+  Audio = 'Audio',
+  Model = 'Model',
+  Photo = 'Photo',
+  Video = 'Video'
 }
 
 export type Mutation = {
@@ -227,6 +227,8 @@ export type Place = {
   children?: Maybe<Array<Place>>;
   contacts?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
+  createdBy?: Maybe<User>;
+  createdByID?: Maybe<Scalars['Int']>;
   hours?: Maybe<Scalars['String']>;
   id: Scalars['Float'];
   language: Scalars['String'];
@@ -255,6 +257,12 @@ export type PlaceResponse = {
   place?: Maybe<Place>;
 };
 
+export type PlacesResponse = {
+  __typename?: 'PlacesResponse';
+  errors?: Maybe<Array<FieldError>>;
+  places?: Maybe<Array<Place>>;
+};
+
 export enum PlaceTypes {
   Administrative = 'Administrative',
   Commercial = 'Commercial',
@@ -272,12 +280,6 @@ export enum PlaceTypes {
   State = 'State',
   Transit = 'Transit'
 }
-
-export type PlacesResponse = {
-  __typename?: 'PlacesResponse';
-  errors?: Maybe<Array<FieldError>>;
-  places?: Maybe<Array<Place>>;
-};
 
 
 export type Post = {
@@ -305,9 +307,9 @@ export type PostCreateInput = {
 
 export type PostReply = {
   __typename?: 'PostReply';
+  author: User;
+  authorID: Scalars['String'];
   createdAt: Scalars['DateTime'];
-  creator: User;
-  creatorID: Scalars['String'];
   id: Scalars['String'];
   parentReply: PostReply;
   parentReplyId?: Maybe<Scalars['String']>;
@@ -330,7 +332,7 @@ export type Query = {
   getPlaceInfo: PlacesResponse;
   getPlacesFromLocation: PlacesResponse;
   /** Return an address and information given Lat/Lon coords */
-  getReverseGeocode: PlacesResponse;
+  getReverseGeocode: PlaceResponse;
   me?: Maybe<User>;
   myPosts: Array<Post>;
   user: User;
@@ -437,17 +439,17 @@ export type UserResponse = {
 };
 
 export enum UserRoles {
-  Admin = 'ADMIN',
-  User = 'USER'
+  Admin = 'Admin',
+  User = 'User'
 }
 
 export enum UserStatuses {
-  Active = 'ACTIVE',
-  Archive = 'ARCHIVE',
-  Deactivated = 'DEACTIVATED',
-  Inactive = 'INACTIVE',
-  Invited = 'INVITED',
-  Removed = 'REMOVED'
+  Active = 'Active',
+  Archive = 'Archive',
+  Deactivated = 'Deactivated',
+  Inactive = 'Inactive',
+  Invited = 'Invited',
+  Removed = 'Removed'
 }
 
 export type UserUpdateInput = {
@@ -457,10 +459,10 @@ export type UserUpdateInput = {
 };
 
 export enum UserVerifications {
-  Celebrity = 'CELEBRITY',
-  Developer = 'DEVELOPER',
-  Official = 'OFFICIAL',
-  Standard = 'STANDARD'
+  Celebrity = 'Celebrity',
+  Developer = 'Developer',
+  Official = 'Official',
+  Standard = 'Standard'
 }
 
 export type UserVisitHistory = {

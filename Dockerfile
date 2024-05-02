@@ -20,8 +20,6 @@ RUN npm install
 
 RUN npm run build
 
-RUN npx drizzle:migration:generate
-
 EXPOSE 3000
 
 CMD npm start

@@ -4,7 +4,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from "class-validator";
-import { users } from "../entities/Schema";
+import { users } from "../schema";
 import { dzlClient } from "../../lib/drizzle";
 import { eq, sql, count } from "drizzle-orm";
 

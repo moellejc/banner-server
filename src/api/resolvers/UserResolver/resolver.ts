@@ -15,7 +15,7 @@ import {
   sendRefreshToken,
 } from "../../../auth/auth";
 import { User } from "../../entities/User";
-import { users } from "../../entities/Schema";
+import { users } from "../../schema";
 import { DUPLICATE_ENTRY } from "../../../constants/ErrorCodes";
 import { AppContext } from "../../../context/AppContext";
 import { isAuth } from "../../../middlewares";

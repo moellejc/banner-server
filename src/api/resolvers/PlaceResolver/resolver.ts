@@ -17,7 +17,7 @@ import {
   createPlace,
   fromPlaceGraphQLInput,
 } from "../../entities/Place";
-import { places } from "../../entities/Schema";
+import { places } from "../../schema";
 import { FieldError } from "../../errors";
 import { eq, sql } from "drizzle-orm";
 

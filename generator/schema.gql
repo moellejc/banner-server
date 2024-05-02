@@ -62,10 +62,10 @@ input GetPlaceInfoInput {
 type Like {
   createdAt: DateTime!
   id: Int!
+  liker: User!
+  likerID: Int!
   post: Post!
   postID: Int!
-  user: User!
-  userID: Int!
 }
 
 type Location {
@@ -132,10 +132,10 @@ type Media {
 scalar MediaScalar
 
 enum MediaTypes {
-  AUDIO
-  MODEL
-  PHOTO
-  VIDEO
+  Audio
+  Model
+  Photo
+  Video
 }
 
 type Mutation {
@@ -164,6 +164,8 @@ type Place {
   children: [Place!]
   contacts: String
   createdAt: DateTime!
+  createdBy: User
+  createdByID: Int
   hours: String
   id: Float!
   language: String!
@@ -240,9 +242,9 @@ input PostCreateInput {
 }
 
 type PostReply {
+  author: User!
+  authorID: String!
   createdAt: DateTime!
-  creator: User!
-  creatorID: String!
   id: String!
   parentReply: PostReply!
   parentReplyId: String
@@ -337,17 +339,17 @@ type UserResponse {
 }
 
 enum UserRoles {
-  ADMIN
-  USER
+  Admin
+  User
 }
 
 enum UserStatuses {
-  ACTIVE
-  ARCHIVE
-  DEACTIVATED
-  INACTIVE
-  INVITED
-  REMOVED
+  Active
+  Archive
+  Deactivated
+  Inactive
+  Invited
+  Removed
 }
 
 input UserUpdateInput {
@@ -357,10 +359,10 @@ input UserUpdateInput {
 }
 
 enum UserVerifications {
-  CELEBRITY
-  DEVELOPER
-  OFFICIAL
-  STANDARD
+  Celebrity
+  Developer
+  Official
+  Standard
 }
 
 type UserVisitHistory {

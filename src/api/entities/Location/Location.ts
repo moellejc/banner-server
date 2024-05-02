@@ -3,16 +3,12 @@ import { dzlClient } from "../../../lib/drizzle";
 import { User } from "../User";
 import { Post } from "../Post";
 import { Place } from "../Place";
-import { locations } from "../Schema/locations";
+import { locations } from "../../schema/locations";
 import { Coordinates } from "../Coordinates";
+import { LocationTypes } from "../../enums";
 import h3 from "h3-js";
 
 const DEFAULT_LEVEL = 12;
-
-export enum LocationTypes {
-  Place = "Place",
-  User = "User",
-}
 
 registerEnumType(LocationTypes, {
   name: "LocationTypes",

@@ -5,27 +5,7 @@ import { Post } from "../Post";
 import { Location } from "../Location";
 import { UserLocationPath } from "./UserLocationPath";
 import { UserVisitHistory } from "./UserVisitHistory";
-
-export enum UserRoles {
-  Admin = "ADMIN",
-  User = "USER",
-}
-
-export enum UserStatuses {
-  Active = "ACTIVE",
-  Archive = "ARCHIVE",
-  Deactivated = "DEACTIVATED",
-  Inactive = "INACTIVE",
-  Invited = "INVITED",
-  Removed = "REMOVED",
-}
-
-export enum UserVerifications {
-  Celebrity = "CELEBRITY",
-  Developer = "DEVELOPER",
-  Official = "OFFICIAL",
-  Standard = "STANDARD",
-}
+import { UserRoles, UserStatuses, UserVerifications } from "../../enums";
 
 registerEnumType(UserRoles, {
   name: "UserRoles",
