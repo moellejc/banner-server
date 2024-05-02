@@ -27,7 +27,7 @@ import {
 import { Coordinates } from "../../entities/Coordinates";
 import { FieldError } from "../../errors";
 import { relations, eq, sql, inArray } from "drizzle-orm";
-import { addresses, locations, places } from "../../entities/Schema";
+import { addresses, locations, places } from "../../schema";
 
 @Resolver()
 export class LocationResolver {

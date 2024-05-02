@@ -2,7 +2,7 @@ import { Field, ObjectType } from "type-graphql";
 import { Place } from "../Place";
 import { AddressInput } from "../../resolvers/AddressResolver";
 import { dzlClient } from "../../../lib/drizzle";
-import { addresses } from "../Schema";
+import { addresses } from "../../schema";
 
 @ObjectType()
 export class Address {

@@ -13,9 +13,9 @@ import { logger } from "../../../lib/logger/Logger";
 import { isAuth } from "../../../middlewares/isAuth";
 import { Media } from "../../entities/Media";
 import { Post } from "../../entities/Post";
-import { posts } from "../../entities/Schema";
+import { posts } from "../../schema";
 import { User } from "../../entities/User";
-import { users } from "../../entities/Schema";
+import { users } from "../../schema";
 import { convertValidationErrors } from "../../errors/FieldError";
 import {
   PostAuthorNotFound,

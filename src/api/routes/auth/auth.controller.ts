@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { verify } from "jsonwebtoken";
 import { createAccessToken } from "../../../auth/auth";
 import { User } from "../../entities/User";
-import { users } from "../../entities/Schema";
+import { users } from "../../schema";
 import { dzlClient } from "../../../lib/drizzle";
 import { eq, sql } from "drizzle-orm";
 

@@ -15,7 +15,7 @@ import { relations, sql } from "drizzle-orm";
 import { users } from "./users";
 import { posts } from "./posts";
 import { places } from "./places";
-import { LocationTypes } from "../Location";
+import { LocationTypes } from "../enums";
 
 export const LocationTypesDZL = pgEnum(
   "location_types",
