@@ -18,3 +18,12 @@ export class PlaceResponse {
   @Field(() => Place, { nullable: true })
   place?: Place;
 }
+
+@ObjectType()
+export class PlaceGreetingResponse {
+  @Field(() => [FieldError], { nullable: true })
+  errors?: FieldError[];
+
+  @Field(() => String, { nullable: true })
+  greeting?: string;
+}

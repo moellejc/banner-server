@@ -1,5 +1,5 @@
 import { Field, Float, InputType, Int } from "type-graphql";
-import { Coordinates } from "../../entities/Coordinates/Coordinates";
+import { Coordinates } from "../../entities/Coordinates";
 import { AddressInput } from "../AddressResolver";
 import { PlaceIncludes } from "./types";
 import { PlaceTypes } from "../../enums";
@@ -41,4 +41,10 @@ export class GetPlaceInfoInput {
 
   @Field(() => PlaceIncludes, { nullable: true })
   includes?: PlaceIncludes;
+}
+
+@InputType()
+export class GetPlaceGreetingInput {
+  @Field(() => Coordinates)
+  coords: Coordinates;
 }

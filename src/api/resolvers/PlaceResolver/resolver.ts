@@ -10,8 +10,16 @@ import {
   ObjectType,
 } from "type-graphql";
 import { AppContext } from "../../../context/AppContext";
-import { CreatePlaceInput, GetPlaceInfoInput } from "./inputs";
-import { PlaceResponse, PlacesResponse } from "./responses";
+import {
+  CreatePlaceInput,
+  GetPlaceInfoInput,
+  GetPlaceGreetingInput,
+} from "./inputs";
+import {
+  PlaceResponse,
+  PlacesResponse,
+  PlaceGreetingResponse,
+} from "./responses";
 import {
   Place,
   createPlace,
@@ -20,6 +28,11 @@ import {
 import { places } from "../../schema";
 import { FieldError } from "../../errors";
 import { eq, sql } from "drizzle-orm";
+import { placeFromLocation } from "../../../lib/googlemaps";
+import { greetMe } from "../../../lib/openai";
+import { PlaceData } from "@googlemaps/google-maps-services-js";
+import { exit } from "process";
+import { assert } from "console";
 
 @Resolver()
 export class PlaceResolver {
@@ -74,6 +87,45 @@ export class PlaceResolver {
         field: "id",
         message: `Place with id ${options.id} not found`,
       });
+    }
+
+    return { errors };
+  }
+
+  @Query(() => PlaceGreetingResponse)
+  async getPlaceGreeting(
+    @Arg("options", () => GetPlaceGreetingInput)
+    options: GetPlaceGreetingInput,
+    @Ctx() { db }: AppContext
+  ): Promise<PlaceGreetingResponse> {
+    let errors: FieldError[] = [];
+    try {
+      let gmPlaceInfoResponse = await placeFromLocation(options.coords);
+
+      let placeInfo = {} as Partial<PlaceData>;
+
+      for (let i = 0; i < gmPlaceInfoResponse.data.results.length; i++) {
+        const place = gmPlaceInfoResponse.data.results[i];
+
+        // find the first restaurant and exit
+        if (place.types) {
+          for (let i = 0; i < place.types.length; i++) {
+            const t = place.types[i];
+            if (t == "restaurant" && place.name) {
+              placeInfo = place;
+              exit;
+            }
+          }
+        }
+      }
+      if (placeInfo.name) {
+        let placeType = placeInfo.types ? placeInfo.types[0] : "";
+        let greeting = await greetMe(placeInfo.name, placeType);
+
+        return { errors, greeting };
+      }
+    } catch (error) {
+      errors.push({ message: `${error}` });
     }
 
     return { errors };

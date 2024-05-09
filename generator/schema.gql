@@ -54,6 +54,10 @@ type FieldError {
   message: String
 }
 
+input GetPlaceGreetingInput {
+  coords: Coordinates!
+}
+
 input GetPlaceInfoInput {
   id: Int!
   includes: PlaceIncludes
@@ -183,6 +187,11 @@ type Place {
   visitorHistory: [UserVisitHistory!]
 }
 
+type PlaceGreetingResponse {
+  errors: [FieldError!]
+  greeting: String
+}
+
 input PlaceIncludes {
   address: Boolean
   location: Boolean
@@ -262,6 +271,7 @@ type PostResponse {
 type Query {
   getHereInfo(options: LocationInput!): PlacesResponse!
   getNearInfo(options: LocationInput!): PlacesResponse!
+  getPlaceGreeting(options: GetPlaceGreetingInput!): PlaceGreetingResponse!
   getPlaceInfo(options: GetPlaceInfoInput!): PlacesResponse!
   getPlacesFromLocation(location: LocationInput!): PlacesResponse!
 
