@@ -78,6 +78,12 @@ type Location {
   createdAt: DateTime!
   geoCellRes0: String!
   geoCellRes1: String!
+  geoCellRes10: String!
+  geoCellRes11: String!
+  geoCellRes12: String!
+  geoCellRes13: String!
+  geoCellRes14: String!
+  geoCellRes15: String!
   geoCellRes2: String!
   geoCellRes3: String!
   geoCellRes4: String!
@@ -86,12 +92,6 @@ type Location {
   geoCellRes7: String!
   geoCellRes8: String!
   geoCellRes9: String!
-  geoCellRes10: String!
-  geoCellRes11: String!
-  geoCellRes12: String!
-  geoCellRes13: String!
-  geoCellRes14: String!
-  geoCellRes15: String!
   id: Int!
   lat: Float!
   locationType: LocationTypes!
@@ -202,6 +202,11 @@ type PlaceResponse {
   place: Place
 }
 
+type PlacesResponse {
+  errors: [FieldError!]
+  places: [Place!]
+}
+
 enum PlaceTypes {
   Administrative
   Commercial
@@ -218,11 +223,6 @@ enum PlaceTypes {
   Residential
   State
   Transit
-}
-
-type PlacesResponse {
-  errors: [FieldError!]
-  places: [Place!]
 }
 
 """A set of coordinates. x, y"""

@@ -66,6 +66,10 @@ export type FieldError = {
   message?: Maybe<Scalars['String']>;
 };
 
+export type GetPlaceGreetingInput = {
+  coords: Coordinates;
+};
+
 export type GetPlaceInfoInput = {
   id: Scalars['Int'];
   includes?: Maybe<PlaceIncludes>;
@@ -88,12 +92,6 @@ export type Location = {
   createdAt: Scalars['DateTime'];
   geoCellRes0: Scalars['String'];
   geoCellRes1: Scalars['String'];
-  geoCellRes10: Scalars['String'];
-  geoCellRes11: Scalars['String'];
-  geoCellRes12: Scalars['String'];
-  geoCellRes13: Scalars['String'];
-  geoCellRes14: Scalars['String'];
-  geoCellRes15: Scalars['String'];
   geoCellRes2: Scalars['String'];
   geoCellRes3: Scalars['String'];
   geoCellRes4: Scalars['String'];
@@ -102,6 +100,12 @@ export type Location = {
   geoCellRes7: Scalars['String'];
   geoCellRes8: Scalars['String'];
   geoCellRes9: Scalars['String'];
+  geoCellRes10: Scalars['String'];
+  geoCellRes11: Scalars['String'];
+  geoCellRes12: Scalars['String'];
+  geoCellRes13: Scalars['String'];
+  geoCellRes14: Scalars['String'];
+  geoCellRes15: Scalars['String'];
   id: Scalars['Int'];
   lat: Scalars['Float'];
   locationType: LocationTypes;
@@ -246,6 +250,12 @@ export type Place = {
   visitorHistory?: Maybe<Array<UserVisitHistory>>;
 };
 
+export type PlaceGreetingResponse = {
+  __typename?: 'PlaceGreetingResponse';
+  errors?: Maybe<Array<FieldError>>;
+  greeting?: Maybe<Scalars['String']>;
+};
+
 export type PlaceIncludes = {
   address?: Maybe<Scalars['Boolean']>;
   location?: Maybe<Scalars['Boolean']>;
@@ -255,12 +265,6 @@ export type PlaceResponse = {
   __typename?: 'PlaceResponse';
   errors?: Maybe<Array<FieldError>>;
   place?: Maybe<Place>;
-};
-
-export type PlacesResponse = {
-  __typename?: 'PlacesResponse';
-  errors?: Maybe<Array<FieldError>>;
-  places?: Maybe<Array<Place>>;
 };
 
 export enum PlaceTypes {
@@ -280,6 +284,12 @@ export enum PlaceTypes {
   State = 'State',
   Transit = 'Transit'
 }
+
+export type PlacesResponse = {
+  __typename?: 'PlacesResponse';
+  errors?: Maybe<Array<FieldError>>;
+  places?: Maybe<Array<Place>>;
+};
 
 
 export type Post = {
@@ -329,6 +339,7 @@ export type Query = {
   __typename?: 'Query';
   getHereInfo: PlacesResponse;
   getNearInfo: PlacesResponse;
+  getPlaceGreeting: PlaceGreetingResponse;
   getPlaceInfo: PlacesResponse;
   getPlacesFromLocation: PlacesResponse;
   /** Return an address and information given Lat/Lon coords */
@@ -347,6 +358,11 @@ export type QueryGetHereInfoArgs = {
 
 export type QueryGetNearInfoArgs = {
   options: LocationInput;
+};
+
+
+export type QueryGetPlaceGreetingArgs = {
+  options: GetPlaceGreetingInput;
 };
 
 
